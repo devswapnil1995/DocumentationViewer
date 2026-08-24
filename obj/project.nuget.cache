@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "tqskrRUzxE8=",
+  "success": true,
+  "projectFilePath": "D:\\Swapnil\\Projects\\TopicDemoApp\\DocumentationViewer\\DocumentationViewer.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Swapnil\\.nuget\\packages\\markdig\\1.3.2\\markdig.1.3.2.nupkg.sha512"
+  ],
+  "logs": []
+}
