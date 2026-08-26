@@ -111,12 +111,12 @@ For example, We have multiple payment method, but internally it is calling make 
 
 #### Two Types of polymorphism
 
-—> Compile time polymorphism (Method overloading)
+##### —> Compile time polymorphism (Method overloading)
 Same method name, different parameter. Compiler decide based on parameters which method should get execute. No need of inheritance in this.
 
 [https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverloadingExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverloadingExample.cs)
 
-—> Runtime polymorphism (Method overriding)
+##### —> Runtime polymorphism (Method overriding)
 The child class redefines method from parent class, basically we required inheritance here. Method name and signature should be same but implementation will be differ. We need to defined method with virtual keyword in parent class and use override in child class.
 
 [https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs)
@@ -127,7 +127,7 @@ The child class redefines method from parent class, basically we required inheri
 - Basically child class will get behavior of parent class.
 - Parent class should hold all common method/functionality, child/derived class can inherits it. This feature is called extensibility.
 
-Types of inheritance:
+##### Types of inheritance:
 
 1. Single Inheritance -  One parent, one child
  The `Dog` class **reuses** the `MakeSound()` method from `Animal`. This is **single inheritance** in action!
@@ -148,6 +148,7 @@ Types of inheritance:
 - An abstract class is declared using the `abstract` keyword.
 - Abstract method must be implemented in derived classes, with **abstract methods**, we enforce **mandatory implementation** in child classes.
 - We can create constructor of abstract class
+- We cannot use multiple abstract classes at same time
 
 Why abstract methods are important?
 
@@ -249,7 +250,7 @@ In C#, “static” means “relating to the type itself, rather than an instanc
 
 A constructor is a special method, which gets invoked when object of class created. It should be a same name as class name. It cannot have return type.
 
-Types of constructor:
+##### Types of constructor:
 
 - Default constructor - Takes no parameter
 - Parameterized constructor - Takes one or more parameter
@@ -273,7 +274,7 @@ Types of constructor:
         - It only allowed to access members in same class as well as in derived classes
         - It does not allowed outside from base and derived class
     - internal:
-        - Accesible in same assebly(project), not in referensed project/assemblies
+        - Accesible in same assembly(project), not in referenced project/assemblies
     - protected internal:
         - It is combination of protected and internal.
         - Members are assesible within same assembly and also by derived classes(even they are in different assembly)

@@ -8,7 +8,6 @@
 - Generics and Constraints
 - Delegates, Events, Func/Action/Predicate
 - Extension Methods
-- Exception Handling best practices (custom exceptions, `try/finally`, exception filters)
 - `Span<T>`, `Memory<T>` (performance-focused topics)
 - Init-only properties, required members (C# 11+)
 
@@ -413,7 +412,7 @@ In order to get rid of all the first steps, we can directly use Func, Action, or
 #### Scenario: Calculate salary
 
 ```csharp
-Func<Employee,decimal> calculateSalary=employee=> employee.BasicSalary+employee.Bonus;
+Func<Employee,decimal> calculateSalary = employee => employee.BasicSalary + employee.Bonus;
 ```
 
 Use it:
@@ -456,7 +455,7 @@ Think **`Func`**.
 #### Scenario: Is employee active?
 
 ```csharp
-Predicate<Employee> isActive=employee=>employee.IsActive;
+Predicate<Employee> isActive = employee => employee.IsActive;
 ```
 
 Result:
@@ -505,7 +504,7 @@ Think **`Predicate`**.
 #### Scenario: Log a message
 
 ```csharp
-Action<string> log= message => Console.WriteLine(message);
+Action<string> log = message => Console.WriteLine(message);
 ```
 
 Usage:
@@ -568,7 +567,7 @@ Func<T,bool>
 Example:
 
 ```csharp
-var activeEmployees=employees.Where(e=>e.IsActive);
+var activeEmployees = employees.Where(e => e.IsActive);
 ```
 
 Conceptually:
@@ -598,13 +597,13 @@ rather than explicitly declaring `Predicate<T>`.
 Suppose:
 
 ```csharp
-varemployees= ...
+var employees= ...
 ```
 
 You want only names:
 
 ```csharp
-var names=employees.Select(e=>e.Name);
+var names = employees.Select(e=>e.Name);
 ```
 
 `Select` needs something like:
@@ -679,13 +678,13 @@ voidProcessPayment(Paymentpayment,Action<Payment>notify)
 The caller decides what notification means:
 
 ```csharp
-ProcessPayment(payment,p=>SendEmail(p));
+ProcessPayment(payment,p => SendEmail(p));
 ```
 
 or:
 
 ```csharp
-ProcessPayment(payment,p=>SendSms(p));
+ProcessPayment(payment,p => SendSms(p));
 ```
 
 or:
@@ -703,7 +702,7 @@ This is a very practical use of `Action`.
 Suppose your system needs a reusable rule:
 
 ```csharp
-Predicate<Employee>canGetBonus=employee=>employee.PerformanceScore>=80;
+Predicate<Employee> canGetBonus = employee => employee.PerformanceScore >= 80;
 ```
 
 Then:
@@ -720,7 +719,7 @@ You can change the rule without changing the method that uses it.
 Another example:
 
 ```csharp
-Predicate<Product> isAvailable= product => product.Stock>0;
+Predicate<Product> isAvailable = product => product.Stock>0;
 ```
 
 ---
@@ -728,7 +727,7 @@ Predicate<Product> isAvailable= product => product.Stock>0;
 #### 9. Scenario: Calculation with multiple inputs → `Func`
 
 ```csharp
-Func<decimal,decimal,decimal> calculateTotal=(price,tax)=>price+tax;
+Func<decimal,decimal,decimal> calculateTotal=(price,tax) => price+tax;
 ```
 
 Usage:
@@ -838,3 +837,960 @@ Send email            → Action
 Log message           → Action
 Publish event         → Action
 ```
+
+## Extension Methods
+- In C#, an extension method is a special kind of static method that allows you to add new methods to an existing type (class, struct or interface) 
+without modifying its source code or creating a derived type. 
+- Extension methods are defined in a static class and are marked with the this keyword in their first parameter.
+```csharp
+public static class ClassName{
+    public static ReturnType MethodName(this TargetType obj, parameters){
+        // method body
+    }
+}
+```
+
+#### Key Points
+- Must be defined in a static class.
+- Must be declared as a static method.
+- The first parameter must use the this keyword to indicate the type being extended.
+- They provide additional functionality without altering the original type.
+- They are called like instance methods on the target type.
+
+#### Example 1: Extension Method on Built-in Type
+This example shows how to extend a built-in .NET type (string) with a custom method. 
+We will add a WordCount method to count the number of words in a string.
+
+#### Example 2: Extension Method on User-defined Class
+This example extends a user-defined class Student by adding a method PrintResult. 
+The method evaluates whether the student has passed or failed, without modifying the original Student class.
+
+#### Example 3: Extension Method on Interface
+In this example, we extend an interface ILogger. 
+By defining the LogError extension method, every class implementing ILogger automatically gains this additional functionality without needing to redefine it.
+
+#### Benefits
+- Add functionality without modifying original code.
+- Can extend sealed classes (e.g., string, DateTime).
+- Keep code clean and readable.
+- Useful in scenarios like LINQ queries and utility functions.
+
+#### Limitations
+- Cannot override existing methods.
+- Can lead to confusion if overused, especially with similar method names.
+- Extension methods are static methods defined inside a static class, with the first parameter marked using the this keyword.
+
+https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ExtensionMethodsExample.cs
+
+## `Span<T>`, `Memory<T>` (performance-focused topics)
+- Span<T> and Memory<T> are both zero/low-allocation ways to work with contiguous memory in .NET
+- They are especially useful when performance matters—parsing, serialization, networking, file processing, etc.
+- Span<T> is a lightweight, stack-only view over contiguous memory. I use it when I need high-performance synchronous processing while avoiding allocations and copying
+- Memory<T> provides a similar memory abstraction but isn't stack-only, so it can be stored on the heap and safely used across asynchronous operations. 
+- I can obtain a Span<T> from it for synchronous processing.
+
+###### contiguous
+- Data is stored next to each other in memory, without gaps.
+- Suppose an int takes 4 bytes.
+```csharpe
+    int[] numbers = { 10, 20, 30, 40 };
+```
+Conceptually, memory looks like:
+```csharpe
+Memory Address
+
+1000 → 10
+1004 → 20
+1008 → 30
+1012 → 40
+```
+The elements are next to each other: That's contiguous memory.
+┌──────┬──────┬──────┬──────┐
+│  10  │  20  │  30  │  40  │
+└──────┴──────┴──────┴──────┘
+ 1000   1004   1008   1012
+
+### 1. The problem with normal arrays
+
+Suppose you have:
+
+```csharp
+byte[] data = GetData();
+
+byte[] part1 = data[0..100];
+byte[] part2 = data[100..200];
+```
+
+Those slices create **new arrays and copy data**.
+
+If you're processing millions of messages, this can cause:
+
+* More memory allocations
+* More GC pressure
+* More CPU spent copying data
+
+Instead:
+
+```csharp
+Span<byte> part1 = data.AsSpan(0, 100);
+Span<byte> part2 = data.AsSpan(100, 100);
+```
+
+Now `part1` and `part2` are just **views over the original array**.
+
+No new byte array is created.
+
+---
+
+# 2. What exactly is `Span<T>`?
+
+Think of `Span<T>` as:
+
+> **A window/view over a continuous region of memory.**
+
+For example:
+
+```text
+Original array
+
+Index:   0   1   2   3   4   5   6   7   8   9
+         └─────────────── byte[] ─────────────────┘
+
+Span<int>
+             └───────┘
+             2       6
+```
+
+Example:
+
+```csharp
+int[] numbers = { 10, 20, 30, 40, 50 };
+
+Span<int> span = numbers.AsSpan(1, 3);
+
+Console.WriteLine(span[0]); // 20
+Console.WriteLine(span[1]); // 30
+Console.WriteLine(span[2]); // 40
+```
+
+The span doesn't own the data.
+
+It simply points to:
+
+```text
+numbers
+   ↓
+[10][20][30][40][50]
+     └──────────┘
+        Span
+```
+
+---
+
+# 3. The really important part: `Span<T>` is a `ref struct`
+
+This is where interviews often become interesting.
+
+```csharp
+Span<int>
+```
+
+is a `ref struct`.
+
+That means it has **stack-only lifetime restrictions**.
+
+For example, you generally cannot:
+
+```csharp
+class MyClass
+{
+    Span<int> span; // ❌
+}
+```
+
+And you cannot use `Span<T>` across an `await`:
+
+```csharp
+async Task Process()
+{
+    Span<byte> buffer = ...;
+
+    await SomethingAsync();
+
+    // ❌ span cannot survive across await
+}
+```
+
+Why?
+
+Because `Span<T>` can refer to memory whose lifetime is tied to the current stack frame.
+
+So .NET prevents it from escaping that safe lifetime.
+
+---
+
+# 4. Then what is `Memory<T>`?
+
+This is where `Memory<T>` becomes useful.
+
+Think:
+
+> `Span<T>` = synchronous/high-performance view
+> `Memory<T>` = heap-friendly view that can survive asynchronous operations
+
+Example:
+
+```csharp
+Memory<byte> memory = new byte[1000];
+```
+
+You can store it in a class:
+
+```csharp
+class BufferManager
+{
+    private Memory<byte> buffer;
+
+    public BufferManager()
+    {
+        buffer = new byte[1000];
+    }
+}
+```
+
+And you can use it with async code:
+
+```csharp
+async Task ProcessAsync(Memory<byte> memory)
+{
+    await SomeAsyncOperation();
+
+    Span<byte> span = memory.Span;
+
+    // Process span
+}
+```
+
+This is one of the biggest differences to remember.
+
+---
+
+# 5. `Span<T>` vs `Memory<T>`
+
+|                         | `Span<T>`            | `Memory<T>`          |
+| ----------------------- | -------------------- | -------------------- |
+| Type                    | `ref struct`         | `struct`             |
+| Stack-only restrictions | Yes                  | No                   |
+| Can be stored in class  | ❌                    | ✅                    |
+| Can cross `await`       | ❌                    | ✅                    |
+| Synchronous processing  | Excellent            | Excellent            |
+| Async processing        | Not directly         | Excellent            |
+| Allocation              | No allocation itself | No allocation itself |
+| Can access array        | Yes                  | Yes                  |
+| `.Span` property        | N/A                  | Yes                  |
+
+A very useful mental model:
+
+```text
+Memory<T>
+   │
+   │ .Span
+   ↓
+Span<T>
+```
+
+You can convert:
+
+```csharp
+Memory<byte> memory = new byte[1000];
+
+Span<byte> span = memory.Span;
+```
+
+---
+
+# 6. Example: parsing data
+
+Suppose you receive:
+
+```text
+"Swapnil,30,India"
+```
+
+You could do:
+
+```csharp
+string[] parts = input.Split(',');
+```
+
+But `Split()` creates strings/arrays.
+
+For performance-sensitive code, you can work with spans.
+
+Conceptually:
+
+```csharp
+ReadOnlySpan<char> span = input.AsSpan();
+
+int comma = span.IndexOf(',');
+
+ReadOnlySpan<char> name = span[..comma];
+```
+
+Now `name` is simply a view into the original string.
+
+No new string needs to be created just to identify that portion.
+
+---
+
+# 7. `ReadOnlySpan<T>`
+
+There is also:
+
+```csharp
+ReadOnlySpan<T>
+```
+
+Use it when you want to read memory but **not modify it**.
+
+For example:
+
+```csharp
+ReadOnlySpan<char> text = "Hello World".AsSpan();
+
+Console.WriteLine(text[0]);
+```
+
+You cannot do:
+
+```csharp
+text[0] = 'X'; // ❌
+```
+
+This is very useful for APIs:
+
+```csharp
+void Parse(ReadOnlySpan<char> input)
+{
+    // Read only
+}
+```
+
+You are telling the caller:
+
+> "Give me access to this memory, but I promise not to modify it."
+
+---
+
+# 8. A very important performance example
+
+Consider:
+
+```csharp
+string input = "123456789";
+```
+
+You want to process the first 3 characters.
+
+### Approach 1 — substring
+
+```csharp
+string value = input.Substring(0, 3);
+```
+
+Creates:
+
+```text
+new string
+   ↓
+"123"
+```
+
+### Approach 2 — span
+
+```csharp
+ReadOnlySpan<char> value = input.AsSpan(0, 3);
+```
+
+Conceptually:
+
+```text
+Original string
+
+"123456789"
+ └───┘
+ Span
+```
+
+No new string allocation just for the slice.
+
+This is why spans are popular in:
+
+* JSON parsing
+* HTTP processing
+* serialization
+* protocol parsing
+* database drivers
+* high-performance libraries
+
+---
+
+# 9. `stackalloc` + `Span<T>`
+
+Here's one of the coolest uses.
+
+Normally:
+
+```csharp
+byte[] buffer = new byte[256];
+```
+
+This allocates an array on the managed heap.
+
+With `Span<T>`:
+
+```csharp
+Span<byte> buffer = stackalloc byte[256];
+```
+
+The buffer is allocated on the **stack**.
+
+Conceptually:
+
+```text
+STACK
+┌───────────────────┐
+│ 256 bytes         │
+│                   │
+│ Span<byte> ───────┘
+└───────────────────┘
+```
+
+This can be extremely fast for small temporary buffers.
+
+But you shouldn't blindly use huge `stackalloc` allocations because stack space is limited.
+
+---
+
+# 10. Where `Memory<T>` shines
+
+Imagine a network operation.
+
+```csharp
+Memory<byte> buffer = new byte[4096];
+
+await stream.ReadAsync(buffer);
+```
+
+After the async operation:
+
+```csharp
+Span<byte> data = buffer.Span;
+
+Process(data);
+```
+
+This gives you a nice pattern:
+
+```text
+              Async world
+                  │
+                  ▼
+             Memory<byte>
+                  │
+                await
+                  │
+                  ▼
+            Memory<byte>
+                  │
+                .Span
+                  ▼
+             Span<byte>
+                  │
+                  ▼
+        High-performance processing
+```
+
+This is the pattern I would remember.
+
+---
+
+# 11. Important: Span doesn't automatically make code faster
+
+This is a common misconception.
+
+Using:
+
+```csharp
+Span<T>
+```
+
+doesn't magically make every operation faster.
+
+The performance advantage usually comes from:
+
+**avoiding unnecessary allocations and copies.**
+
+For example:
+
+```csharp
+var result = input.Substring(10, 20);
+```
+
+versus:
+
+```csharp
+var result = input.AsSpan(10, 20);
+```
+
+The second avoids creating a new string.
+
+But if your application doesn't have allocation/copying as a bottleneck, using spans everywhere can make the code unnecessarily complicated.
+
+---
+
+# 12. The easiest rule to remember
+
+Think of these four types like this:
+
+```text
+T[]
+ │
+ │ owns actual data
+ ▼
+Array
+
+
+Span<T>
+ │
+ │ temporary view
+ ▼
+Synchronous processing
+
+
+ReadOnlySpan<T>
+ │
+ │ temporary read-only view
+ ▼
+Synchronous read-only processing
+
+
+Memory<T>
+ │
+ │ longer-lived / async-friendly view
+ ▼
+Async processing
+```
+
+## Init-only properties
+- Init-only properties introduced in C# 9 are class or struct properties that can only be assigned during object initialization. 
+- Unlike standard set accessors, an init accessor restricts assignments to object initializers or constructors. 
+- This enforces immutability without using read-only fields.
+- These are features for controlling how objects are initialized, especially useful when you want objects to be immutable or require certain values when created.
+These are **C# features for controlling how objects are initialized**, especially useful when you want objects to be immutable or require certain values when created.
+
+They are related, but solve **different problems**.
+
+---
+
+### 1. `init`-only properties
+
+Normally, a property with `set` can be changed anytime:
+
+```csharp
+public class Employee
+{
+    public string Name { get; set; }
+}
+```
+
+So:
+
+```csharp
+var employee = new Employee
+{
+    Name = "Swapnil"
+};
+
+employee.Name = "Rahul"; // ✅ Allowed
+```
+
+With `init`:
+
+```csharp
+public class Employee
+{
+    public string Name { get; init; }
+}
+```
+
+Now:
+
+```csharp
+var employee = new Employee
+{
+    Name = "Swapnil"
+};
+```
+
+is allowed.
+
+But:
+
+```csharp
+employee.Name = "Rahul"; // ❌ Compilation error
+```
+
+### Think of `init` as:
+
+> **"You can set this property only while creating the object."**
+
+```text
+new Employee
+{
+    Name = "Swapnil"   ← ✅
+}
+
+employee.Name = ...   ← ❌
+```
+
+---
+
+### 2. Why was `init` introduced?
+
+Before `init`, you had a few options.
+
+### Option 1 — `set`
+
+```csharp
+public string Name { get; set; }
+```
+
+Easy, but mutable.
+
+### Option 2 — constructor
+
+```csharp
+public Employee(string name)
+{
+    Name = name;
+}
+
+public string Name { get; }
+```
+
+Then:
+
+```csharp
+var employee = new Employee("Swapnil");
+```
+
+This gives immutability, but constructors can become cumbersome when there are many properties.
+
+### `init` gives you both:
+
+```csharp
+var employee = new Employee
+{
+    Name = "Swapnil",
+    Department = "IT",
+    City = "Mumbai"
+};
+```
+
+while keeping them immutable afterward.
+
+---
+
+#### 3. `required` is a different concept
+
+Suppose:
+
+```csharp
+public class Employee
+{
+    public string Name { get; init; }
+    public string Department { get; init; }
+}
+```
+
+You can do:
+
+```csharp
+var employee = new Employee();
+```
+
+The compiler doesn't complain.
+
+But logically, an employee **must have a name**.
+
+That's where `required` comes in:
+
+```csharp
+public class Employee
+{
+    public required string Name { get; init; }
+
+    public string Department { get; init; }
+}
+```
+
+Now:
+
+```csharp
+var employee = new Employee
+{
+    Name = "Swapnil"
+};
+```
+
+✅ Good.
+
+But:
+
+```csharp
+var employee = new Employee();
+```
+
+❌ Compiler error.
+
+Because `Name` is required.
+
+---
+
+#### 4. `required` does NOT mean `init`
+
+This is extremely important.
+
+You can have:
+
+```csharp
+public required string Name { get; set; }
+```
+
+This means:
+
+> Name **must be provided during initialization**, but it can still be changed later.
+
+Example:
+
+```csharp
+var employee = new Employee
+{
+    Name = "Swapnil"
+};
+
+employee.Name = "Rahul"; // ✅
+```
+
+Because it has `set`.
+
+---
+
+You can combine them:
+
+```csharp
+public required string Name { get; init; }
+```
+
+Now:
+
+> Name **must be provided during initialization AND cannot be changed afterward.**
+
+```text
+required
+   ↓
+Must provide value
+
+init
+   ↓
+Cannot change after initialization
+```
+
+---
+
+#### 5. Compare all combinations
+
+| Declaration                           | Must provide? | Can change later? |
+| ------------------------------------- | ------------: | ----------------: |
+| `string Name { get; set; }`           |             ❌ |                 ✅ |
+| `string Name { get; init; }`          |             ❌ |                 ❌ |
+| `required string Name { get; set; }`  |             ✅ |                 ✅ |
+| `required string Name { get; init; }` |             ✅ |                 ❌ |
+
+This table is worth remembering for interviews.
+
+---
+
+#### 6. Real-world example
+
+Imagine an API request model:
+
+```csharp
+public class CreateEmployeeRequest
+{
+    public required string Name { get; init; }
+
+    public required string Email { get; init; }
+
+    public string? Department { get; init; }
+}
+```
+
+You can create:
+
+```csharp
+var request = new CreateEmployeeRequest
+{
+    Name = "Swapnil",
+    Email = "swapnil@example.com",
+    Department = "IT"
+};
+```
+
+But this:
+
+```csharp
+var request = new CreateEmployeeRequest
+{
+    Name = "Swapnil"
+};
+```
+
+fails because:
+
+```text
+Email
+  ↓
+required
+  ↓
+Missing
+  ↓
+❌ Compiler error
+```
+
+And after creation:
+
+```csharp
+request.Name = "Rahul";
+```
+
+also fails because:
+
+```text
+init
+ ↓
+Cannot modify after initialization
+```
+
+---
+
+#### 7. `required` is compile-time safety
+
+This is another important point.
+
+`required` doesn't automatically validate that the value is meaningful.
+
+For example:
+
+```csharp
+public required string Name { get; init; }
+```
+
+This satisfies the compiler:
+
+```csharp
+var employee = new Employee
+{
+    Name = ""
+};
+```
+
+The property was provided.
+
+But your application may still consider `""` invalid.
+
+So:
+
+```text
+required
+   ↓
+Compiler-level initialization requirement
+
+Validation
+   ↓
+Business/application-level correctness
+```
+
+They are different things.
+
+---
+
+#### 8. What about constructors?
+
+You can also use `required` with constructors.
+
+For example:
+
+```csharp
+public class Employee
+{
+    public required string Name { get; init; }
+
+    public Employee()
+    {
+    }
+}
+```
+
+The compiler still expects callers to initialize `Name`.
+
+You can also tell the compiler that a constructor initializes required members using:
+
+```csharp
+[SetsRequiredMembers]
+```
+
+This is more advanced and generally comes up when designing reusable libraries or constructors.
+
+---
+
+#### 9. The easiest way to remember
+
+Think about creating an employee:
+
+#### `set`
+
+> "You can change it whenever you want."
+
+```csharp
+Name { get; set; }
+```
+
+#### `init`
+
+> "Set it when creating the object, then it's locked."
+
+```csharp
+Name { get; init; }
+```
+
+#### `required`
+
+> "You are not allowed to create this object without providing it."
+
+```csharp
+required string Name
+```
+
+### Together
+
+```csharp
+public required string Name { get; init; }
+```
+
+means:
+
+> **"You MUST provide Name when creating the object, and once created, you CANNOT change it."**
+
+That's the core distinction you should know for a C#/.NET interview.
