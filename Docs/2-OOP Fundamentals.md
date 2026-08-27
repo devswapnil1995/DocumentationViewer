@@ -9,7 +9,9 @@
 - Composition vs Inheritance ("has-a" vs "is-a")
 - Boxing and Unboxing
 
-## **What is OOP?**
+---
+
+## What is OOP?
 
 - OPP is standing for object oriented programming.
 - In this programming, we follow the principle “DO NOT REPEAT”.
@@ -18,17 +20,18 @@
 
 ### Four Pillars:
 
-### 1. Abstraction:
+#### 1. Abstraction:
 
 - It is used to display only necessary and essentials feature of object to other classes.
 - Abstraction is process of hiding the implementation details from user, only functionality provided to user.
 - In other word, user will have information **what** object does instead of **how** it does.
 - It allow us to hide unnecessary details and expose only what’s needed.
 E.g.
+```csharp
+    Console.WriteLine(); // We just call this method we never care about how it is working internally
+```
 
-`Console.WriteLine(); // We just call this method we never care about how it is working internally`
-
-Abstraction is “To represent the essential feature without representing the background details.”
+> Abstraction is “To represent the essential feature without representing the background details.”
 
 1. While driving car, we don’t care how engine works
 2. While using TV remote, we don’t care how it is working internally
@@ -39,7 +42,7 @@ To achieve abstraction we can use:
 1. Abstract Class
 2. Interface
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs)
+[Click here for Abstraction Encapsulation BasicExample](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs)
 
 ### 2. Encapsulation
 
@@ -54,7 +57,7 @@ For example, think about a bank account system. You don’t want anyone to chang
 2. It make your code clean - you control how data can accessed
 3. It prevents accidental modification - Only allowed methods can change values
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs)
+[Click here for Abstraction Encapsulation BasicExample](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs)
 
 We use access specifiers to achieve encapsulation
 
@@ -112,14 +115,14 @@ For example, We have multiple payment method, but internally it is calling make 
 #### Two Types of polymorphism
 
 ##### —> Compile time polymorphism (Method overloading)
-Same method name, different parameter. Compiler decide based on parameters which method should get execute. No need of inheritance in this.
+> Same method name, different parameter. Compiler decide based on parameters which method should get execute. No need of inheritance in this.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverloadingExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverloadingExample.cs)
+[Click here for Method overloading Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverloadingExample.cs)
 
 ##### —> Runtime polymorphism (Method overriding)
-The child class redefines method from parent class, basically we required inheritance here. Method name and signature should be same but implementation will be differ. We need to defined method with virtual keyword in parent class and use override in child class.
+> The child class redefines method from parent class, basically we required inheritance here. Method name and signature should be same but implementation will be differ. We need to defined method with virtual keyword in parent class and use override in child class.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs)
+[Click here for Method overriding Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs)
 
 ### 4. Inheritance
 
@@ -137,7 +140,9 @@ The child class redefines method from parent class, basically we required inheri
  One parent (`Animal`), multiple children (`Dog` and `Bird`).
 4. Multiple inheritance - we need interfaces to achieve this
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InheritanceExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InheritanceExample.cs)
+[Click here for Inheritance Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InheritanceExample.cs)
+
+---
 
 ## Abstract Class vs Interface
 
@@ -158,7 +163,7 @@ Why abstract methods are important?
 - Encourage polymorphism -  Method behave differently, based on object type
 - Abstract methods are rules for derived classes, they ensures that every subclasses implement a method in its own way.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractClassExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractClassExample.cs)
+[Click here for Abstract Class Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractClassExample.cs)
 
 ### Interface:
 
@@ -171,7 +176,8 @@ Why abstract methods are important?
 - They promote loose coupling, making code easier to maintain and test.
 - No constructor
 - We use interfaces in depedency injection as well, as there is no constructor there will be no dependency of initialization
-- C# 8 introduced default interface methods, allowing interfaces to contain method implementations primarily so interfaces can evolve without breaking existing implementations.
+
+> **C# 8 introduced default interface methods, allowing interfaces to contain method implementations primarily so interfaces can evolve without breaking existing implementations.**
 
 #### Type of interface:
 
@@ -184,7 +190,7 @@ Why abstract methods are important?
 4. Explicit Interface Implementation (Avoiding Naming Conflicts)
     - When a class implements **multiple interfaces with the same method name**, explicit interface implementation helps!
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InterfaceExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InterfaceExample.cs)
+[Click here for Interface Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InterfaceExample.cs)
 
 #### Use Abstract Classes When:
 
@@ -198,6 +204,7 @@ Why abstract methods are important?
 - You want to support multiple inheritance (C# doesn’t support multiple base classes).
 - You need to ensure different classes follow the same method structure.
 
+---
 ## Sealed Class & Method
 
 - When you **seal** a class, you **prevent other classes from inheriting it**. This ensures that no one can modify or extend its functionality, keeping it **secure and stable**.
@@ -213,7 +220,7 @@ Why abstract methods are important?
     - Use sealed inheritance to improve performance.
 - **One interview trap:** A `sealed` method does **not** mean the class cannot be inherited. It only prevents that particular virtual method from being overridden further.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SealedClassMethodExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SealedClassMethodExample.cs)
+[Click here for Sealed Class/Method Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SealedClassMethodExample.cs)
 
 | `sealed class` | `sealed method` |
 | --- | --- |
@@ -223,7 +230,9 @@ Why abstract methods are important?
 | No class can derive from it | Derived classes can still inherit the class |
 | Stops the inheritance chain | Stops the override chain |
 
-## **Static Method And Instance**
+---
+
+## Static Method And Instance
 
 In C#, “static” means “relating to the type itself, rather than an instance of the type”. You access a static member using the type name instead of a reference or a value e.g  [`Guid.New](http://Guid.New)Guid()`
 
@@ -237,7 +246,7 @@ In C#, “static” means “relating to the type itself, rather than an instanc
 - Static methods are normally faster to invoke on call stack than instance method
 - Instance methods actually use the ‘this’ instance pointer as the first parameter, so an instance method will always have that overhead.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/StaticVsInstanceExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/StaticVsInstanceExample.cs)
+[Click here for Static vs Instance Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/StaticVsInstanceExample.cs)
 
 | **Static Method** | **Non Static Method** |
 | --- | --- |
@@ -246,6 +255,7 @@ In C#, “static” means “relating to the type itself, rather than an instanc
 | 3. We can’t use this keyword inside the Static Method | 3. We can use thiskeyword inside Non Static Method |
 | 4. Static Method uses the memory of Class | 4. Non Static Method uses a memory of an object |
 
+---
 ## Constructor
 
 A constructor is a special method, which gets invoked when object of class created. It should be a same name as class name. It cannot have return type.
@@ -257,9 +267,10 @@ A constructor is a special method, which gets invoked when object of class creat
 - Copy constructor - Creates copy of existing object
 - Static constructor - If we have static members, to instantiate static member class
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ConstructorExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ConstructorExample.cs)
+[Click here for Constructor Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ConstructorExample.cs)
 
-## **Access Modifiers**
+---
+## Access Modifiers
 
 - Access modifiers help for data hiding.
 - Access modfiers defines scope and visiblity of classes, methods, fields, contructor and other members. They defined where and how member can accessed in program.
@@ -286,15 +297,16 @@ A constructor is a special method, which gets invoked when object of class creat
 - The default accessibility for the top-level types (that are not nested in other types, can only have public or internal accessibility) is internal.
 - If no access modifier is specified for a member declaration, then the default accessibility is used based on the context.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AccessModifiersExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AccessModifiersExample.cs)
+[Click here for Access Modifiers Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AccessModifiersExample.cs)
 
+---
 ## Composition
 
-- Composition is design principle where one class contain an instance of another class as private member creating “has-a” relationship. (Inheritance creates “Is-a”)
+- Composition is design principle where one class contain an instance of another class as private member creating **“has-a”** relationship. (Inheritance creates “Is-a”)
 - It helps in encapsulation
 - Composition in C# creates a strong ownership relationship where the contained object cannot exist independently of its container. This design principle promotes encapsulation and provides better control over object lifecycles, making it ideal for scenarios where components are integral parts of a whole system.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/CompositionExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/CompositionExample.cs)
+[Click here for Composition Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/CompositionExample.cs)
 
 - I generally prefer composition over inheritance because composition gives lower coupling, better flexibility, and allows behaviors to be changed independently. I use inheritance when there's a genuine is-a relationship and I need polymorphism—for example, Developer and Manager being Employees. I avoid inheritance just for code reuse because it creates a strong dependency on the base class and can lead to fragile hierarchies. So my default is composition, but I choose based on the domain relationship and whether polymorphism is actually needed
 
@@ -311,23 +323,25 @@ A constructor is a special method, which gets invoked when object of class creat
 | Typical example | `Dog : Animal` | `Car has Engine` |
 | Best for | Stable hierarchy | Changeable behavior |
 
-## **Boxing And Unboxing**
+---
+## Boxing And Unboxing
 
-### **Boxing**
+### Boxing
 
 - The process of converting a [**Value Type**](https://www.geeksforgeeks.org/c-sharp/c-sharp-data-types/) variable (char, int etc.) to a [**Reference Type**](https://www.geeksforgeeks.org/c-sharp/c-sharp-data-types/) variable (object) is called Boxing.
 - Boxing is an implicit conversion process where a value type is wrapped inside an object instance and stored on the heap.
 - Value-type variables are generally stored on the stack when they are local variables. When they are fields within a reference type, they are part of the heap-allocated memory for the reference type.
 - Reference type variables store memory addresses (references) on the stack, while their actual data is stored on the heap (except in some optimizations like String Interning).
 
-### **UnBoxing**
+### UnBoxing
 
 - Unboxing is the process of explicitly converting a boxed object back into its original value type. It is an explicit conversion process. We can also say that the reverse process of boxing.
 
-> *int num = 23;         // value type is int and assigned value 23
-Object Obj = num;    // Boxing
-int i = (int)Obj;    // Unboxing*
-> 
+```csharp
+    int num = 23;         // value type is int and assigned value 23
+    Object Obj = num;    // Boxing
+    int i = (int)Obj;    // Unboxing*
+```
 - In unboxing first we create a Value Type integer i to unbox the value from obj. Unboxing requires explicit casting. The object must contain a valid boxed value of the correct type, or an InvalidCastException will be thrown.
 
 Why we required boxing and unboxing:
@@ -336,4 +350,4 @@ Why we required boxing and unboxing:
 - Boxing is needed when a value type needs to be treated as an object or another reference-type representation, because `object` can represent any C# type. Boxing copies the value into an object on the heap.
 - Unboxing retrieves the value type from that boxed object using an explicit cast. We see this mainly with APIs that accept `object`, non-generic collections, interfaces, and some reflection scenarios. In modern C#, we generally avoid unnecessary boxing because it can create allocations and impact performance, which is one reason generics such as `List<int>` are preferred.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/BoxingUnboxingExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/BoxingUnboxingExample.cs)
+[Click here for Boxing and Unboxing Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/BoxingUnboxingExample.cs)

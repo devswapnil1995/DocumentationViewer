@@ -33,17 +33,13 @@
 
 ## ref, out, in parameters
 
-`ref`, `out`, and `in` are all about **passing arguments by reference**, but they have different contracts.
+> `ref`, `out`, and `in` are all about **passing arguments by reference**, but they have different contracts.
 
 The easiest interview mental model is:
 
-> **`ref` = read + write**
-> 
-> 
-> **`out` = write only / must be assigned**
-> 
-> **`in` = read only**
-> 
+**`ref` = read + write**
+**`out` = write only / must be assigned**
+**`in` = read only** 
 
 ### ref:
 
@@ -85,9 +81,11 @@ The easiest interview mental model is:
            ref                   out                  in
 ```
 
-`ref` is for an existing value that the method needs to read and modify. `out` is for a value that the method is responsible for producing, commonly used in Try-pattern APIs such as `TryParse`. `in` is for read-only reference access, mainly when working with larger value types where avoiding a copy is beneficial. In normal cases, I prefer regular parameters and return values because they're simpler and clearer.
+> `ref` is for an existing value that the method needs to read and modify. `out` is for a value that the method is responsible for producing, commonly used in Try-pattern APIs such as `TryParse`. `in` is for read-only reference access, mainly when working with larger value types where avoiding a copy is beneficial. In normal cases, I prefer regular parameters and return values because they're simpler and clearer.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/RefOutInExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/RefOutInExample.cs)
+[Take me to github for Ref-Out-In Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/RefOutInExample.cs)
+
+---
 
 ## Nullable Reference Types
 
@@ -97,11 +95,13 @@ The easiest interview mental model is:
 - You can also use Nullable type instead of a reference type to store a null value.
 - You cannot directly access the value of the Nullable type. You have to use GetValueOrDefault() method to get an original assigned value if it is not null. You will get the default value if it is null. The default value for null will be zero.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/NullableReferenceTypesExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/NullableReferenceTypesExample.cs)
+[Take me to github for Nullable Reference Types Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/NullableReferenceTypesExample.cs)
+
+---
 
 ## record vs class vs struct
 
-```
+```text
                      C# Types
                         │
           ┌─────────────┴─────────────┐
@@ -163,9 +163,11 @@ use a **class for identity**, a **record for data/value-oriented reference types
 | **`record`** | Data/value-oriented object where **value equality** is useful; often immutable | DTOs, API responses, commands, events |
 | **`record struct`** | Small value type where you also want **record-style value equality / `with`** | `Money`, `Point`, `Coordinate` |
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/TypeKindsExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/TypeKindsExample.cs)
+[Take me to github for Type Kinds Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/TypeKindsExample.cs)
 
-## **Switch Expression**
+---
+
+## Switch Expression
 
 - Switch expression in c# introduced after .NET 10
 - They are a more concise, readable and expressive way to handle multiple conditional branches compared to the traditional switch statement.
@@ -184,17 +186,18 @@ It differs from the traditional switch statement in the following ways:
 - When using pattern matching for cleaner and more readable code.
 - When you want to avoid fall-through bugs common in switch statements.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SwitchExpressionExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SwitchExpressionExample.cs)
+[Take me to github for Switch Expression Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SwitchExpressionExample.cs)
 
-## **Generic Constraints**
+## Generic Constraints
 
-- In C#, Generics allow classes, methods, interfaces and delegates to work with any data type. However, sometimes you may want to restrict the type of arguments that can be passed to a generic type. This is where constraints come in.
+- In C#, Generics allow classes, methods, interfaces and delegates to work with any data type. 
+- However, sometimes you may want to restrict the type of arguments that can be passed to a generic type. This is where constraints come in.
 - Generic constraints specify requirements for the type parameters in generics, ensuring only suitable types are used.
 
 ```csharp
-*class ClassName<T> where T : constraint{
-// members using T
-}*
+class ClassName<T> where T : constraint{
+    // members using T
+}
 ```
 
 **Why Use Constraints**
@@ -204,9 +207,9 @@ Without constraints, a generic type can accept any type. Constraints help in:
 2. **Enabling functionality:** Allow use of certain members or constructors of the type parameter.
 3. **Improving type safety:** Prevent invalid type substitutions at compile-time.
 
-### **Types of Constraints in C#**
+### Types of Constraints in C#
 
-#### **1. where T : struct**
+#### 1. where T : struct
 
 - Restricts T to value types (like int, double, bool, or user-defined struct).
 - Cannot be null.
@@ -220,9 +223,9 @@ class ValueContainer<T> where T : struct
 ```
 
 > *Use this when you want to ensure the generic type is always a non-nullable value type.*
-> 
 
-#### **2. where T : class**
+
+#### 2. where T : class
 
 - Restricts T to reference types (class, interface, delegate, array).
 - Allows null values.
@@ -235,9 +238,9 @@ class ReferenceContainer<T> where T : class
 ```
 
 > *Useful when designing classes that should work only with objects and not primitive/value types.*
-> 
+ 
 
-#### **3. where T : new()**
+#### 3. where T : new()
 
 - Restricts T to types that have a public parameterless constructor.
 - Must appear last when combining multiple constraints.
@@ -253,9 +256,9 @@ class Factory<T> where T : new()
 ```
 
 > *Helpful when you want to instantiate objects of type T inside the generic class.*
-> 
+ 
 
-#### **4. where T : BaseClassName**
+#### 4. where T : BaseClassName
 
 - Restricts T to types that inherit from a specific base class.
 - Allows access to members of the base class inside the generic class.
@@ -272,7 +275,7 @@ class AnimalContainer<T> where T : Animal
 
 Ensures only classes derived from Animal (like Dog) can be used as type arguments.
 
-#### **5. where T : InterfaceName**
+#### 5. where T : InterfaceName
 
 - Restricts T to types that implement a specific interface.
 - Enables calling interface methods on the generic parameter.
@@ -294,7 +297,7 @@ class ShapeContainer<T> where T : IShape
 
 Ensures all type arguments follow a specific contract.
 
-#### **6. Multiple Constraints**
+#### 6. Multiple Constraints
 
 - More than one constraint can be applied using a comma.
 - **Example:** Restrict T to be a reference type and must have a parameterless constructor.
@@ -311,7 +314,7 @@ class Sample<T> where T : class, new()
 
 Common in factory patterns where you want reference types that can be instantiated.
 
-#### **7. Constraints on Multiple Type Parameters**
+#### 7. Constraints on Multiple Type Parameters
 
 Each type parameter can have its own constraint.
 
@@ -327,7 +330,9 @@ class Sample<T1, T2>
 
 Ensures fine-grained control when working with multiple generics.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/GenericConstraintsExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/GenericConstraintsExample.cs)
+[Take me to github for Generic Constraints Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/GenericConstraintsExample.cs)
+
+---
 
 ## Delegates, Events, Func/Action/Predicate
 
@@ -346,7 +351,7 @@ Ensures fine-grained control when working with multiple generics.
 - For functional-style programming with LINQ and lambdas.
 
 ```csharp
-*[modifier] delegate [return_type] [delegate_name]([parameter_list]);*
+  [modifier] delegate [return_type] [delegate_name]([parameter_list]);
 ```
 
 - **modifier:** Defines the accessibility of the delegate (public, private, internal, etc.). It is optional.
@@ -366,7 +371,7 @@ Delegates can reference multiple methods at once using the + or += operator. Suc
 - '+' or '+=' Operator is used to add the methods to delegates.
 - '–' or '-=' Operator is used to remove the methods from the delegates list.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/DelegateExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/DelegateExample.cs)
+[Take me to github for Delegate Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/DelegateExample.cs)
 
 ### Events:
 
@@ -393,7 +398,7 @@ An event handler is a method that responds to an event. It contains the code to 
 - Events promote encapsulation because they can only be raised by the declaring class or its derived classes (typically through protected methods).
 - Multiple subscribers can listen to the same event.
 
-[https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/EventExample.cs](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/EventExample.cs)
+[Take me to github for Event Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/EventExample.cs)
 
 In order to get rid of all the first steps, we can directly use Func, Action, or Predicate delegates.
 
@@ -418,7 +423,7 @@ Func<Employee,decimal> calculateSalary = employee => employee.BasicSalary + empl
 Use it:
 
 ```csharp
-decimal salary=calculateSalary(employee);
+decimal salary = calculateSalary(employee);
 ```
 
 Think:
@@ -443,10 +448,7 @@ Product → product name
 
 Whenever your question is:
 
-> **"Give me something back."**
-> 
-
-Think **`Func`**.
+> **"Give me something back."** Think **`Func`**.
 
 ---
 
@@ -461,27 +463,15 @@ Predicate<Employee> isActive = employee => employee.IsActive;
 Result:
 
 ```csharp
-bool result=isActive(employee);
+bool result = isActive(employee);
 ```
 
 You get:
-
 ```
 true / false
 ```
 
-Think:
-
-```
-Employee
-   ↓
-Predicate
-   ↓
-Yes / No
-```
-
 ### Other scenarios
-
 ```
 Is user logged in?
 Is order valid?
@@ -493,7 +483,6 @@ Is number even?
 Whenever your question is:
 
 > **"Is this true?"**
-> 
 
 Think **`Predicate`**.
 
@@ -510,20 +499,10 @@ Action<string> log = message => Console.WriteLine(message);
 Usage:
 
 ```csharp
-log("Order completed");
+ log("Order completed");
 ```
 
 There is no return value.
-
-Think:
-
-```
-Message
-   ↓
-Action
-   ↓
-DO SOMETHING
-```
 
 ### Other scenarios
 
@@ -540,7 +519,6 @@ Notify user
 Whenever your question is:
 
 > **"Perform this operation."**
-> 
 
 Think **`Action`**.
 
@@ -556,12 +534,10 @@ You might think:
 Predicate<Employee>
 ```
 
-is always used for filtering.
-
-But LINQ's `Where()` actually expects a:
+is always used for filtering. But LINQ's `Where()` actually expects a:
 
 ```csharp
-Func<T,bool>
+    Func<T,bool>
 ```
 
 Example:
@@ -571,7 +547,6 @@ var activeEmployees = employees.Where(e => e.IsActive);
 ```
 
 Conceptually:
-
 ```
 Employee
    ↓
@@ -614,28 +589,15 @@ Func<Employee,string>
 
 Meaning:
 
-```
+```text
 Employee → string
 ```
 
 So:
 
-```
+```csharp
 e=>e.Name
 ```
-
-is a `Func`.
-
-### Think:
-
-```
-Select
-   ↓
-Transform
-   ↓
-Func
-```
-
 ---
 
 #### 6. Scenario: Logging → `Action`
@@ -662,7 +624,6 @@ Because the method doesn't need a result from the logger.
 It just says:
 
 > "Do something with this message."
-> 
 
 ---
 
@@ -733,7 +694,7 @@ Func<decimal,decimal,decimal> calculateTotal=(price,tax) => price+tax;
 Usage:
 
 ```csharp
-vartotal=calculateTotal(1000,180);
+var total=calculateTotal(1000,180);
 ```
 
 Think:
@@ -773,7 +734,7 @@ Therefore:
 These can look almost identical:
 
 ```csharp
-Predicate<int> p= x => x >10;
+Predicate<int> p = x => x >10;
 ```
 
 and:
@@ -793,13 +754,13 @@ So which should you use?
 #### Use `Predicate<T>` when you're explicitly modeling a predicate/condition:
 
 ```csharp
-Predicate<User> isAdmin =user => user.Role =="Admin";
+Predicate<User> isAdmin = user => user.Role =="Admin";
 ```
 
 #### Use `Func<T,bool>` when working with APIs that expect `Func`, especially LINQ:
 
 ```csharp
-users.Where(user=>user.IsActive);
+users.Where(user => user.IsActive);
 ```
 
 In practice, you'll encounter **`Func<T,bool>` much more frequently in LINQ**.
@@ -838,12 +799,15 @@ Log message           → Action
 Publish event         → Action
 ```
 
+---
+
 ## Extension Methods
 - In C#, an extension method is a special kind of static method that allows you to add new methods to an existing type (class, struct or interface) 
 without modifying its source code or creating a derived type. 
 - Extension methods are defined in a static class and are marked with the this keyword in their first parameter.
+
 ```csharp
-public static class ClassName{
+public static class ClassName {
     public static ReturnType MethodName(this TargetType obj, parameters){
         // method body
     }
@@ -880,7 +844,9 @@ By defining the LogError extension method, every class implementing ILogger auto
 - Can lead to confusion if overused, especially with similar method names.
 - Extension methods are static methods defined inside a static class, with the first parameter marked using the this keyword.
 
-https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ExtensionMethodsExample.cs
+["Take me to github for Extension Methods Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ExtensionMethodsExample.cs)
+
+---
 
 ## `Span<T>`, `Memory<T>` (performance-focused topics)
 - Span<T> and Memory<T> are both zero/low-allocation ways to work with contiguous memory in .NET
@@ -910,7 +876,7 @@ The elements are next to each other: That's contiguous memory.
 └──────┴──────┴──────┴──────┘
  1000   1004   1008   1012
 
-### 1. The problem with normal arrays
+### The problem with normal arrays
 
 Suppose you have:
 
@@ -942,11 +908,9 @@ No new byte array is created.
 
 ---
 
-# 2. What exactly is `Span<T>`?
+### What exactly is `Span<T>`?
 
-Think of `Span<T>` as:
-
-> **A window/view over a continuous region of memory.**
+> ** `Span<T>` is a window/view over a continuous region of memory.**
 
 For example:
 
@@ -987,7 +951,7 @@ numbers
 
 ---
 
-# 3. The really important part: `Span<T>` is a `ref struct`
+### The really important part: `Span<T>` is a `ref struct`
 
 This is where interviews often become interesting.
 
@@ -1023,13 +987,11 @@ async Task Process()
 
 Why?
 
-Because `Span<T>` can refer to memory whose lifetime is tied to the current stack frame.
-
-So .NET prevents it from escaping that safe lifetime.
+Because `Span<T>` can refer to memory whose lifetime is tied to the current stack frame. So .NET prevents it from escaping that safe lifetime.
 
 ---
 
-# 4. Then what is `Memory<T>`?
+### Then what is `Memory<T>`?
 
 This is where `Memory<T>` becomes useful.
 
@@ -1064,9 +1026,7 @@ And you can use it with async code:
 async Task ProcessAsync(Memory<byte> memory)
 {
     await SomeAsyncOperation();
-
     Span<byte> span = memory.Span;
-
     // Process span
 }
 ```
@@ -1075,7 +1035,7 @@ This is one of the biggest differences to remember.
 
 ---
 
-# 5. `Span<T>` vs `Memory<T>`
+### `Span<T>` vs `Memory<T>`
 
 |                         | `Span<T>`            | `Memory<T>`          |
 | ----------------------- | -------------------- | -------------------- |
@@ -1109,7 +1069,7 @@ Span<byte> span = memory.Span;
 
 ---
 
-# 6. Example: parsing data
+### Example: parsing data
 
 Suppose you receive:
 
@@ -1123,27 +1083,21 @@ You could do:
 string[] parts = input.Split(',');
 ```
 
-But `Split()` creates strings/arrays.
-
-For performance-sensitive code, you can work with spans.
+But `Split()` creates strings/arrays. For performance-sensitive code, you can work with spans.
 
 Conceptually:
 
 ```csharp
 ReadOnlySpan<char> span = input.AsSpan();
-
 int comma = span.IndexOf(',');
-
 ReadOnlySpan<char> name = span[..comma];
 ```
 
-Now `name` is simply a view into the original string.
-
-No new string needs to be created just to identify that portion.
+Now `name` is simply a view into the original string. No new string needs to be created just to identify that portion.
 
 ---
 
-# 7. `ReadOnlySpan<T>`
+### `ReadOnlySpan<T>`
 
 There is also:
 
@@ -1153,11 +1107,8 @@ ReadOnlySpan<T>
 
 Use it when you want to read memory but **not modify it**.
 
-For example:
-
 ```csharp
 ReadOnlySpan<char> text = "Hello World".AsSpan();
-
 Console.WriteLine(text[0]);
 ```
 
@@ -1182,7 +1133,7 @@ You are telling the caller:
 
 ---
 
-# 8. A very important performance example
+### A very important performance example
 
 Consider:
 
@@ -1235,50 +1186,12 @@ This is why spans are popular in:
 
 ---
 
-# 9. `stackalloc` + `Span<T>`
-
-Here's one of the coolest uses.
-
-Normally:
-
-```csharp
-byte[] buffer = new byte[256];
-```
-
-This allocates an array on the managed heap.
-
-With `Span<T>`:
-
-```csharp
-Span<byte> buffer = stackalloc byte[256];
-```
-
-The buffer is allocated on the **stack**.
-
-Conceptually:
-
-```text
-STACK
-┌───────────────────┐
-│ 256 bytes         │
-│                   │
-│ Span<byte> ───────┘
-└───────────────────┘
-```
-
-This can be extremely fast for small temporary buffers.
-
-But you shouldn't blindly use huge `stackalloc` allocations because stack space is limited.
-
----
-
-# 10. Where `Memory<T>` shines
+### Where `Memory<T>` shines
 
 Imagine a network operation.
 
 ```csharp
 Memory<byte> buffer = new byte[4096];
-
 await stream.ReadAsync(buffer);
 ```
 
@@ -1286,7 +1199,6 @@ After the async operation:
 
 ```csharp
 Span<byte> data = buffer.Span;
-
 Process(data);
 ```
 
@@ -1315,7 +1227,7 @@ This is the pattern I would remember.
 
 ---
 
-# 11. Important: Span doesn't automatically make code faster
+### Important: Span doesn't automatically make code faster
 
 This is a common misconception.
 
@@ -1325,9 +1237,7 @@ Using:
 Span<T>
 ```
 
-doesn't magically make every operation faster.
-
-The performance advantage usually comes from:
+doesn't magically make every operation faster. The performance advantage usually comes from:
 
 **avoiding unnecessary allocations and copies.**
 
@@ -1343,13 +1253,11 @@ versus:
 var result = input.AsSpan(10, 20);
 ```
 
-The second avoids creating a new string.
-
-But if your application doesn't have allocation/copying as a bottleneck, using spans everywhere can make the code unnecessarily complicated.
+The second avoids creating a new string. But if your application doesn't have allocation/copying as a bottleneck, using spans everywhere can make the code unnecessarily complicated.
 
 ---
 
-# 12. The easiest rule to remember
+### The easiest rule to remember
 
 Think of these four types like this:
 
@@ -1382,6 +1290,8 @@ Memory<T>
 Async processing
 ```
 
+---
+
 ## Init-only properties
 - Init-only properties introduced in C# 9 are class or struct properties that can only be assigned during object initialization. 
 - Unlike standard set accessors, an init accessor restricts assignments to object initializers or constructors. 
@@ -1393,7 +1303,7 @@ They are related, but solve **different problems**.
 
 ---
 
-### 1. `init`-only properties
+### `init`-only properties
 
 Normally, a property with `set` can be changed anytime:
 
@@ -1456,7 +1366,7 @@ employee.Name = ...   ← ❌
 
 ---
 
-### 2. Why was `init` introduced?
+### Why was `init` introduced?
 
 Before `init`, you had a few options.
 
@@ -1502,7 +1412,7 @@ while keeping them immutable afterward.
 
 ---
 
-#### 3. `required` is a different concept
+#### `required` is a different concept
 
 Suppose:
 
@@ -1520,10 +1430,7 @@ You can do:
 var employee = new Employee();
 ```
 
-The compiler doesn't complain.
-
-But logically, an employee **must have a name**.
-
+The compiler doesn't complain. But logically, an employee **must have a name**.
 That's where `required` comes in:
 
 ```csharp
@@ -1558,7 +1465,7 @@ Because `Name` is required.
 
 ---
 
-#### 4. `required` does NOT mean `init`
+#### `required` does NOT mean `init`
 
 This is extremely important.
 
@@ -1609,7 +1516,7 @@ Cannot change after initialization
 
 ---
 
-#### 5. Compare all combinations
+#### Compare all combinations
 
 | Declaration                           | Must provide? | Can change later? |
 | ------------------------------------- | ------------: | ----------------: |
@@ -1622,7 +1529,7 @@ This table is worth remembering for interviews.
 
 ---
 
-#### 6. Real-world example
+#### Real-world example
 
 Imagine an API request model:
 
@@ -1684,78 +1591,7 @@ Cannot modify after initialization
 ```
 
 ---
-
-#### 7. `required` is compile-time safety
-
-This is another important point.
-
-`required` doesn't automatically validate that the value is meaningful.
-
-For example:
-
-```csharp
-public required string Name { get; init; }
-```
-
-This satisfies the compiler:
-
-```csharp
-var employee = new Employee
-{
-    Name = ""
-};
-```
-
-The property was provided.
-
-But your application may still consider `""` invalid.
-
-So:
-
-```text
-required
-   ↓
-Compiler-level initialization requirement
-
-Validation
-   ↓
-Business/application-level correctness
-```
-
-They are different things.
-
----
-
-#### 8. What about constructors?
-
-You can also use `required` with constructors.
-
-For example:
-
-```csharp
-public class Employee
-{
-    public required string Name { get; init; }
-
-    public Employee()
-    {
-    }
-}
-```
-
-The compiler still expects callers to initialize `Name`.
-
-You can also tell the compiler that a constructor initializes required members using:
-
-```csharp
-[SetsRequiredMembers]
-```
-
-This is more advanced and generally comes up when designing reusable libraries or constructors.
-
----
-
-#### 9. The easiest way to remember
+#### The easiest way to remember
 
 Think about creating an employee:
 
