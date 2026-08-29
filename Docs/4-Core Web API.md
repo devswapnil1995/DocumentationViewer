@@ -1,6 +1,4 @@
-﻿# ASP.NET Core Web API
-
-- Request Pipeline overview & Middleware
+﻿- Request Pipeline overview & Middleware
 - Routing (attribute routing, conventional routing)
 - Filters: Action, Exception, Authorization, Resource, Result filters
 - Dependency Injection lifetimes: Transient, Scoped, Singleton
@@ -12,6 +10,9 @@
 - Health Checks
 - Exception Handling (global exception middleware, ProblemDetails)
 - CORS
+
+------------------------
+------------------------
 
 ## What is API?
 - API is stands for Application Programming Interface
@@ -25,18 +26,20 @@
 - Internal APIs(Private): Used within organisation
 - Composite API: Combine multiple data or service APIs
 
+------------------------
+------------------------
 
 ## Request Pipeline overview & Middleware
 
-> **The journey an HTTP request takes through your application before a response comes back.**
+> The journey an HTTP request takes through your application before a response comes back.
 
-> "The ASP.NET Core request pipeline is a sequence of middleware components through which every HTTP request and response passes.
+> The ASP.NET Core request pipeline is a sequence of middleware components through which every HTTP request and response passes.
 Middleware can inspect or modify the request/response and can either handle the request or call the next middleware.
 Typical middleware includes exception handling, HTTPS redirection, static files, routing, authentication, authorization, and endpoint execution.
-The order is important because middleware wraps subsequent middleware, so the request flows forward and the response flows back through the pipeline."
+The order is important because middleware wraps subsequent middleware, so the request flows forward and the response flows back through the pipeline.
 
 
-### Big picture
+**Big picture**
 
 ```text
 Client
@@ -83,22 +86,14 @@ Client
          Client
 ```
 
-The important concept is:
-
-**Middleware forms a pipeline.**
-
----
-
 ### What is Middleware?
 
-Middleware is a component that can:
+> In .NET Core middleware is software component that assembled into application which will handle request and response
 
-1. Inspect the request
-2. Modify the request
-3. Do something before the next component
-4. Call the next component
-5. Inspect/modify the response
-6. Basically it is a security guard, inspector, helper and may be a special software component for request.
+- Each middleware will does something with the request pipeline
+- Can execute some code logic and pass request to next middleware in pipeline
+- Short circuit the pipeline(stop processing and send a response)
+- Basically it is a security guard, inspector, helper and may be a special software component for request.
 
 For example:
 
@@ -113,9 +108,7 @@ app.Use(async (context, next) =>
 
 This is powerful because middleware wraps the next middleware.
 
----
-
-### The "onion" model
+**The "onion" model:**
 
 Suppose you have:
 
@@ -175,63 +168,9 @@ So middleware executes:
 A → B → C → B → A
 ```
 
-That's one of the most important things to understand.
-
----
-
-### Typical ASP.NET Core pipeline
-
-In a real application you might see:
-
-```csharp
-var app = builder.Build();
-app.UseExceptionHandler("/error");
-app.UseHttpsRedirection();
-app.UseStaticFiles();
-app.UseRouting();
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapControllers();
-app.Run();
-```
-
-Conceptually:
-
-```text
-HTTP Request
-     │
-     ▼
-Exception Handling
-     │
-     ▼
-HTTPS Redirection
-     │
-     ▼
-Static Files
-     │
-     ▼
-Routing
-     │
-     ▼
-Authentication
-     │
-     ▼
-Authorization
-     │
-     ▼
-Controller / Endpoint
-     │
-     ▼
-HTTP Response
-```
-
-The exact pipeline varies depending on the application.
-
----
-
 ### `Use`, `Run`, and `Map`
 
-#### `Use`
+**`Use`**
 
 Usually allows you to call the next middleware:
 
@@ -241,9 +180,8 @@ app.Use(async (context, next) =>
     await next();
 });
 ```
----
 
-#### `Run`
+**`Run`**
 
 Terminates the pipeline. Nothing after this middleware executes for that request.
 
@@ -253,9 +191,8 @@ app.Run(async context =>
     await context.Response.WriteAsync("Hello");
 });
 ```
----
 
-#### `Map`
+**`Map`**
 
 Creates a branch in the pipeline.
 
@@ -277,9 +214,7 @@ Request ─────────┤
                  └── other → Normal pipeline
 ```
 
----
-
-### Why middleware order matters
+**Why middleware order matters**
 
 This is **very important**.
 
@@ -305,9 +240,7 @@ Is user allowed?
 
 If you reverse them, you can get incorrect behavior.
 
----
-
-### Exception handling should be early
+***Exception handling should be early***
 
 Usually:
 
@@ -342,9 +275,7 @@ Controller
 Exception Handler catches it
 ```
 
----
-
-### Where does Dependency Injection fit?
+***Where does Dependency Injection fit?***
 
 ASP.NET Core creates controllers/services using the DI container.
 
@@ -376,59 +307,6 @@ Repository
 Database
 ```
 
----
-
-### Complete mental model
-
-For an API request:
-
-```text
-             CLIENT
-                │
-                │ HTTP
-                ▼
-             KESTREL
-                │
-                ▼
-        Exception Handling
-                │
-                ▼
-          HTTPS / Static
-                │
-                ▼
-             Routing
-                │
-                ▼
-        Authentication
-                │
-                ▼
-         Authorization
-                │
-                ▼
-        Endpoint Selection
-                │
-                ▼
-           Controller
-                │
-                ▼
-            Service
-                │
-                ▼
-          Repository
-                │
-                ▼
-           Database
-                │
-                ▼
-           Controller
-                │
-                ▼
-            Response
-                │
-                ▼
-             Client
-```
-
 ### Built in middlewares
 - UseRouting()/UseEndpoints() - routing & endpoint binding
 - UseStaticFiles() - to serve static files
@@ -454,8 +332,6 @@ For example:
 * Blocking certain requests
 
 For these, you can create **custom middleware**.
-
----
 
 ### Basic custom middleware
 
@@ -487,33 +363,12 @@ Then register it:
 ```csharp
 app.UseMiddleware<LoggingMiddleware>();
 ```
----
 
 ### Understand `_next`
 
-This is the most important part.
+> "I have finished my work. Continue to the next middleware. It is called request delegate"
 
-```csharp
-private readonly RequestDelegate _next;
-```
-
-`_next` represents:
-
-> **The next middleware in the pipeline.**
-
-When you do:
-
-```csharp
-await _next(context);
-```
-
-you're saying:
-
-> "I have finished my work. Continue to the next middleware."
-
----
-
-### What happens if we don't call `_next()`?
+***What happens if we don't call `_next()`?***
 
 This is very important.
 
@@ -523,26 +378,9 @@ Consider:
 public async Task InvokeAsync(HttpContext context)
 {
     Console.WriteLine("Request received");
-
     // No _next()
 }
 ```
-
-The pipeline stops there.
-
-```text
-Request
-   │
-   ▼
-Custom Middleware
-   │
-   X
-   │
-   ▼
-Controller never executes
-```
-
-This can actually be useful.
 
 For example, you might reject a request:
 
@@ -577,13 +415,9 @@ Return response
 STOP
 ```
 
----
-
 ### Three common ways to create middleware
 
-There are several approaches.
-
-#### Approach 1 — Inline middleware
+***Approach 1 — Inline middleware***
 
 For small logic:
 
@@ -601,9 +435,7 @@ Good for:
 * Quick experiments
 * Very simple middleware
 
----
-
-#### Approach 2 — Middleware class
+***Approach 2 — Middleware class***
 
 For reusable logic:
 
@@ -634,9 +466,7 @@ app.UseMiddleware<LoggingMiddleware>();
 
 This is probably the **most common custom middleware approach** you'll see.
 
----
-
-#### Approach 3 — Extension method
+***Approach 3 — Extension method***
 
 Usually, we don't want `Program.cs` to become:
 
@@ -665,12 +495,10 @@ Then:
 ```csharp
 app.UseCustomLogging();
 ```
-
-Much cleaner.
-
 ---
+### Real-world example
 
-### Real-world example: Request logging
+`1. Request logging:`
 
 Suppose you want:
 
@@ -727,9 +555,8 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 Now every request can be measured.
 
----
-
-### Real-world example: Correlation ID
+----
+`2. Correlation ID:`
 
 This is extremely common in enterprise applications.
 
@@ -774,9 +601,8 @@ var correlationId = context.Items["CorrelationId"];
 
 This is a very good **real-world middleware use case**.
 
----
-
-### Real-world example: Global exception handling
+----
+`3. Global exception handling:`
 
 You don't want every controller to do:
 
@@ -834,9 +660,8 @@ Exception Middleware
 
 This is one of the most valuable uses of middleware.
 
----
 
-### Middleware can access almost everything in `HttpContext`
+**Middleware can access almost everything in `HttpContext`**
 
 You have:
 
@@ -863,49 +688,6 @@ var statusCode = context.Response.StatusCode;
 
 So middleware can make decisions based on the HTTP request.
 
----
-
-### Middleware vs Controller Filter
-
-This is an important interview question.
-
-Suppose you want logging.
-
-You could use:
-
-```text
-Middleware
-```
-
-or:
-
-```text
-Action Filter
-```
-
-### Middleware
-
-Runs at the **HTTP pipeline level**.
-
-```text
-Request
- ↓
-Middleware
- ↓
-Routing
- ↓
-Controller
-```
-
-It can apply to:
-
-* Controllers
-* Minimal APIs
-* Static files
-* Other endpoints
-
-depending on where it's placed.
-
 ### Filter
 
 Runs more specifically around MVC/controller execution.
@@ -925,50 +707,6 @@ Action
 So:
 
 > **Middleware is broader; filters are more MVC/controller-specific.**
-
----
-
-### Middleware vs Service
-
-Another important distinction.Don't put business logic into middleware.
-
-Bad:
-
-```csharp
-public async Task InvokeAsync(HttpContext context)
-{
-    // 500 lines of business logic ❌
-
-    await _next(context);
-}
-```
-
-Better:
-
-```text
-Middleware
-    ↓
-Service
-    ↓
-Business Logic
-```
-
-Middleware should generally deal with **cross-cutting concerns**.
-
-Examples:
-
-```text
-Logging
-Authentication
-Exception handling
-Correlation IDs
-Security headers
-Request timing
-Auditing
-Rate limiting
-```
-
----
 
 ### Middleware ordering
 
@@ -1007,8 +745,6 @@ Response
 Therefore:
 
 > **The order in which middleware is registered matters.**
-
----
 
 ### A very practical ASP.NET Core example
 
@@ -1072,49 +808,21 @@ Think:
                 RESPONSE
 ```
 
----
-
-### One interview question to remember
-
-### Interviewer:
+### Interview questions to remember
 
 **"What happens if middleware doesn't call `next()`?"**
-
-Answer:
 
 > "The pipeline is short-circuited. Subsequent middleware and the endpoint won't execute. This is useful when middleware itself wants to generate a response, for example when rejecting an unauthorized request."
 
 **"Why is middleware order important?"**
 
-Answer:
-
 > "Middleware executes in the order it is registered for the request and in reverse order as control returns for the response. Therefore, middleware that depends on something being established by another middleware must be registered after it."
 
 **"What are common use cases for custom middleware?"**
 
-Answer:
-
 > "Cross-cutting concerns such as global exception handling, request/response logging, correlation IDs, security headers, auditing, request timing, custom authentication or validation, and rate limiting."
 
-The **key mental model** is:
-
-```text
-Middleware = wrapper around the rest of the pipeline
-
-         ┌──────────────────────┐
-         │ Middleware           │
-         │                      │
-Request ─┤  Before              │
-         │      ↓               │
-         │   Next Middleware    │
-         │      ↓               │
-         │  After               │
-         └──────────────────────┘
-                  │
-               Response
-```
-
-Once this "wrapper" concept is clear, **custom middleware, pipeline ordering, exception handling, logging, authentication, and filters** become much easier to understand.
+-----
 
 ### DI lifetimes and thread-safety
 - Middleware is usually registered as a singleton component of pipeline (class with RequestDelegate next is constructed once). 
@@ -1123,6 +831,8 @@ BUT if your middleware has constructor-injected scoped services, it’s fine —
 - If you implement IMiddleware, DI can create middleware per-request (depending on registration), avoiding lifetime pitfalls.
 - Do not store HttpContext or other request scoped objects on static fields/singletons.
 
+-----
+
 ### Performance & best practices
 - Avoid blocking I/O — always prefer async/await.
 - Don’t copy large responses into memory (response-capture) unless necessary.
@@ -1130,9 +840,11 @@ BUT if your middleware has constructor-injected scoped services, it’s fine —
 - Keep middleware lightweight; heavy logic may belong to background services.
 - Use caching, compression, and CDN for static assets instead of middleware when appropriate.
 
+-----
+
 ### Why should we not read http header or request data and use it in middleware for any reason? [JP Morgan - 7 Aug 2025]
 
-#### Request Body can only be read once by default
+**Request Body can only be read once by default**
 In ASP.NET Core, the request body (HttpContext.Request.Body) is a forward-only stream.
 Once you read it in middleware, it’s consumed — meaning downstream middleware or MVC controllers won’t be able to read it (e.g., FromBody model binding will fail).
 
@@ -1153,32 +865,30 @@ var body = await reader.ReadToEndAsync();
 context.Request.Body.Position = 0; // Reset so downstream can read
 ```
 
-### Headers are fine, but…
+**Headers are fine, but…**
 Headers can be read as many times as you want — no problem there.
 The risk is timing:
 Some headers may not yet be set until a certain middleware runs (especially if reverse proxies modify them).
 If you depend on a header (e.g., X-Forwarded-For) before UseForwardedHeaders(), you’ll get the wrong value.
 
-### Performance considerations
+**Performance considerations**
 Reading large request bodies in middleware can slow down the pipeline significantly, especially for file uploads or JSON payloads.
 If you store the body in memory for logging/inspection, it can consume a lot of RAM and cause OutOfMemoryExceptions under load.
 
-### Security concerns
+**Security concerns**
 Logging raw headers or request bodies in middleware can expose sensitive data (passwords, tokens, PII) to logs.
 Middleware runs for every request — including authentication requests, payment data, etc.
 → Always filter or mask sensitive info before logging.
 
-### Rule of thumb:
+**Rule of thumb**
 Headers: safe to read anytime (just watch middleware order).
 Body: read only if necessary, and use EnableBuffering() so you don’t break downstream processing.
 Always consider performance + security.
 
+--------------------------
+--------------------------
 
 ## Routing (attribute routing, conventional routing)
-
-#### What is Routing?
-
-In simple terms:
 
 > **Routing decides which endpoint should handle an incoming HTTP request.**
 
@@ -1198,11 +908,7 @@ Which code should execute?
 EmployeeController.GetById(10)
 ```
 
-That's the job of **routing**.
-
----
-
-#### Simple example
+**Simple example**
 
 Suppose you have:
 
@@ -1237,18 +943,14 @@ and ASP.NET Core executes:
 GetEmployee(10)
 ```
 
----
-
-#### Routing has two major concepts
+**Routing has two major concepts**
 
 1. Conventional Routing
 2. Attribute Routing
 
 For Web APIs, **attribute routing is very common**.
 
----
-
-#### Attribute Routing
+### Attribute Routing
 
 You specify the route directly using attributes.
 
@@ -1284,19 +986,15 @@ GET     /api/employees/10
 POST    /api/employees
 ```
 
----
-
-#### `[Route]`
+**`[Route]`**
 
 `[Route]` defines the route template.
 
 ```csharp
 [Route("api/employees")]
 ```
----
 
-#### HTTP method attributes
-
+**`HTTP method attributes`**
 You can specify both the HTTP method and route.
 
 ```csharp
@@ -1347,9 +1045,8 @@ DELETE /api/employees/10
 
 Same URL pattern, different HTTP method.
 
----
 
-#### Route Parameters
+**Route Parameters**
 
 This:
 
@@ -1385,38 +1082,7 @@ public IActionResult GetEmployee(int id)
 
 The routing system extracts `25` and passes it to your action.
 
----
-
-#### Multiple route parameters
-
-You can have:
-
-```csharp
-[HttpGet("{employeeId}/projects/{projectId}")]
-public IActionResult GetProject(
-    int employeeId,
-    int projectId)
-{
-    ...
-}
-```
-
-Request:
-
-```http
-GET /api/employees/10/projects/50
-```
-
-results in:
-
-```text
-employeeId = 10
-projectId  = 50
-```
-
----
-
-#### Route Constraints
+**Route Constraints**
 
 This is an important routing feature.
 
@@ -1463,32 +1129,10 @@ means:
 
 > `id` must be an integer and must be at least 1.
 
----
 
-#### Query Parameters vs Route Parameters
+**Query Parameters vs Route Parameters**
 
-This distinction is extremely important.
-
-### Route parameter
-
-```http
-GET /api/employees/10
-```
-
-```csharp
-[HttpGet("{id}")]
-public IActionResult Get(int id)
-```
-
-Here:
-
-```text
-10 → Route parameter
-```
-
----
-
-#### Query parameter
+***Query parameter***
 
 ```http
 GET /api/employees?department=IT
@@ -1523,61 +1167,7 @@ Think:
           Query parameter
 ```
 
----
-
-#### `[controller]` token
-
-You often see:
-
-```csharp
-[Route("api/[controller]")]
-```
-
-If your controller is:
-
-```csharp
-EmployeeController
-```
-
-then:
-
-```text
-[controller]
-```
-
-becomes:
-
-```text
-employee
-```
-
-So:
-
-```csharp
-[Route("api/[controller]")]
-```
-
-becomes:
-
-```text
-/api/employee
-```
-
-Similarly:
-
-```csharp
-OrderController
-```
-
-becomes:
-
-```text
-/api/order
-```
-
----
-
-#### 13. `[action]` token
+**`[controller]` & `[action]`**
 
 You can also use:
 
@@ -1609,112 +1199,14 @@ PUT    /api/employees/10
 DELETE /api/employees/10
 ```
 
-is usually cleaner.
-
----
-
-#### `MapControllers()`
-
-This is important when using attribute routing.
-
-In `Program.cs`:
-
-```csharp
-builder.Services.AddControllers();
-
-var app = builder.Build();
-
-app.MapControllers();
-```
-
-`MapControllers()` maps controller actions using their attribute routes.
-
-For example:
-
-```csharp
-[Route("api/employees")]
-public class EmployeeController : ControllerBase
-{
-    [HttpGet]
-    public IActionResult Get()
-    {
-        ...
-    }
-}
-```
-
-`MapControllers()` makes that endpoint available.
-
----
-
-#### What if multiple routes match?
-
-This is where **route selection** becomes important.
-
-Suppose:
-
-```csharp
-[HttpGet("{id}")]
-public IActionResult GetById(int id)
-```
-
-and:
-
-```csharp
-[HttpGet("active")]
-public IActionResult GetActive()
-```
-
-Request:
-
-```http
-GET /api/employees/active
-```
-
-Both might appear potentially relevant if `id` isn't constrained.
-
-You can make the first one:
-
-```csharp
-[HttpGet("{id:int}")]
-```
-
-Now:
-
-```text
-/active
-   ↓
-Not an integer
-   ↓
-Doesn't match {id:int}
-
-/10
- ↓
-Integer
- ↓
-Matches
-```
-
-Route constraints help remove ambiguity.
-
----
-#### Interview-ready definition
-
-If asked **"What is routing in ASP.NET Core?"**, you can say:
-
-> **"Routing is the mechanism in ASP.NET Core that matches an incoming HTTP request to an endpoint based on things such as the URL pattern and HTTP method. It can extract route parameters, apply route constraints, and select the appropriate controller action or minimal API endpoint for execution."**
-
-And the three things I'd focus on next are **attribute routing, endpoint routing, and route constraints**. Those are the parts that usually matter most in real .NET API development and interviews.
-
+------------------------
+------------------------
 
 ## Filters
-The easiest way to understand them is:
 
-> **A filter allows you to run code before or after specific stages of controller/action execution.**
+> A filter allows you to run code before or after specific stages of controller/action execution.
 
-Think of middleware as **application-wide**, while filters are usually **MVC/controller/action-specific**.
-
----
+> Filters provide a way to execute custom logic at specific stages of the MVC request pipeline, such as authorization, resource processing, action execution, exception handling, and result execution. They can be applied globally, at the controller level, or at the action level. Unlike middleware, which operates at the broader HTTP pipeline level, filters are primarily focused on MVC/controller execution.
 
 ### Why do we need filters?
 
@@ -1752,8 +1244,6 @@ public IActionResult GetEmployees()
 ```
 
 Instead, create a filter once and apply it where needed.
-
----
 
 ### Basic flow
 
@@ -1793,19 +1283,13 @@ Result Filter
 Response
 ```
 
-Exception filters can handle exceptions from MVC execution.
-
----
-
 ### Types of filters
 
-```text
-Authorization Filter
-Resource Filter
-Action Filter
-Exception Filter
-Result Filter
-```
+1. Authorization Filter
+2. Resource Filter
+3. Action Filter
+4. Exception Filter
+5. Result Filter
 
 A useful order to remember:
 
@@ -1821,9 +1305,7 @@ Controller Action
 Result
 ```
 
----
-
-### Authorization Filter
+**`1. Authorization Filter`**
 
 Runs very early.
 
@@ -1859,7 +1341,7 @@ If the user isn't authorized, the action doesn't execute.
 
 ---
 
-### Action Filter
+**`2. Action Filter`**
 
 This is probably the filter you'll use most often when learning custom filters.
 
@@ -1916,9 +1398,7 @@ After Action Filter
 Response
 ```
 
----
-
-### Async Action Filter
+**`3. Async Action Filter`**
 
 In real applications, you'll often use:
 
@@ -1958,9 +1438,8 @@ await _next(context);
 
 Both allow execution to continue and then perform logic afterward.
 
----
 
-### Exception Filter
+**`4. Exception Filter`**
 
 Exception filters handle exceptions thrown during MVC/controller execution.
 
@@ -1999,9 +1478,8 @@ Exception Filter
 
 However, in modern ASP.NET Core applications, **global exception-handling middleware** is often preferred for truly global exception handling.
 
----
 
-### Result Filter
+**`5. Result Filter`**
 
 Result filters execute around the result execution. You might use result filters for things such as:
 
@@ -2030,9 +1508,7 @@ public class MyResultFilter : IResultFilter
 
 ### Where can you apply a filter?
 
-This is very important. You can generally apply filters at different scopes.
-
-### Action level
+***1. Action level***
 
 ```csharp
 [MyFilter]
@@ -2043,9 +1519,7 @@ public IActionResult Get()
 
 Only this action.
 
----
-
-### Controller level
+***2. Controller level***
 
 ```csharp
 [MyFilter]
@@ -2056,9 +1530,7 @@ public class EmployeeController : ControllerBase
 
 All actions in this controller.
 
----
-
-### Global level
+***3. Global level***
 
 Register globally:
 
@@ -2068,51 +1540,6 @@ builder.Services.AddControllers(options =>
     options.Filters.Add<MyFilter>();
 });
 ```
-
-Now it applies across controllers.
-
----
-
-### Filter vs Middleware
-
-This is one of the most common interview questions.
-
-### Middleware
-
-Works at the **HTTP pipeline level**.
-
-```text
-HTTP Request
-     ↓
-Middleware
-     ↓
-Routing
-     ↓
-Controller
-```
-
-It can work with things beyond MVC controllers.
-
-### Filter
-
-Works inside the **MVC/controller execution pipeline**.
-
-```text
-HTTP Request
-     ↓
-Middleware
-     ↓
-Controller Pipeline
-     ↓
-Filter
-     ↓
-Action
-```
-
-So:
-
-> **Middleware is broader. Filters are more specific to MVC/controller execution.**
-
 ---
 
 ### Practical example: Execution-time filter
@@ -2155,95 +1582,6 @@ Response
 This is a very practical use of filters.
 
 ---
-
-### Filter order — important concept
-
-The general idea is:
-
-```text
-Authorization
-      ↓
-Resource
-      ↓
-Action
-      ↓
-Action Method
-      ↓
-Result
-```
-
-And when execution returns, the "after" portions unwind.
-
-For example:
-
-```text
-Authorization Before
-        ↓
-Resource Before
-        ↓
-Action Before
-        ↓
-Controller Action
-        ↓
-Action After
-        ↓
-Resource After
-        ↓
-Result
-```
-
-The exact execution details vary by filter type and short-circuiting, but the **nested/wrapping model** is the key concept.
-
----
-
-### Short-circuiting
-
-Just like middleware, a filter can prevent the action from executing.
-
-For example, an action filter can set:
-
-```csharp
-context.Result = new UnauthorizedResult();
-```
-
-Then:
-
-```text
-Request
-   ↓
-Filter
-   ↓
-❌ Action doesn't execute
-   ↓
-401 Response
-```
-
-This is useful when a filter determines that processing should stop.
-
----
-
-### One important distinction: `[Authorize]`
-
-You may wonder:
-
-> "Is `[Authorize]` a filter?"
-
-In the MVC/controller world, authorization is implemented through ASP.NET Core's authorization infrastructure and endpoint metadata; MVC authorization filters participate in the authorization stage.
-
-For practical understanding:
-
-```text
-[Authorize]
-      ↓
-Authorization stage
-      ↓
-Is user authorized?
-```
-
-Don't think of `[Authorize]` as simply "a normal custom filter attribute." Its behavior is integrated with the broader ASP.NET Core authorization system.
-
----
-
 ### When should I use what?
 
 A good practical rule:
@@ -2263,59 +1601,13 @@ A good practical rule:
 | Modify result execution         | Result Filter                        |
 | MVC-specific exception handling | Exception Filter                     |
 
----
 
-### The interview answer
-
-If they ask:
-
-**"What are filters in ASP.NET Core?"**
-
-You can answer:
-
-> **"Filters provide a way to execute custom logic at specific stages of the MVC request pipeline, such as authorization, resource processing, action execution, exception handling, and result execution. They can be applied globally, at the controller level, or at the action level. Unlike middleware, which operates at the broader HTTP pipeline level, filters are primarily focused on MVC/controller execution."**
-
----
+-------------------
+-------------------
 
 ## Dependency Injection (DI) lifetimes
 
-### First understand Dependency Injection
-
-Suppose your controller needs an `IEmployeeService`.
-
-Instead of doing:
-
-```csharp
-public class EmployeeController
-{
-    private readonly EmployeeService _service;
-
-    public EmployeeController()
-    {
-        _service = new EmployeeService();
-    }
-}
-```
-
-you register it:
-
-```csharp
-builder.Services.AddScoped<IEmployeeService, EmployeeService>();
-```
-
-Then ASP.NET Core creates and provides it:
-
-```csharp
-public class EmployeeController
-{
-    private readonly IEmployeeService _service;
-
-    public EmployeeController(IEmployeeService service)
-    {
-        _service = service;
-    }
-}
-```
+> Dependency Injection is a design pattern where an object's dependencies (the other objects/services it needs to work) are provided from outside, rather than the object creating them itself. It's a specific form of Inversion of Control (IoC).
 
 The DI container manages:
 
@@ -2324,19 +1616,15 @@ The DI container manages:
 * Managing their lifetime
 * Disposing them when appropriate
 
-And that's where **Transient, Scoped, Singleton** come in.
+### Service Lifetimes in .NET DI Container
 
----
+**``1. Transient``**
 
-### Transient
+> **Create a new instance every time the service is requested from DI.**
 
 ```csharp
 builder.Services.AddTransient<IEmployeeService, EmployeeService>();
 ```
-
-Means:
-
-> **Create a new instance every time the service is requested from DI.**
 
 Example:
 
@@ -2352,7 +1640,7 @@ Request
 
 Every resolution gets a new instance.
 
-### Use Transient when:
+***Use Transient when:***
 
 The service is:
 
@@ -2370,23 +1658,13 @@ Small calculation service
 Mapper/helper-like services
 ```
 
----
+**`2. Scoped (Default)`**
 
-### Scoped (Default)
+> **One instance per DI scope. One HTTP request = one scope**
 
 ```csharp
 builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 ```
-
-Means:
-
-> **One instance per DI scope.**
-
-In a typical ASP.NET Core Web API:
-
-> **One HTTP request = one scope.**
-
-This is the most important thing to remember.
 
 ```text id="7p7b4x"
 HTTP Request #1
@@ -2410,11 +1688,7 @@ Request 2 → B
 Request 3 → C
 ```
 
-But within the same request:
-
----
-
-### Why is Scoped so important?
+***Why is Scoped so important?***
 
 Because many ASP.NET Core services are naturally **request-oriented**.
 
@@ -2452,7 +1726,7 @@ All those components can participate in the same request-level unit of work.
 
 Then the request ends and the scoped `DbContext` is disposed.
 
-### Common Scoped services
+***Common Scoped services***
 
 ```text id="iq0zqi"
 DbContext
@@ -2462,17 +1736,13 @@ Unit of Work
 Request-specific services
 ```
 
----
+**`3. Singleton`**
 
-### Singleton
+> **Create one instance and reuse it for the lifetime of the application/service provider.**
 
 ```csharp
 builder.Services.AddSingleton<IEmployeeService, EmployeeService>();
 ```
-
-Means:
-
-> **Create one instance and reuse it for the lifetime of the application/service provider.**
 
 Conceptually:
 
@@ -2491,9 +1761,7 @@ EmployeeService Instance A
 
 Everyone gets the same instance.
 
----
-
-### When should you use Singleton?
+***When should you use Singleton?***
 
 Good candidates are usually:
 
@@ -2522,37 +1790,6 @@ Request 3 ──┼──> SAME Singleton
 Request 4 ──┤
 Request 5 ──┘
 ```
-
----
-
-### The easiest comparison
-
-Memorize this:
-
-```text id="qww5a0"
-Transient
-    ↓
-New instance every time requested
-
-Scoped
-    ↓
-One instance per scope
-Typically one HTTP request
-
-Singleton
-    ↓
-One instance for application lifetime
-```
-
-Or:
-
-```text id="b2j9iw"
-Transient  → Every time
-Scoped     → Every request
-Singleton  → Entire application
-```
-
-That's the interview shortcut.
 
 ---
 
@@ -2620,8 +1857,6 @@ Should have a different Scoped Service
 
 But the singleton is still holding the old one. That's a lifetime mismatch.
 
----
-
 ### Dependency direction rule
 
 A singleton can safely depend on another singleton.
@@ -2650,9 +1885,7 @@ But be careful with how those dependencies are used and resolved.
 
 ---
 
-### Why shouldn't DbContext be Singleton?
-
-This is a very common interview question.
+***Why shouldn't DbContext be Singleton?***
 
 Bad:
 
@@ -2687,23 +1920,18 @@ Request 2 → DbContext B
 Request 3 → DbContext C
 ```
 
----
+----------------
+----------------
 
 ## Minimal APIs
 
-### "What are Minimal APIs?"
-
-You can say:
-
-> **"Minimal APIs are a lightweight way of building HTTP APIs in ASP.NET Core without requiring controller classes and action methods. Endpoints are defined directly using methods such as `MapGet`, `MapPost`, `MapPut`, and `MapDelete`. They still support dependency injection, routing, authentication, authorization, middleware, model binding, and endpoint filters."**
+> "Minimal APIs are a lightweight way of building HTTP APIs in ASP.NET Core without requiring controller classes and action methods. Endpoints are defined directly using methods such as `MapGet`, `MapPost`, `MapPut`, and `MapDelete`. They still support dependency injection, routing, authentication, authorization, middleware, model binding, and endpoint filters."
 
 If asked:
 
 ### "Controllers vs Minimal APIs?"
 
-I'd answer:
-
-> **"Controllers provide a more structured MVC programming model with controller classes, actions, model binding, filters, and many MVC-specific features, making them suitable for larger and more complex APIs. Minimal APIs reduce ceremony and are particularly convenient for small APIs, microservices, and simple endpoints. Both use the same underlying ASP.NET Core infrastructure such as DI, middleware, routing, and endpoint routing."**
+> "Controllers provide a more structured MVC programming model with controller classes, actions, model binding, filters, and many MVC-specific features, making them suitable for larger and more complex APIs. Minimal APIs reduce ceremony and are particularly convenient for small APIs, microservices, and simple endpoints. Both use the same underlying ASP.NET Core infrastructure such as DI, middleware, routing, and endpoint routing."
 
 ### The mental model
 
@@ -2729,6 +1957,7 @@ I'd answer:
 **Simple rule:**
 
 > **Controllers = more structure/features**
+
 > **Minimal APIs = less ceremony/simplicity**
 
 With Minimal API:
@@ -2748,43 +1977,6 @@ app.MapGet("/api/employees/{id}", (int id) =>
 That's the basic idea.
 
 > **Minimal APIs let you define endpoints directly, without requiring controllers.**
-
-### The basic structure
-
-A Minimal API usually looks like:
-
-```csharp
-app.MapGet("/api/employees", () =>
-{
-    return Results.Ok();
-});
-```
-
-Think:
-
-```text
-MapGet
-   │
-   ├── URL
-   │
-   └── Handler
-```
-
-For example:
-
-```csharp
-app.MapGet("/api/employees/{id}", (int id) =>
-{
-    return Results.Ok(id);
-});
-```
-
-Request:
-
-```http
-GET /api/employees/10
-```
----
 
 ### HTTP methods
 
@@ -2816,10 +2008,8 @@ app.MapDelete("/api/employees/{id}", DeleteEmployee);
 
 So you can build a complete REST API without controllers.
 
----
 
-
-### Does Minimal API mean "less performance"?
+***Does Minimal API mean "less performance"?***
 
 Not necessarily.
 
@@ -2833,11 +2023,7 @@ In a real application, database calls, network latency, serialization, business 
 
 Architecture and maintainability are usually more important than tiny framework-level differences.
 
----
-
-### When would I choose Minimal APIs?
-
-I'd lean toward **Minimal APIs** when:
+***When would I choose Minimal APIs?***
 
 ```text
 Small API
@@ -2848,13 +2034,13 @@ Health endpoints
 Lightweight service
 Prototype
 ```
----
+---------------------
+---------------------
 
 ## API Versioning
 > It’s the practice of supporting multiple versions of your API endpoints so that:
 Existing clients keep working without breaking changes.
 You can evolve and improve your API over time.
-
 
 ### Why do we need API Versioning?
 
@@ -2907,28 +2093,19 @@ So instead:
 
 Now old clients can continue using V1 while new clients move to V2.
 
----
-
 ### Common API versioning strategies
 
 There are several ways to specify the version.
 
 The most common are:
 
-```text
 1. URL path
 2. Query string
 3. HTTP header
 4. Media type / Accept header
-```
 
-Let's understand each.
+**`1. Version in URL path`**
 
----
-
-#### Version in URL path
-
-Probably the easiest to understand:
 
 ```http
 GET /api/v1/employees
@@ -2969,9 +2146,8 @@ public class EmployeesV2Controller : ControllerBase
     }
 }
 ```
----
 
-#### Query string versioning
+**`2. Query string versioning`**
 
 Another approach:
 
@@ -2991,11 +2167,8 @@ The URL resource remains:
 /api/employees
 ```
 
-while the query specifies the version.
 
----
-
-### Header versioning
+**`3. Header versioning`**
 
 You can specify the version using a custom header:
 
@@ -3010,9 +2183,8 @@ The URL stays:
 /api/employees
 ```
 
----
 
-### Media type versioning
+**`4. Media type versioning`**
 
 This is a more advanced approach.
 
@@ -3033,9 +2205,6 @@ application/vnd.company.employee-v2+json
   ↓
 V2 representation
 ```
-
-This is powerful but more complicated than URL versioning.
-
 ---
 
 ### Which approach is most common?
@@ -3066,15 +2235,12 @@ services.AddApiVersioning(options =>
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
 ```
----
+---------------------
+---------------------
 
 ## Content Negotiation
 
-### "What is Content Negotiation?"
-
-A strong answer is:
-
-> **"Content negotiation is the process by which ASP.NET Core determines the representation format of an HTTP response based on the client's `Accept` header and the formatters configured by the application. For example, a client can request `application/json` or `application/xml`, and ASP.NET Core selects a suitable output formatter to serialize the response. `Content-Type`, on the other hand, describes the format of the request body being sent by the client."**
+> "Content negotiation is the process by which ASP.NET Core determines the representation format of an HTTP response based on the client's `Accept` header and the formatters configured by the application. For example, a client can request `application/json` or `application/xml`, and ASP.NET Core selects a suitable output formatter to serialize the response. `Content-Type`, on the other hand, describes the format of the request body being sent by the client."
 
 ### Remember these 4 things:
 
@@ -3096,15 +2262,7 @@ Output Formatter
 .NET Object → Response
 ```
 
-**Most important interview trap:**
-
-> `Accept` ≠ `Content-Type`
-
-### The important HTTP headers
-
-There are two headers you should know:
-
-#### `Accept`
+**`Accept`**
 
 Tells the server:
 
@@ -3116,7 +2274,7 @@ Example:
 Accept: application/json
 ```
 
-#### `Content-Type`
+**`Content-Type`**
 
 Tells the server:
 
@@ -3131,7 +2289,9 @@ Content-Type: application/json
 These are often confused.
 
 > 406 Not Acceptable is error message if content not match
----
+
+-----------------------
+-----------------------
 
 ## Rate Limiting
 
@@ -3160,7 +2320,6 @@ The API can reject request #101, typically with:
 429 Too Many Requests
 ```
 
----
 ### ASP.NET Core has built-in rate limiting
 
 Modern ASP.NET Core provides rate-limiting middleware through:
@@ -3206,8 +2365,6 @@ Yes  No
 API  429
 ```
 
----
-
 ### Concurrency Limiter
 
 This is slightly different.
@@ -3218,7 +2375,7 @@ Instead of:
 
 it asks:
 
-> **"How many requests can execute simultaneously?"**
+> "How many requests can execute simultaneously?"
 
 For example:
 
@@ -3249,8 +2406,6 @@ Heavy report generation
 Database-intensive operation
 CPU-intensive processing
 ```
-
----
 
 ### Fixed Window example in ASP.NET Core
 
@@ -3294,29 +2449,119 @@ fixed policy
 10 requests/minute
 ```
 
----
+------------
 
-### Rate Limiting vs Throttling
+### latency and why is it required?
 
-You may hear both terms.
+> Latency is the delay in response, and while it’s unavoidable to some degree (because physics), our goal is to minimize it so that systems feel fast and responsive.
 
-They are related but not always used identically.
+- It’s usually measured in milliseconds (ms)
 
-### Rate limiting
+Formula (simplified):
+Latency = Response start time − Request send time
 
-Controls how many requests are allowed.
+Example:
+You click “Get Products” in a web app.
+The browser sends a request to your API at 10:00:00.000.
+The first byte of the response arrives at 10:00:00.120.
+Latency = 120 ms.
 
-```text
-100 requests/minute
+**Why it matters**
+
+**We care about latency because:**
+- User experience → High latency makes apps feel slow and unresponsive.
+- Performance → Low latency means faster feedback loops.
+- Scalability → If each request takes long, fewer requests can be served at once.
+- Competitive advantage → Faster APIs are often a selling point.
+
+**Where latency comes from**
+- Network delays → Distance between client and server (ping time).
+- Server processing time → How long it takes your code to handle a request.
+- Database calls → Slow queries increase latency.
+- External API calls → Waiting on third-party services.
+- Congestion → Too many requests causing queuing.
+
+**Types of Latency:**
+- Network latency – Time to send data over the internet.
+- Application latency – Time your API takes to process the request.
+- End-to-end latency – Total delay from user action to final response.
+
+**Why we measure latency**
+- We don’t “require” latency, but we require latency monitoring because:
+- It’s a key performance indicator (KPI) for APIs.
+- Helps detect bottlenecks early.
+- Useful in Service Level Agreements (SLAs) — e.g., “99% of requests will have latency < 200 ms.”
+
+Example in .NET
+You can log latency in middleware:
+```csharp
+app.Use(async (context, next) =>
+{
+    var stopwatch = Stopwatch.StartNew();
+    await next();
+    stopwatch.Stop();
+    Console.WriteLine($"Latency: {stopwatch.ElapsedMilliseconds} ms");
+});
 ```
 
-### Throttling
-
-Often refers more broadly to slowing/restricting clients when they exceed a threshold.
-
-For interview purposes, you can treat them as closely related concepts, but **rate limiting** is the more precise ASP.NET Core feature name.
-
 ---
+
+### What is Throughput?
+> Throughput is the number of requests your system can handle in a given time.
+
+- It’s usually measured in:
+    Requests per second (RPS)
+    Transactions per second (TPS)
+    MB/s or GB/s for data transfer.
+
+Example analogy:
+Latency: How long it takes a single coffee to be made.
+Throughput: How many coffees can be made in one minute.
+
+Example
+Your API takes 200 ms latency to respond.
+Your server handles 50 requests per second.
+If latency increases to 1 second, throughput will likely drop (because fewer requests can be handled in parallel).
+
+
+**Why Throughput Matters**
+- Capacity planning → Know how much traffic you can serve.
+- Scalability testing → Find limits before production.
+- SLA compliance → e.g., “We guarantee 1000 RPS sustained throughput.”
+- Cost optimization → Avoid over/under provisioning.
+ 
+**Improving Throughput**
+- Optimize database queries.
+- Use caching (in-memory, Redis).
+- Reduce unnecessary I/O.
+- Use async programming in .NET (async/await).
+- Scale horizontally (add more servers).
+- Use load balancers.
+
+**In .NET — Measuring Throughput**
+You can measure throughput with performance tools like:
+- Apache JMeter
+- k6
+- wrk
+- Azure Application Insights
+
+Or with custom middleware:
+```csharp
+int requestCount = 0;
+var timer = new Timer(_ =>
+{
+    Console.WriteLine($"Throughput: {requestCount} requests/sec");
+    requestCount = 0;
+}, null, 0, 1000);
+
+app.Use(async (context, next) =>
+{
+    Interlocked.Increment(ref requestCount);
+    await next();
+});
+```
+----------------------------------
+----------------------------------
 
 ## Caching
 > Caching is a technique for storing frequently accessed or expensive-to-generate data or responses so that subsequent requests can be served faster without repeating the underlying work. ASP.NET Core supports mechanisms such as in-memory caching, distributed caching, response caching, and output caching.
@@ -3334,7 +2579,7 @@ For interview purposes, you can treat them as closely related concepts, but **ra
        ▼
   Reduce DB calls
 ```
-### This can reduce:
+**This can reduce:**
 
 - Database load
 - Response time
@@ -3353,7 +2598,7 @@ Cache Miss = data not found, so you need to retrieve it.
 4. Output caching
 5. Browser/client-side caching
 
-### In-Memory Cache
+**`1. In-Memory Cache`**
 
 ASP.NET Core provides: IMemoryCache
 ```csharp
@@ -3395,7 +2640,7 @@ Server B doesn't know about Server A's cache.So each server has its own cache.
 
 This is where Distributed Cache becomes useful.
 
-### Distributed Cache
+**`2. Distributed Cache`**
 > A distributed cache is shared between application instances.
 
 Conceptually:
@@ -3410,7 +2655,7 @@ Conceptually:
               Distributed
                  Cache
 
-##### Common technologies include:
+***Common technologies include:***
 
 - Redis
 - SQL Server
@@ -3422,7 +2667,7 @@ In .NET you'll encounter: IDistributedCache
 
 > Multiple application instances → Distributed Cache is often preferable
 
-### Response Caching
+**`3. Response Caching`**
 Instead of caching the data inside your service:
 
 Controller
@@ -3470,7 +2715,7 @@ Caching rules
      ↓
 Can response be reused?
 
-### Output Caching
+**`4. Output Caching`**
 
 This is particularly important in modern ASP.NET Core.
 
@@ -3496,8 +2741,11 @@ app.MapGet("/api/products", () =>
 
 > Response Caching Primarily follows HTTP caching semantics. Output Caching ASP.NET Core's server-side mechanism for caching generated responses.
 
+---------------------------
+---------------------------
 
 ## Health Checks
+
 > Health Checks provide endpoints that allow us and infrastructure such as load balancers or Kubernetes to determine whether an application and its critical dependencies are functioning correctly. ASP.NET Core provides built-in health-check middleware and supports custom checks for dependencies such as databases, Redis, and external services
 
 > Liveness determines whether the application is alive, while readiness determines whether it is ready to receive traffic
@@ -3531,3 +2779,5 @@ Health Check
        ▼
 Healthy / Unhealthy
 ```
+------------------------
+------------------------

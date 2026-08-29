@@ -1,5 +1,3 @@
-# OOP Fundamentals
-
 - Four Pillars: Abstraction, Encapsulation, Inheritance, Polymorphism
 - Method Overloading vs Overriding
 - Abstract Class vs Interface
@@ -18,9 +16,9 @@
 - It is ideal for building scalable, reusable and maintainable code.
 - In this programming everything is representing by object.
 
-### Four Pillars:
+### Four Pillars
 
-#### 1. Abstraction:
+#### 1. Abstraction
 
 - It is used to display only necessary and essentials feature of object to other classes.
 - Abstraction is process of hiding the implementation details from user, only functionality provided to user.
@@ -37,14 +35,13 @@ E.g.
 2. While using TV remote, we don’t care how it is working internally
 3. While processing payment we can make payment any type like UPI, Credit Card, Debit Card but we don’t care how it is working in background
 
-To achieve abstraction we can use:
-
+**To achieve abstraction we can use:**
 1. Abstract Class
 2. Interface
 
 [Click here for Abstraction Encapsulation BasicExample](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AbstractionEncapsulationBasicExample.cs)
 
-### 2. Encapsulation
+#### 2. Encapsulation
 
 - It is like putting all important stuff into locker and give key only to authorized/correct person.
 - In coding terms, hiding internal details of class and exposing only what’s necessary.
@@ -68,49 +65,51 @@ We use access specifiers to achieve encapsulation
 | **Achieved By** | Abstract classes, Interfaces | Access modifiers, Properties, Methods |
 | **Example** | ILogger.Log() – you know logging exists, not how it’s done. | BankAccount._balance hidden, exposed via methods. |
 
-### 3. Polymorphism
+#### 3. Polymorphism
 
 - Meaning of this is “One name, multiple form”.
 - It allows method to behave differently based on the object that is calling them.
 - This makes your code flexible, reusable and easier to maintain.
 - In polymorphism, we have same method name but different behaviors.
-- We can initiate base class with derived class but we cannot create object of derived class using base class. When required such scenario
-    1. **Method accepts Base, but caller can provide any Derived**
+
+> We can initiate base class with derived class but we cannot create object of derived class using base class. When required such scenario
+   
+   **1. Method accepts Base, but caller can provide any Derived**
     
-    ```jsx
-    Base obj = new Derived(); 
-    void Process(Base obj)
-    {
-      obj.DoSomething();
-    }
-    Process(new Derived1());
-    Process(new Derived2());
+    ```csharp
+        Base obj = new Derived(); 
+        void Process(Base obj)
+        {
+          obj.DoSomething();
+        }
+        Process(new Derived1());
+        Process(new Derived2());
     ```
     
-    2. Collections of different derived types
+   **2. Collections of different derived types**
     
-    ```jsx
-    List<Base> items = new List<Base>();
-    items.Add(new Derived1());
-    items.Add(new Derived2());
-    items.Add(new Derived3());
+    ```csharp
+        List<Base> items = new List<Base>();
+        items.Add(new Derived1());
+        items.Add(new Derived2());
+        items.Add(new Derived3());
     ```
     
-    3. Dependency Injection
+   **3. Dependency Injection**
     
-    ```jsx
-    class Service
-    {
-    	private readonly IRepository repository;
-    	public Service(IRepository repository)
-    	{
-    	    this.repository = repository;
-    	}
-    }
+    ```csharp
+        class Service
+        {
+    	    private readonly IRepository repository;
+    	    public Service(IRepository repository)
+    	    {
+    	        this.repository = repository;
+    	    }
+        }
     ```
     
 
-For example, We have multiple payment method, but internally it is calling make payment method which execute it functionality based on method type.
+—> For example, We have multiple payment method, but internally it is calling make payment method which execute it functionality based on method type.
 
 #### Two Types of polymorphism
 
@@ -124,7 +123,7 @@ For example, We have multiple payment method, but internally it is calling make 
 
 [Click here for Method overriding Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs)
 
-### 4. Inheritance
+#### 4. Inheritance
 
 - With the help of inheritance we can inherit properties, methods from parent class in child class.
 - Basically child class will get behavior of parent class.
@@ -142,20 +141,21 @@ For example, We have multiple payment method, but internally it is calling make 
 
 [Click here for Inheritance Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InheritanceExample.cs)
 
----
+---------
+---------
 
 ## Abstract Class vs Interface
 
 ### Abstract class:
 
 - Abstract class serves as blueprint for other classes, which contains abstract methods(without implementation) and regular methods(with implementation).
-- Abstract class cannot be **instantiated,** we cannot create object of abstract class.
+- Abstract class cannot be instantiated, we cannot create object of abstract class.
 - An abstract class is declared using the `abstract` keyword.
-- Abstract method must be implemented in derived classes, with **abstract methods**, we enforce **mandatory implementation** in child classes.
+- Abstract method must be implemented in derived classes, with abstract methods, we enforce mandatory implementation in child classes.
 - We can create constructor of abstract class
 - We cannot use multiple abstract classes at same time
 
-Why abstract methods are important?
+**Why abstract methods are important?**
 
 - Force consistency -  Ensures all subclasses implement the method
 - Improve code organization - Define a clear structure for derived classes
@@ -177,7 +177,7 @@ Why abstract methods are important?
 - No constructor
 - We use interfaces in depedency injection as well, as there is no constructor there will be no dependency of initialization
 
-> **C# 8 introduced default interface methods, allowing interfaces to contain method implementations primarily so interfaces can evolve without breaking existing implementations.**
+> C# 8 introduced default interface methods, allowing interfaces to contain method implementations primarily so interfaces can evolve without breaking existing implementations.
 
 #### Type of interface:
 
@@ -192,35 +192,35 @@ Why abstract methods are important?
 
 [Click here for Interface Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InterfaceExample.cs)
 
-#### Use Abstract Classes When:
+##### Use Abstract Classes When:
 
 - You have common behavior to share across multiple classes.
 - You need to provide default implementations for some methods.
 - You want to enforce certain behaviors but also allow overrides.
 
-#### Use Interfaces When:
+##### Use Interfaces When:
 
 - You only need to define a contract without implementation.
 - You want to support multiple inheritance (C# doesn’t support multiple base classes).
 - You need to ensure different classes follow the same method structure.
 
----
+------------------------
+------------------------
+
 ## Sealed Class & Method
 
-- When you **seal** a class, you **prevent other classes from inheriting it**. This ensures that no one can modify or extend its functionality, keeping it **secure and stable**.
-- A **sealed class** is a class that **cannot be inherited**
+- When you seal a class, you prevent other classes from inheriting it. This ensures that no one can modify or extend its functionality, keeping it secure and stable.
+- A sealed class is a class that cannot be inherited
 - We can create object of sealed class
-- The **sealed** keyword is like a **lock on a bank vault**. It prevents unauthorized **modifications and inheritance**, keeping your class **safe and secure**.
-- Sealed Method: Only want to stop method overriding, not the whole class, in this case we use sealed method
-    - Use sealed classes for security-sensitive operations.
-    - A `sealed` method is used only with an **overridden method**.
-    - Use sealed methods to stop unnecessary method overriding.
-    - This override is the final override; derived classes cannot override it further
-    - Don’t seal every class – only when necessary.
-    - Use sealed inheritance to improve performance.
-- **One interview trap:** A `sealed` method does **not** mean the class cannot be inherited. It only prevents that particular virtual method from being overridden further.
+- The sealed keyword is like a lock on a bank vault*. 
+- It prevents unauthorized modifications and inheritance, keeping your class safe and secure.
 
-[Click here for Sealed Class/Method Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SealedClassMethodExample.cs)
+### Sealed method
+- A sealed method is a method in a derived class that prevents further overriding in classes that inherit from it.
+- It acts as a final override point in an inheritance hierarchy.
+- If this class becomes someone's parent then won't able to override but it does not mean that main parent class will not allow overriding.
+
+**One interview trap:** A `sealed` method does not mean the class cannot be inherited. It only prevents that particular virtual method from being overridden further.
 
 | `sealed class` | `sealed method` |
 | --- | --- |
@@ -230,23 +230,35 @@ Why abstract methods are important?
 | No class can derive from it | Derived classes can still inherit the class |
 | Stops the inheritance chain | Stops the override chain |
 
+
+[Click here for Sealed Class/Method Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SealedClassMethodExample.cs)
+
+---
 ---
 
-## Static Method And Instance
+## Static & Instance Method
 
-In C#, “static” means “relating to the type itself, rather than an instance of the type”. You access a static member using the type name instead of a reference or a value e.g  [`Guid.New](http://Guid.New)Guid()`
+- Static Method:
+> A method that belongs to the class itself, not to any specific instance. Called on the class, not on objects.
 
+- Instance Method:
+> A method that belongs to a specific object instance. Each instance can have different behavior and access instance data.
+
+- In C#, “static” means “relating to the type itself, rather than an instance of the type”. You access a static member using the type name instead of a reference or a value e.g  [`Guid.New](http://Guid.New)Guid()`
 - In addition to methods and variables, you can also declare class to be static. A static class cannot be instantiated and can only contains static members.
-    - Static classes always derive from object, you can’t specify a different base type
-    - Static class connot implement an interface
-    - Static class connot have any instance members
-    - Static classes are implicity abstract, you can’t add abstract modifier yourself
-    - Static class may be generic
-    - Static constructor runs once before the first access to any static member
+- Static classes always derive from object, you can’t specify a different base type
+- Static class connot implement an interface
+- Static class connot have any instance members
+- Static classes are implicity abstract, you can’t add abstract modifier yourself
+- Static class may be generic
+- Static constructor runs once before the first access to any static member
 - Static methods are normally faster to invoke on call stack than instance method
-- Instance methods actually use the ‘this’ instance pointer as the first parameter, so an instance method will always have that overhead.
+- We cannot access instance member's from static class, as it don't `this` reference.
 
-[Click here for Static vs Instance Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/StaticVsInstanceExample.cs)
+**When to Use:**
+- Static Class: Only static members, pure utilities (Math, Console, File)
+- Regular Class with Static: Mix of static and instance (Repository with static factory)
+
 
 | **Static Method** | **Non Static Method** |
 | --- | --- |
@@ -255,13 +267,36 @@ In C#, “static” means “relating to the type itself, rather than an instanc
 | 3. We can’t use this keyword inside the Static Method | 3. We can use thiskeyword inside Non Static Method |
 | 4. Static Method uses the memory of Class | 4. Non Static Method uses a memory of an object |
 
+-> When interviewer asks: "Should this be static or normal?"
+            
+1. Ask clarifying questions:  
+   - "Do we need multiple instances?"
+   - "Does each instance have unique state?"
+   - "Is this a utility or business entity?"
+  
+2. Provide examples:  
+   - Static: Logger, Math helper, Validator
+   - Normal: User, Order, Account, Repository
+   
+3. Mention SOLID principles:
+   - Static makes DI harder
+   - Normal classes are more testable\
+   - Normal classes are more flexible
+   
+4. Consider the domain:
+   - Real-world entity → Normal class
+   - Pure utility → Static class
+
+[Click here for Static vs Instance Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/StaticVsInstanceExample.cs)
+
 ---
+---
+
 ## Constructor
 
-A constructor is a special method, which gets invoked when object of class created. It should be a same name as class name. It cannot have return type.
+> A constructor is a special method, which gets invoked when object of class created. It should be a same name as class name. It cannot have return type.
 
-##### Types of constructor:
-
+### Types of constructor:
 - Default constructor - Takes no parameter
 - Parameterized constructor - Takes one or more parameter
 - Copy constructor - Creates copy of existing object
@@ -270,11 +305,14 @@ A constructor is a special method, which gets invoked when object of class creat
 [Click here for Constructor Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/ConstructorExample.cs)
 
 ---
+---
+
 ## Access Modifiers
 
+> Access modfiers defines scope and visiblity of classes, methods, fields, contructor and other members. They defined where and how member can accessed in program.
+
 - Access modifiers help for data hiding.
-- Access modfiers defines scope and visiblity of classes, methods, fields, contructor and other members. They defined where and how member can accessed in program.
-- **Access Modifiers and Accessibility**
+- Access Modifiers and Accessibility
     - public:
         - Accessible in anywhere in project as well as in referenced assemblies.
         - It helps to keep member available globally.
@@ -300,15 +338,17 @@ A constructor is a special method, which gets invoked when object of class creat
 [Click here for Access Modifiers Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/AccessModifiersExample.cs)
 
 ---
+---
+
 ## Composition
 
-- Composition is design principle where one class contain an instance of another class as private member creating **“has-a”** relationship. (Inheritance creates “Is-a”)
+> Composition is design principle where one class contain an instance of another class as private member creating **“has-a”** relationship. (Inheritance creates “Is-a”)
+
 - It helps in encapsulation
-- Composition in C# creates a strong ownership relationship where the contained object cannot exist independently of its container. This design principle promotes encapsulation and provides better control over object lifecycles, making it ideal for scenarios where components are integral parts of a whole system.
+- Composition in C# creates a strong ownership relationship where the contained object cannot exist independently of its container. 
+- This design principle promotes encapsulation and provides better control over object lifecycles, making it ideal for scenarios where components are integral parts of a whole system.
 
-[Click here for Composition Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/CompositionExample.cs)
-
-- I generally prefer composition over inheritance because composition gives lower coupling, better flexibility, and allows behaviors to be changed independently. I use inheritance when there's a genuine is-a relationship and I need polymorphism—for example, Developer and Manager being Employees. I avoid inheritance just for code reuse because it creates a strong dependency on the base class and can lead to fragile hierarchies. So my default is composition, but I choose based on the domain relationship and whether polymorphism is actually needed
+> I will generally prefer composition over inheritance because composition gives lower coupling, better flexibility, and allows behaviors to be changed independently. I use inheritance when there's a genuine is-a relationship and I need polymorphism—for example, Developer and Manager being Employees. I avoid inheritance just for code reuse because it creates a strong dependency on the base class and can lead to fragile hierarchies. So my default is composition, but I choose based on the domain relationship and whether polymorphism is actually needed
 
 | Question | Inheritance | Composition |
 | --- | --- | --- |
@@ -323,7 +363,12 @@ A constructor is a special method, which gets invoked when object of class creat
 | Typical example | `Dog : Animal` | `Car has Engine` |
 | Best for | Stable hierarchy | Changeable behavior |
 
+
+[Click here for Composition Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/CompositionExample.cs)
+
 ---
+---
+
 ## Boxing And Unboxing
 
 ### Boxing
@@ -351,3 +396,29 @@ Why we required boxing and unboxing:
 - Unboxing retrieves the value type from that boxed object using an explicit cast. We see this mainly with APIs that accept `object`, non-generic collections, interfaces, and some reflection scenarios. In modern C#, we generally avoid unnecessary boxing because it can create allocations and impact performance, which is one reason generics such as `List<int>` are preferred.
 
 [Click here for Boxing and Unboxing Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/BoxingUnboxingExample.cs)
+
+---
+---
+
+## Value Types vs Reference Types
+
+- The key difference is how they behave when they're assigned or passed around. A value type contains its actual value, so assigning it creates an independent copy. Examples are `int`, `bool`, `struct`, and `enum`.
+- A reference type variable contains a reference to an object, so assigning it copies the reference and both variables can point to the same object. Classes, arrays, and strings are examples of reference types.
+- I wouldn't define the distinction simply as stack versus heap. That's an implementation detail. A value type can exist inside a heap-allocated object, for example. The more important distinction is value semantics versus reference semantics.
+- This also explains boxing and unboxing: when a value type needs to be represented as an `object` or another compatible reference representation, it can be boxed. In modern C#, generics help avoid unnecessary boxing.
+- If the type represents a small value where copying should create an independent value, a struct may be appropriate. If it represents an entity with identity, complex state, mutability, or needs inheritance, I would generally use a class.
+
+| Concept | Value Type | Reference Type |
+| --- | --- | --- |
+| Examples | `int`, `bool`, `struct`, `enum` | `class`, `string`, array |
+| Variable contains | Actual value | Reference to object |
+| Assignment | Copies value | Copies reference |
+| Independent copy | Yes | No, unless explicitly cloned |
+| Can be `null`? | Normally no | Yes |
+| Heap? | Not necessarily | Objects generally allocated on managed heap |
+| Inheritance | Cannot inherit from another struct/class | Supports class inheritance |
+| Boxing | Can be boxed | Already reference type |
+| Typical use | Values | Entities/objects |
+
+---
+---
