@@ -967,7 +967,7 @@ var result = employees
 
 Then reuse `result`.
 
-***`6. Count() vs ToList().Count`***
+***`7. Count() vs ToList().Count`***
 
 ❌:
 
@@ -997,7 +997,7 @@ WHERE IsActive = 1;
 
 You're getting a number rather than transferring all matching rows.
 
-***`7. Any() vs Count() > 0`***
+***`8. Any() vs Count() > 0`***
 
 If you only want to know whether something exists:
 

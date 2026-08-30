@@ -351,8 +351,7 @@ public class JwtOptions
 **3. Register + inject**
 
 ```csharp
-builder.Services.Configure<JwtOptions>(
-    builder.Configuration.GetSection("Jwt"));
+builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("Jwt"));
 ```
 
 ```csharp
@@ -1340,4 +1339,165 @@ Policies can do things like:
 ------------------------
 ------------------------
 
+## CORS
 
+**CORS = Cross-Origin Resource Sharing**
+
+> **CORS is a browser security mechanism that controls whether a web page from one origin is allowed to make requests to a different origin.**
+
+
+**What is an Origin?**
+
+An origin consists of:
+
+```text
+Scheme + Host + Port
+```
+
+For example:
+
+```text
+https://myapp.com:443
+```
+
+Consider:
+
+```text
+Frontend:
+https://myapp.com
+
+Backend:
+https://api.myapp.com
+```
+
+These are **different origins** because the host is different.
+
+Another example:
+
+```text
+Frontend:
+http://localhost:4200
+
+Backend:
+https://localhost:7001
+```
+
+Different origin.
+
+**Why Do We Need CORS?**
+
+Imagine your Angular application runs on:
+
+```text
+http://localhost:4200
+```
+
+and your .NET API runs on:
+
+```text
+https://localhost:7001
+```
+
+Angular sends:
+
+```http
+GET https://localhost:7001/api/employees
+```
+
+The browser sees:
+
+```text
+Frontend Origin
+http://localhost:4200
+
+        ↓
+
+Different API Origin
+https://localhost:7001
+```
+
+The browser applies its same-origin security rules.
+
+If the API hasn't allowed the frontend origin, the browser can block the response from being made available to the web application.
+
+---
+
+### What Is a Preflight Request?
+
+This is a common interview question.
+
+Sometimes the browser sends an `OPTIONS` request before the actual request.
+
+For example:
+
+```text
+Browser
+   ↓
+OPTIONS /api/orders
+   ↓
+Server
+   ↓
+"Is this origin/method/header allowed?"
+   ↓
+YES
+   ↓
+POST /api/orders
+```
+
+This is called a:
+
+> **CORS preflight request**
+
+
+### Why Does Preflight Happen?
+
+For certain **non-simple cross-origin requests**, the browser checks with the server first.
+
+For example:
+
+```http
+OPTIONS /api/orders
+Origin: https://myapp.com
+Access-Control-Request-Method: POST
+Access-Control-Request-Headers: Authorization, Content-Type
+```
+
+The server can respond with headers indicating what's allowed.
+
+Then the browser sends:
+
+```http
+POST /api/orders
+```
+
+`Origin`
+
+```http
+Origin: https://myapp.com
+```
+
+Tells the server where the request originated.
+
+`Access-Control-Allow-Origin`
+
+```http
+Access-Control-Allow-Origin: https://myapp.com
+```
+
+Tells the browser that this origin is allowed.
+
+`Access-Control-Allow-Methods`
+
+```http
+Access-Control-Allow-Methods: GET, POST, PUT
+```
+
+`Access-Control-Allow-Headers`
+
+```http
+Access-Control-Allow-Headers: Authorization, Content-Type
+```
+
+`Access-Control-Allow-Credentials`
+
+Indicates whether credentials can be included in the cross-origin request.

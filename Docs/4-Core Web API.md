@@ -2670,12 +2670,13 @@ In .NET you'll encounter: IDistributedCache
 **`3. Response Caching`**
 Instead of caching the data inside your service:
 
+```text
 Controller
     ↓
 Database result
     ↓
 Cache object
-
+```
 > Response caching deals with caching HTTP responses according to HTTP caching rules.
 
 For example:
@@ -2709,11 +2710,13 @@ public IActionResult GetProducts()
 ```
 The important idea is:
 
+```csharp
 HTTP Response
      ↓
 Caching rules
      ↓
 Can response be reused?
+```
 
 **`4. Output Caching`**
 
