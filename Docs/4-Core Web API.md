@@ -415,7 +415,7 @@ Return response
 STOP
 ```
 
-### Three common ways to create middleware
+### Four common ways to create middleware
 
 ***Approach 1 — Inline middleware***
 
@@ -495,6 +495,27 @@ Then:
 ```csharp
 app.UseCustomLogging();
 ```
+
+***Approach 4 — Register using IMiddleware***
+```csharp
+    public class LoggingMiddleware : IMiddleware
+    {        
+        public async Task InvokeAsync(HttpContext context, RequestDelegate next)
+        {
+            Console.WriteLine("HI Server I am here");
+            await next(context);
+            Console.WriteLine("Saying bye bye to the server");
+        }
+    }
+
+    register in program.cs:
+    builder.Services.AddTransient<LoggingMiddleware>();
+
+    use as:
+    app.UseMiddleware<LoggingMiddleware>();
+
+```
+
 ---
 ### Real-world example
 
@@ -2234,6 +2255,13 @@ services.AddApiVersioning(options =>
     options.AssumeDefaultVersionWhenUnspecified = true;
     options.DefaultApiVersion = new ApiVersion(1, 0);
 });
+
+[ApiVersion(1.0)]
+[Route("api/v{version:apiVersion}/[controller]")]
+public class ProductsController : ControllerBase
+{
+}
+
 ```
 ---------------------
 ---------------------
@@ -2743,6 +2771,18 @@ app.MapGet("/api/products", () =>
 ```
 
 > Response Caching Primarily follows HTTP caching semantics. Output Caching ASP.NET Core's server-side mechanism for caching generated responses.
+
+
+|                                  | Response Caching                             | Output Caching               |
+| -------------------------------- | -------------------------------------------- | ---------------------------- |
+| Main purpose                     | HTTP caching                                 | Server-side response caching |
+| Cache location                   | Browser/proxy/client/intermediary            | ASP.NET Core server          |
+| Based on HTTP cache headers      | ✅ Yes                                        | Not primarily                |
+| Server controls cache            | Limited                                      | ✅ Strong control             |
+| Can prevent controller execution | Usually because request may not reach server | ✅ Yes                        |
+| Configuration                    | `AddResponseCaching()`                       | `AddOutputCache()`           |
+| Attribute                        | `[ResponseCache]`                            | `[OutputCache]`              |
+| Best for                         | HTTP/proxy caching scenarios                 | API/server response caching  |
 
 ---------------------------
 ---------------------------

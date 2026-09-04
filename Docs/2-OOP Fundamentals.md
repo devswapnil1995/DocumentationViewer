@@ -154,6 +154,7 @@ We use access specifiers to achieve encapsulation
 - Abstract method must be implemented in derived classes, with abstract methods, we enforce mandatory implementation in child classes.
 - We can create constructor of abstract class
 - We cannot use multiple abstract classes at same time
+- We can created object of derived class using abstract class reference, this is called polymorphism. Even method call defined in abstract class it will execute code from override method.
 
 **Why abstract methods are important?**
 
@@ -212,7 +213,7 @@ We use access specifiers to achieve encapsulation
 - When you seal a class, you prevent other classes from inheriting it. This ensures that no one can modify or extend its functionality, keeping it secure and stable.
 - A sealed class is a class that cannot be inherited
 - We can create object of sealed class
-- The sealed keyword is like a lock on a bank vault*. 
+- The sealed keyword is like a lock on a bank vault. 
 - It prevents unauthorized modifications and inheritance, keeping your class safe and secure.
 
 ### Sealed method
@@ -244,7 +245,7 @@ We use access specifiers to achieve encapsulation
 - Instance Method:
 > A method that belongs to a specific object instance. Each instance can have different behavior and access instance data.
 
-- In C#, “static” means “relating to the type itself, rather than an instance of the type”. You access a static member using the type name instead of a reference or a value e.g  [`Guid.New](http://Guid.New)Guid()`
+- In C#, “static” means “relating to the type itself, rather than an instance of the type”. You access a static member using the type name instead of a reference or a value e.g  [`Guid().New`]
 - In addition to methods and variables, you can also declare class to be static. A static class cannot be instantiated and can only contains static members.
 - Static classes always derive from object, you can’t specify a different base type
 - Static class connot implement an interface
@@ -289,6 +290,7 @@ We use access specifiers to achieve encapsulation
 
 [Click here for Static vs Instance Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/StaticVsInstanceExample.cs)
 
+> No. Static members belong to the type rather than an instance, so I access them using the class name. The class itself doesn't have to be declared static. An instance is required only for non-static members.
 ---
 ---
 
@@ -389,7 +391,7 @@ We use access specifiers to achieve encapsulation
 ```
 - In unboxing first we create a Value Type integer i to unbox the value from obj. Unboxing requires explicit casting. The object must contain a valid boxed value of the correct type, or an InvalidCastException will be thrown.
 
-Why we required boxing and unboxing:
+**Why we required boxing and unboxing:**
 
 - Sometimes an API needs an `object`, but you have a value type like `int`.
 - Boxing is needed when a value type needs to be treated as an object or another reference-type representation, because `object` can represent any C# type. Boxing copies the value into an object on the heap.

@@ -11,7 +11,7 @@
 
 ## async/await internals (Task, ValueTask)
 
-### Why do we need `async` / `await`?
+**Why do we need `async` / `await`?**
 
 Imagine an ASP.NET Core API:
 
@@ -19,7 +19,6 @@ Imagine an ASP.NET Core API:
 public async Task<IActionResult> GetEmployees()
 {
     var employees = await db.Employees.ToListAsync();
-
     return Ok(employees);
 }
 ```
@@ -50,9 +49,7 @@ Database working             │
 
 That's the major benefit of async I/O.
 
----
-
-### What does `async` actually mean?
+**What does `async` actually mean?**
 
 When you write:
 
@@ -71,13 +68,13 @@ It does **not** mean:
 
 🚨 This is a very important interview point.
 
-### Wrong understanding:
+**Wrong understanding**
 
 ```text
 async = new thread ❌
 ```
 
-### Better understanding:
+**Better understanding**
 
 ```text
 async/await
@@ -87,9 +84,8 @@ non-blocking asynchronous operation
 especially useful for I/O
 ```
 
----
 
-### What does `await` do?
+**What does `await` do?**
 
 Example:
 
@@ -99,11 +95,11 @@ var employees = await db.Employees.ToListAsync();
 
 Think of `await` as:
 
-> **"If the operation isn't complete, pause this method and resume it when the operation completes."**
+> If the operation isn't complete, pause this method and resume it when the operation completes.
 
 It doesn't mean:
 
-> "Block the current thread until it finishes."
+> Block the current thread until it finishes.
 
 Conceptually:
 
@@ -125,16 +121,13 @@ Is DB operation complete?
      Resume method
 ```
 
----
-
-### What happens internally? 
+**What happens internally?**
 Consider:
 
 ```csharp
 public async Task<string> GetDataAsync()
 {
     var result = await GetFromDatabaseAsync();
-
     return result;
 }
 ```
@@ -167,7 +160,6 @@ Return result
 
 You don't manually implement this state machine. The C# compiler generates the machinery for you.
 
----
 
 ### What is a `Task`?
 
@@ -200,8 +192,6 @@ Eventually:
    ↓
 int result
 ```
-
----
 
 ### `Task` vs Result
 
@@ -245,11 +235,10 @@ Then:
 int result = await task;
 ```
 
----
 
 ### `Task` vs `Task<T>`
 
-#### `Task`
+**`Task`**
 
 For an operation that doesn't return a value:
 
@@ -260,7 +249,7 @@ public async Task SaveAsync()
 }
 ```
 
-#### `Task<T>`
+**`Task<T>`**
 
 For an operation that returns a value:
 
@@ -284,47 +273,11 @@ Task<T>
 Result of type T
 ```
 
----
-
-### Does `await` Create a New Thread?
-
-### No. ❌
-
-This:
-
-```csharp
-await db.Employees.ToListAsync();
-```
-
-doesn't mean:
-
-```text
-Thread 1
-   ↓
-Create Thread 2
-   ↓
-Thread 2 → Database
-```
-
-For I/O operations, the OS/runtime can perform the asynchronous operation without keeping a .NET thread blocked waiting for the result.
-
-This is why async is especially valuable in:
-
-```text
-ASP.NET Core
-Database calls
-HTTP calls
-File I/O
-Network I/O
-```
-
----
-
 ### Async vs Parallelism
 
 These are **not the same thing**.
 
-### Async
+**`Async`**
 
 Usually about:
 
@@ -336,7 +289,7 @@ Example:
 var employee = await GetEmployeeAsync();
 ```
 
-### Parallelism
+**Parallelism**
 
 About:
 
@@ -364,15 +317,14 @@ Parallelism
 
 You can have async without parallelism.
 
----
 
-### Why is Async Important in ASP.NET Core?
+**Why is Async Important in ASP.NET Core?**
 
 Suppose 100 requests arrive.
 
 Each request calls a database that takes 1 second.
 
-#### Synchronous blocking:
+**`Synchronous blocking:`**
 
 ```text
 Request 1 → Thread blocked → DB
@@ -383,7 +335,7 @@ Request 3 → Thread blocked → DB
 
 Threads are occupied waiting.
 
-#### Async:
+ **`Async:`**
 
 ```text
 Request 1 → DB async → thread available
@@ -396,9 +348,7 @@ When the database operations finish, execution resumes.
 
 This allows the server to handle I/O-bound workloads more efficiently.
 
----
-
-### 11. `async` Method Without `await`
+**`async` Method Without `await`**
 
 You might see:
 
@@ -424,9 +374,8 @@ public Task<int> GetNumberAsync()
 
 Though even that may be unnecessary if the method isn't part of an async abstraction.
 
----
 
-### Why Should We Avoid `.Result` and `.Wait()`? 🚨
+**Why Should We Avoid `.Result` and `.Wait()`?**
 
 Bad:
 
@@ -460,7 +409,6 @@ Think:
        ↓
 Block thread ❌
 
-
 await
        ↓
 Asynchronous waiting ✅
@@ -468,9 +416,8 @@ Asynchronous waiting ✅
 
 They can also contribute to deadlock problems in environments with synchronization contexts, particularly older UI/ASP.NET environments.
 
----
 
-### `async` All the Way
+**`async` All the Way**
 
 Suppose:
 
@@ -529,7 +476,6 @@ This is often called:
 
 > **Async all the way.**
 
----
 
 ### What is `ValueTask`? 
 Now the more advanced part.
@@ -571,9 +517,7 @@ Can represent an already-available result without
 allocating a Task in some cases
 ```
 
----
-
-### Why Does `ValueTask<T>` Exist?
+**Why Does `ValueTask<T>` Exist?**
 
 Consider a method that frequently completes synchronously.
 
@@ -605,12 +549,8 @@ public ValueTask<int> GetCachedValueAsync()
 
 The exact benefit depends on the workload.
 
----
-### Interview answer:
 
 > **"`Task` should generally be the default. `ValueTask` is useful in performance-sensitive scenarios where an operation frequently completes synchronously and avoiding task allocations provides a measurable benefit."**
-
----
 
 ### Final Mental Model
 
@@ -653,21 +593,25 @@ The exact benefit depends on the workload.
 7. Async and parallelism are different concepts
 ```
 
-> **"`async/await` provides a non-blocking programming model, especially for I/O-bound operations. It doesn't inherently create a new thread; the compiler uses a state machine to suspend and later resume the method around incomplete awaits."**
+> `async/await` provides a non-blocking programming model, especially for I/O-bound operations. It doesn't inherently create a new thread; the compiler uses a state machine to suspend and later resume the method around incomplete awaits.
 
----
+> It free up threads to handle other work while waiting for I/O operations to complete, improving scalability and responsiveness in applications.
 
+> Never use async void - it used for event handlers only. Always prefer async Task or async Task<T> for asynchronous methods. Exceptions in async void methods cannot be awaited and will crash the application if unhandled.
+
+--------------------
+--------------------
 ## Task vs Thread vs ThreadPool
 
 The easiest way to understand it:
 
-> **Thread = worker**
+> Thread = worker
 
-> **ThreadPool = collection of reusable workers**
+> ThreadPool = collection of reusable workers
 
-> **Task = work you want to get done**
+> Task = work you want to get done
 
-### Thread
+**`Thread`**
 
 A `Thread` represents an actual OS/runtime execution thread.
 
@@ -701,9 +645,7 @@ A thread has its own:
 
 Creating lots of dedicated threads can be expensive.
 
----
-
-### ThreadPool 
+**`ThreadPool`**
 
 .NET maintains a pool of reusable worker threads.
 
@@ -740,9 +682,7 @@ Available for another work item
 
 This avoids repeatedly creating and destroying threads.
 
----
-
-### Task
+**`Task`**
 
 A `Task` represents an operation/work item.
 
@@ -771,13 +711,11 @@ Execute work
 
 Important:
 
-> **A Task is not a Thread.**
+> A Task is not a Thread.
 
 A Task is an abstraction representing work or an asynchronous operation.
 
----
-
-### Task for CPU-Bound Work
+**Task for CPU-Bound Work**
 
 Consider:
 
@@ -814,9 +752,7 @@ ThreadPool
 
 can be appropriate in the right scenario.
 
----
-
-### Task for I/O-Bound Work
+**Task for I/O-Bound Work**
 
 Suppose:
 
@@ -852,9 +788,7 @@ var employees =
 
 because EF Core already provides asynchronous database operations.
 
----
-
-### Thread vs ThreadPool
+**`Thread` vs `ThreadPool`**
 
 |              | Thread                        | ThreadPool                   |
 | ------------ | ----------------------------- | ---------------------------- |
@@ -866,7 +800,7 @@ because EF Core already provides asynchronous database operations.
 | Management   | Manual                        | Runtime managed              |
 
 
-### Thread vs Task
+**`Thread` vs `Task`**
 
 |                   | Thread                    | Task                         |
 | ----------------- | ------------------------- | ---------------------------- |
@@ -882,24 +816,25 @@ For normal application development:
 
 > **Prefer Tasks over manually creating Threads.**
 
----
+--------------------------------
+--------------------------------
 
 ## `ConfigureAwait(false)` 
 
 The simplest explanation:
 
-> **`ConfigureAwait(false)` tells the awaiter: "After this await completes, I don't need to resume on the captured synchronization context."**
+> `ConfigureAwait(false)` tells the awaiter: "After this await completes, I don't need to resume on the captured synchronization context.
 
 But there's an important modern .NET/ASP.NET Core nuance:
 
-> **In ASP.NET Core, there is normally no custom `SynchronizationContext`, so `ConfigureAwait(false)` is usually not necessary for application code.**
+> In ASP.NET Core, there is normally no custom `SynchronizationContext`, so `ConfigureAwait(false)` is usually not necessary for application code.
 
 
-### First: What is a SynchronizationContext?
+**What is a SynchronizationContext?**
 
 A `SynchronizationContext` provides a way for code to say:
 
-> "When my asynchronous operation finishes, resume me on this particular context."
+> When my asynchronous operation finishes, resume me on this particular context.
 
 This was especially important in older application models such as:
 
@@ -931,15 +866,12 @@ Why?
 
 Because UI controls generally need to be accessed from the UI thread.
 
----
-
-### Example Without `ConfigureAwait(false)`
+**Example Without `ConfigureAwait(false)`**
 
 ```csharp
 public async Task LoadDataAsync()
 {
     var data = await GetDataAsync();
-
     UpdateUI(data);
 }
 ```
@@ -968,9 +900,7 @@ UpdateUI(data);
 
 needs to execute on the UI thread.
 
----
-
-### What Does `ConfigureAwait(false)` Do?
+**What Does `ConfigureAwait(false)` Do?**
 
 ```csharp
 var data = await GetDataAsync()
@@ -979,7 +909,7 @@ var data = await GetDataAsync()
 
 You're saying:
 
-> **"Don't capture the current synchronization context for the continuation."**
+> Don't capture the current synchronization context for the continuation.
 
 Conceptually:
 
@@ -1011,11 +941,8 @@ await something.ConfigureAwait(false);
 
 The important difference is **context capture**, not whether the operation itself becomes asynchronous.
 
----
-
-### Does `ConfigureAwait(false)` Create a New Thread?
-
-### No. ❌
+**Does `ConfigureAwait(false)` Create a New Thread?**
+No. ❌
 
 This is a common interview trap.
 
@@ -1035,9 +962,7 @@ ConfigureAwait(false)
 Don't capture SynchronizationContext
 ```
 
----
-
-### Why Was It Important in Older ASP.NET?
+-**Why Was It Important in Older ASP.NET?**
 
 Older ASP.NET applications had a synchronization context associated with requests.
 
@@ -1085,9 +1010,7 @@ Using:
 
 could prevent that particular context-capture issue.
 
----
-
-### Classic Deadlock Example 
+**Classic Deadlock Example**
 
 Consider an environment with a synchronization context:
 
@@ -1130,9 +1053,7 @@ Potential sequence:
 
 This is one of the classic reasons `ConfigureAwait(false)` became important.
 
----
-
-###   How `ConfigureAwait(false)` Changes It
+**How `ConfigureAwait(false)` Changes It**
 
 ```csharp
 public async Task<string> GetDataAsync()
@@ -1158,7 +1079,7 @@ Continuation doesn't need that context
 
 This can avoid that specific synchronization-context deadlock.
 
-### But the better solution is:
+**But the better solution is:**
 
 Don't block in the first place.
 
@@ -1174,9 +1095,7 @@ use:
 await GetDataAsync();
 ```
 
----
-
-### What About ASP.NET Core? 
+**What About ASP.NET Core?**
 
 This is where interviews often become tricky.
 
@@ -1211,11 +1130,9 @@ var result = await service.GetAsync()
 
 in every ASP.NET Core method.
 
----
+**Should I Use `ConfigureAwait(false)` in ASP.NET Core?**
 
-### Should I Use `ConfigureAwait(false)` in ASP.NET Core?
-
-### Application code
+**Application code**
 
 Usually:
 
@@ -1234,13 +1151,11 @@ await service.GetAsync()
 
 everywhere.
 
----
-
-### Where Is `ConfigureAwait(false)` More Useful?
+**Where Is `ConfigureAwait(false)` More Useful?**
 
 It's particularly relevant when writing:
 
-### Reusable libraries
+**Reusable libraries**
 
 For example:
 
@@ -1254,7 +1169,7 @@ Reusable component
 
 A library shouldn't generally assume:
 
-> "I need to resume on whatever application's synchronization context happens to exist."
+> I need to resume on whatever application's synchronization context happens to exist.
 
 So library code often uses:
 
@@ -1264,9 +1179,7 @@ await operation.ConfigureAwait(false);
 
 when it doesn't need the caller's context.
 
----
-
-### Library Example
+**Library Example**
 
 Suppose you're writing:
 
@@ -1300,9 +1213,7 @@ This communicates:
 
 > **"The continuation doesn't depend on the caller's context."**
 
----
-
-### What Does "Continuation" Mean?
+**What Does "Continuation" Mean?**
 
 This is an important word for interviews.
 
@@ -1338,9 +1249,7 @@ Console.WriteLine()
 
 `ConfigureAwait(false)` affects where/how that continuation is scheduled with respect to synchronization-context capture.
 
----
-
-### `ConfigureAwait(false)` Doesn't Make I/O Faster
+**`ConfigureAwait(false)` Doesn't Make I/O Faster**
 
 Another common misconception:
 
@@ -1356,31 +1265,26 @@ It mainly avoids synchronization-context capture.
 
 Any performance benefit is generally from reducing unnecessary context-related overhead, not from making the database/network operation itself faster.
 
----
-
-### Does `ConfigureAwait(false)` Mean "Run on ThreadPool"?
+**Does `ConfigureAwait(false)` Mean "Run on ThreadPool"?**
 
 Not exactly.
 
 Another interview trap:
 
-> "`ConfigureAwait(false)` means resume on ThreadPool."
+> `ConfigureAwait(false)` means resume on ThreadPool.
 
 That's too simplistic.
 
 Better:
 
-> **"`ConfigureAwait(false)` prevents the continuation from requiring the captured synchronization context. The continuation can then run according to the task scheduler/awaiter without being forced back to that context."**
+> `ConfigureAwait(false)` prevents the continuation from requiring the captured synchronization context. The continuation can then run according to the task scheduler/awaiter without being forced back to that context.
 
 In many practical cases this may involve a ThreadPool thread, but that's an implementation detail rather than the definition of `ConfigureAwait(false)`.
 
----
 
-### `ConfigureAwait(false)` vs `Task.Run()`
+**`ConfigureAwait(false)` vs `Task.Run()`**
 
-Don't confuse these.
-
-### `ConfigureAwait(false)`
+**`ConfigureAwait(false)`**
 
 Controls:
 
@@ -1394,7 +1298,7 @@ Example:
 await operation.ConfigureAwait(false);
 ```
 
-### `Task.Run()`
+**`Task.Run()`**
 
 Schedules work to the ThreadPool:
 
@@ -1405,9 +1309,7 @@ await Task.Run(() => CpuHeavyWork());
 So:
 
 ```text
-ConfigureAwait(false)
-→ Context behavior
-
+ConfigureAwait(false)→ Context behavior
 
 Task.Run()
 → ThreadPool scheduling
@@ -1415,13 +1317,14 @@ Task.Run()
 
 Very different purposes.
 
----
+----------------
+-----------------
 
 ## Deadlocks in Async Code
 
-> **A deadlock happens when two pieces of code are waiting for each other to make progress, so neither can continue.**
+> A deadlock happens when two pieces of code are waiting for each other to make progress, so neither can continue.
 
-### The Simplest Deadlock Example
+**The Simplest Deadlock Example**
 
 Imagine:
 
@@ -1440,9 +1343,7 @@ A ──────waits for──────→ B
           DEADLOCK
 ```
 
----
-
-### Classic Async Deadlock 
+**Classic Async Deadlock**
 
 Consider:
 
@@ -1455,7 +1356,6 @@ public string GetData()
 public async Task<string> GetDataAsync()
 {
     var data = await GetFromDatabaseAsync();
-
     return data;
 }
 ```
@@ -1466,9 +1366,7 @@ The dangerous part is:
 .Result
 ```
 
----
-
-### How Does the Deadlock Happen?
+**How Does the Deadlock Happen?**
 
 This is easiest to understand in an environment with a `SynchronizationContext`, such as older ASP.NET or UI applications.
 
@@ -1478,7 +1376,7 @@ Suppose the request/UI thread starts:
 GetDataAsync().Result
 ```
 
-### Step 1
+**Step 1**
 
 `GetDataAsync()` starts.
 
@@ -1488,9 +1386,7 @@ Request/UI Thread
 GetDataAsync()
 ```
 
----
-
-### Step 2
+**Step 2**
 
 It reaches:
 
@@ -1509,10 +1405,7 @@ await
        ↓
 DB operation running
 ```
-
----
-
-### Step 3
+**Step 3**
 
 But the caller is doing:
 
@@ -1528,9 +1421,7 @@ Request/UI Thread
 BLOCKED waiting for Task
 ```
 
----
-
-### Step 4
+**Step 4**
 
 The database operation finishes.
 
@@ -1564,9 +1455,8 @@ So:
 Thread waits for Task
 Task waits for Thread
 ```
----
 
-### Does This Deadlock Happen in ASP.NET Core?
+**Does This Deadlock Happen in ASP.NET Core?**
 
 In **modern ASP.NET Core**, there normally isn't the classic request `SynchronizationContext` that existed in older ASP.NET.
 
@@ -1592,13 +1482,12 @@ So the recommendation remains:
 
 > **Don't synchronously block on asynchronous operations.**
 
----
 
-### Deadlock vs ThreadPool Starvation 
+**Deadlock vs ThreadPool Starvation**
 
 These are frequently confused.
 
-#### Deadlock
+**`Deadlock`**
 
 Two or more operations are waiting on each other.
 
@@ -1607,11 +1496,7 @@ A → waiting for B
 B → waiting for A
 ```
 
-Nobody progresses.
-
----
-
-#### ThreadPool Starvation
+**`ThreadPool Starvation`**
 
 Too many ThreadPool threads are blocked.
 
@@ -1639,13 +1524,11 @@ Poor performance
 
 So:
 
-> **Deadlock = circular waiting**
+> Deadlock = circular waiting
 
-> **Starvation = workers are exhausted/occupied**
+> Starvation = workers are exhausted/occupied
 
----
-
-### Classic Multithreading Deadlock
+**Classic Multithreading Deadlock**
 
 Deadlocks aren't limited to async code.
 
@@ -1698,13 +1581,11 @@ Thread 2 ──holds──→ B
 
 💥 Deadlock.
 
----
-
 ### Four Conditions for a Classic Deadlock 
 
 A deadlock traditionally requires four conditions:
 
-### 1. Mutual Exclusion
+**1. Mutual Exclusion**
 
 A resource can only be used by one thread at a time.
 
@@ -1713,9 +1594,7 @@ Thread A → Resource
 Thread B → Waiting
 ```
 
----
-
-### 2. Hold and Wait
+**2. Hold and Wait**
 
 A thread holds one resource while waiting for another.
 
@@ -1727,15 +1606,11 @@ Holds Lock A
 Waiting for Lock B
 ```
 
----
-
-### 3. No Preemption
+**3. No Preemption**
 
 The resource can't simply be forcibly taken away.
 
----
-
-### 4. Circular Wait
+**4. Circular Wait**
 
 There is a cycle:
 
@@ -1761,19 +1636,18 @@ Potential DEADLOCK
 
 This is a good theory question for interviews.
 
----
+-------------------------------
+-------------------------------
 
 ## `CancellationToken`
 
-> **`CancellationToken` allows you to request that an ongoing operation stop gracefully.**
+> `CancellationToken` allows you to request that an ongoing operation stop gracefully.
 
 The key word is **request**.
 
 It does **not forcibly kill** the operation.
 
----
-
-### Why do we need Cancellation?
+**Why do we need Cancellation?**
 
 Imagine an API:
 
@@ -1817,9 +1691,7 @@ Resources released
 
 This is particularly useful for long-running operations.
 
----
-
-### The Three Main Components
+**The Three Main Components**
 
 You mainly work with:
 
@@ -1835,23 +1707,21 @@ CancellationToken
 
 Think of it like this:
 
-### `CancellationTokenSource`
+**`CancellationTokenSource`**
 
 The **controller** of cancellation.
 
-### `CancellationToken`
+**`CancellationToken`**
 
 The **signal** that tells an operation:
 
 > "Cancellation has been requested."
 
----
 
-### Basic Example
+**Basic Example**
 
 ```csharp
 var cts = new CancellationTokenSource();
-
 CancellationToken token = cts.Token;
 ```
 
@@ -1883,9 +1753,7 @@ Operation notices cancellation
 Stops gracefully
 ```
 
----
-
-### Important: Cancellation Is Cooperative
+**Important: Cancellation Is Cooperative**
 
 This is the most important concept.
 
@@ -1919,9 +1787,7 @@ public async Task DoWorkAsync(CancellationToken token)
 
 The operation checks the token and stops when cancellation is requested.
 
----
-
-### `ThrowIfCancellationRequested()`
+**`ThrowIfCancellationRequested()`**
 
 This is commonly used:
 
@@ -1953,9 +1819,7 @@ Token
 OperationCanceledException
 ```
 
----
-
-### `IsCancellationRequested`
+**`IsCancellationRequested`**
 
 You can also check:
 
@@ -1995,9 +1859,7 @@ token.ThrowIfCancellationRequested()
 
 checks and throws `OperationCanceledException`.
 
----
-
-### Passing CancellationToken to Async APIs
+**Passing CancellationToken to Async APIs**
 
 The most useful pattern is:
 
@@ -2023,9 +1885,7 @@ var response = await httpClient
 
 This is much better than simply checking cancellation yourself after the operation has already completed.
 
----
-
-### ASP.NET Core Example 
+**ASP.NET Core Example**
 
 This is extremely useful for Web API interviews.
 
@@ -2067,9 +1927,7 @@ Database
 
 If the request is aborted, cancellation can propagate down the call chain.
 
----
-
-### Cancellation Should Flow Through Your Layers
+**Cancellation Should Flow Through Your Layers**
 
 Suppose you have:
 
@@ -2085,7 +1943,7 @@ EF Core
 
 Don't stop the token at the controller.
 
-### Controller
+**Controller**
 
 ```csharp
 public async Task<IActionResult> Get(
@@ -2098,7 +1956,7 @@ public async Task<IActionResult> Get(
 }
 ```
 
-### Service
+**Service**
 
 ```csharp
 public async Task<List<Employee>> GetAsync(
@@ -2109,7 +1967,7 @@ public async Task<List<Employee>> GetAsync(
 }
 ```
 
-### Repository
+**Repository**
 
 ```csharp
 public async Task<List<Employee>> GetAsync(
@@ -2122,21 +1980,20 @@ public async Task<List<Employee>> GetAsync(
 
 This is:
 
-> **Cancellation propagation.**
+> Cancellation propagation.
 
----
+--------------------------
+--------------------------
 
 ## `Parallel.For` / `Parallel.ForEach`
 
 The easiest way to remember:
 
-> **`Task.WhenAll` → run multiple async operations concurrently**
+> `Task.WhenAll` → run multiple async operations concurrently
 
-> **`Parallel.ForEach` → process multiple items in parallel using multiple threads**
+> `Parallel.ForEach` → process multiple items in parallel using multiple threads
 
----
-
-### What is Parallel Processing?
+**What is Parallel Processing?**
 
 Suppose you have:
 
@@ -2146,7 +2003,7 @@ Suppose you have:
 
 and each item requires expensive CPU processing.
 
-#### Sequential
+**Sequential**
 
 ```text
 Thread
@@ -2154,7 +2011,7 @@ Thread
 1 → 2 → 3 → 4 → 5 → 6
 ```
 
-#### Parallel
+**Parallel**
 
 ```text
 Thread 1 → 1 → 3
@@ -2165,9 +2022,7 @@ Thread 4 → 6
 
 Multiple items can be processed concurrently.
 
----
-
-### `Parallel.For`
+**`Parallel.For`**
 
 Example:
 
@@ -2194,9 +2049,7 @@ Conceptually:
 
 The runtime decides how to partition and schedule the work.
 
----
-
-### `Parallel.ForEach`
+**`Parallel.ForEach`**
 
 If you already have a collection:
 
@@ -2211,11 +2064,9 @@ Parallel.ForEach(numbers, number =>
 
 This is generally useful when each iteration is independent and CPU-intensive.
 
----
+**`Parallel.For` vs `Parallel.ForEach`**
 
-### `Parallel.For` vs `Parallel.ForEach`
-
-#### `Parallel.For`
+**`Parallel.For`**
 
 Works with a numeric range:
 
@@ -2226,7 +2077,7 @@ Parallel.For(0, 100, i =>
 });
 ```
 
-#### `Parallel.ForEach`
+**`Parallel.ForEach`**
 
 Works with a collection:
 
@@ -2247,9 +2098,7 @@ ForEach
 → collection
 ```
 
----
-
-### Why Use Parallel Instead of Normal `foreach`?
+**Why Use Parallel Instead of Normal `foreach`?**
 
 Normal:
 
@@ -2287,15 +2136,13 @@ can execute multiple iterations concurrently:
 
 Potential benefit:
 
-> **Reduced elapsed time for CPU-bound independent work.**
+> Reduced elapsed time for CPU-bound independent work.
 
----
-
-### CPU-Bound vs I/O-Bound
+**CPU-Bound vs I/O-Bound**
 
 This is the most important thing to understand.
 
-### CPU-bound
+**`CPU-bound`**
 
 Examples:
 
@@ -2317,9 +2164,7 @@ Parallel.ForEach(items, item =>
 });
 ```
 
----
-
-### I/O-bound
+**`I/O-bound`**
 
 Examples:
 
@@ -2345,15 +2190,13 @@ await ...
 
 or controlled async concurrency.
 
----
-
-### `Parallel.ForEach` vs `Task.WhenAll`
+**`Parallel.ForEach` vs `Task.WhenAll`**
 
 This is a **very common interview question**.
 
 Suppose you need to call 100 APIs.
 
-### `Task.WhenAll`
+**`Task.WhenAll`**
 
 ```csharp
 var tasks = urls.Select(url =>
@@ -2372,9 +2215,7 @@ I/O-bound
 Task.WhenAll
 ```
 
----
-
-### `Parallel.ForEach`
+**`Parallel.ForEach`**
 
 ```csharp
 Parallel.ForEach(urls, url =>
@@ -2387,9 +2228,7 @@ Parallel.ForEach(urls, url =>
 
 You're mixing synchronous parallelism with asynchronous I/O.
 
----
-
-### Modern Async Parallelism
+**Modern Async Parallelism**
 
 For async operations, .NET provides:
 
@@ -2422,9 +2261,7 @@ Async operations
 Controlled concurrency
 ```
 
----
-
-### Why Limit Parallelism?
+**Why Limit Parallelism?**
 
 Suppose:
 
@@ -2457,9 +2294,7 @@ Possible problems:
 
 So controlled concurrency is often better.
 
----
-
-### Thread Safety
+**Thread Safety**
 
 This is one of the biggest mistakes with parallel code.
 
@@ -2486,9 +2321,7 @@ at the same time.
 
 You have a race condition.
 
----
-
-### Use `Interlocked`
+**Use `Interlocked`**
 
 For simple atomic operations:
 
@@ -2503,9 +2336,7 @@ Parallel.ForEach(numbers, number =>
 
 Now the update is atomic.
 
----
-
-### Or Use Thread-Safe Collections
+**Or Use Thread-Safe Collections**
 
 Instead of:
 
@@ -2539,7 +2370,9 @@ Parallel.ForEach(items, item =>
 });
 ```
 
----
+----------------------
+----------------------
+
 ## Thread Synchronization 
 
 When multiple threads/tasks access the **same shared data**, we can get problems such as **race conditions**.
@@ -2557,9 +2390,8 @@ Concurrent Collections
 
 The key is knowing **when to use which one**.
 
----
 
-### First: What is a Race Condition?
+**First: What is a Race Condition?**
 
 Suppose:
 
@@ -2627,9 +2459,7 @@ Because multiple threads are accessing **shared mutable state** concurrently.
 
 We need synchronization when operations aren't safely concurrent.
 
----
-
-### `lock` 
+**`lock`**
 
 The simplest synchronization mechanism in C# is:
 
@@ -2658,7 +2488,7 @@ Thread 1 → 🔓
 Thread 2 → 🔒 → executes
 ```
 
---> Critical Section
+**Critical Section**
 
 The code protected by a lock is called the **critical section**.
 
@@ -2672,7 +2502,7 @@ lock (_lock)
 
 The goal is to protect access to shared state.
 
---> Important: What Should You Lock On?
+**Important: What Should You Lock On?**
 
 Prefer a private object:
 
@@ -2703,7 +2533,7 @@ lock (typeof(MyClass))
 
 because other code could also lock the same object, causing unexpected contention or deadlocks.
 
---> How `lock` Works Internally
+**How `lock` Works Internally**
 
 Conceptually, `lock` is based on `Monitor`.
 
@@ -2742,9 +2572,7 @@ finally
 
 The lock must be released even if an exception occurs.
 
----
-
-### `Monitor`
+**`Monitor`**
 
 `Monitor` provides more control than `lock`.
 
@@ -2791,13 +2619,9 @@ else
 }
 ```
 
-### Interview answer:
-
 > **"`lock` is a convenient C# syntax around Monitor. Monitor provides additional capabilities such as TryEnter and explicit control over entering and exiting the critical section."**
 
----
-
-# 8. `lock` vs `Monitor`
+**`lock` vs `Monitor`**
 
 |                          | `lock`     | `Monitor`   |
 | ------------------------ | ---------- | ----------- |
@@ -2811,9 +2635,7 @@ Usually:
 
 > **Use `lock` unless you specifically need Monitor functionality.**
 
----
-
-### `Mutex`
+**`Mutex`**
 
 A `Mutex` is another synchronization primitive.
 
@@ -2850,9 +2672,7 @@ Application B
 
 Whereas `lock` is generally used for synchronization within a process.
 
----
-
-### `lock` vs `Mutex`
+**`lock` vs `Mutex`**
 
 |               | `lock`                 | `Mutex`                       |
 | ------------- | ---------------------- | ----------------------------- |
@@ -2877,9 +2697,8 @@ If you need:
 
 A named `Mutex` may be appropriate.
 
----
 
-### `SemaphoreSlim` 
+**`SemaphoreSlim`**
 
 `SemaphoreSlim` is extremely important in modern async programming.
 
@@ -2926,9 +2745,7 @@ Operation 1 → Release()
 Operation 4 → allowed
 ```
 
----
-
-# 12. Why `SemaphoreSlim` Is Important with Async
+**Why `SemaphoreSlim` Is Important with Async**
 
 Remember:
 
@@ -2964,9 +2781,7 @@ finally
 
 This allows asynchronous waiting.
 
----
-
-### `SemaphoreSlim(1, 1)` = Async Lock
+**`SemaphoreSlim(1, 1)` = Async Lock**
 
 This is a very useful mental model.
 
@@ -2992,9 +2807,7 @@ One-at-a-time access
 Async-compatible
 ```
 
----
-
-### Semaphore vs Mutex
+**Semaphore vs Mutex**
 
 A semaphore can allow **multiple** callers at the same time.
 
@@ -3016,9 +2829,7 @@ Semaphore
 → N
 ```
 
----
-
-### `Interlocked` 
+**`Interlocked`**
 For very simple atomic operations, `Interlocked` is often better than a lock.
 
 Example:
@@ -3048,9 +2859,7 @@ Interlocked.Exchange(ref counter, 100);
 Interlocked.CompareExchange(...);
 ```
 
----
-
-### Why Use `Interlocked`?
+**Why Use `Interlocked`?**
 
 If your operation is simply:
 
@@ -3072,11 +2881,9 @@ Interlocked.Increment(ref _requestCount);
 
 This is designed for atomic operations.
 
----
+**`Interlocked` vs `lock`**
 
-### `Interlocked` vs `lock`
-
-### `Interlocked`
+`Interlocked`
 
 ```csharp
 Interlocked.Increment(ref counter);
@@ -3088,7 +2895,7 @@ Good for:
 Simple atomic state changes
 ```
 
-### `lock`
+`lock`
 
 ```csharp
 lock (_lock)
@@ -3118,9 +2925,7 @@ Complex critical section
 lock
 ```
 
----
-
-### Concurrent Collections
+**Concurrent Collections**
 
 .NET provides thread-safe collections such as:
 
@@ -3146,9 +2951,7 @@ Example:
 dictionary.TryAdd(1, "Swapnil");
 ```
 
----
-
-### Why Use Concurrent Collections?
+**Why Use Concurrent Collections?**
 
 Instead of:
 
@@ -3169,9 +2972,6 @@ The collection handles the necessary synchronization internally.
 
 This can make concurrent code simpler and safer.
 
----
-
-
 ### Real-World Example
 
 Suppose you have an API that maintains:
@@ -3189,8 +2989,6 @@ Interlocked.Increment(ref _requestCount);
 ```
 
 Simple and efficient.
-
----
 
 Now suppose you have:
 
@@ -3214,8 +3012,6 @@ or protect access with:
 lock
 ```
 
----
-
 Now suppose:
 
 > Only 10 external API calls should execute concurrently.
@@ -3225,8 +3021,6 @@ Use:
 ```csharp
 SemaphoreSlim(10, 10)
 ```
-
----
 
 Now suppose:
 
@@ -3240,9 +3034,7 @@ Mutex
 
 may be appropriate.
 
----
-
-### Don't Hold Locks During I/O 🚨
+Don't Hold Locks During I/O 🚨
 
 Avoid:
 
@@ -3278,9 +3070,7 @@ Contention
 
 Instead, keep the critical section small.
 
----
-
-### Deadlock Risk ⭐⭐⭐
+### Deadlock Risk 
 
 Synchronization can introduce deadlocks.
 
@@ -3298,19 +3088,13 @@ We discussed this in the previous topic.
 
 Best practice:
 
-> **Always acquire multiple locks in a consistent order.**
-
----
+> Always acquire multiple locks in a consistent order.
 
 ### `lock` vs `SemaphoreSlim` — Interview Question
 
-### Question:
-
 > "I need to protect an async method. Should I use lock?"
 
-Answer:
-
-> **"A normal `lock` can't be held across an `await`. For asynchronous mutual exclusion, I'd typically use `SemaphoreSlim` and `WaitAsync()`."**
+> "A normal `lock` can't be held across an `await`. For asynchronous mutual exclusion, I'd typically use `SemaphoreSlim` and `WaitAsync()`."
 
 Example:
 
@@ -3327,79 +3111,35 @@ finally
 }
 ```
 
----
-
-### One More Important Concept: Atomicity
-
-An operation is **atomic** when it appears to happen as one indivisible operation from the perspective of other threads.
-
-For example:
-
-```csharp
-Interlocked.Increment(ref counter);
-```
-
-is atomic.
-
-But:
-
-```csharp
-counter++;
-```
-
-is not guaranteed to be atomic as a compound read-modify-write operation.
-
-That's why:
-
-```csharp
-Interlocked.Increment(...)
-```
-
-is useful.
-
----
-
 ### Interview Questions
 
-### Q1. What is a race condition?
+Q1. What is a race condition?
 
 > **"A race condition occurs when multiple threads access shared mutable state concurrently and the result depends on the timing or ordering of their execution."**
 
----
+Q2. What is `lock`?
 
-### Q2. What is `lock`?
+> `lock` provides mutual exclusion, ensuring that only one thread at a time can execute a protected critical section for a particular lock object.
 
-> **"`lock` provides mutual exclusion, ensuring that only one thread at a time can execute a protected critical section for a particular lock object."**
+Q3. `lock` vs `Monitor`?
 
----
+> `lock` is syntactic sugar around Monitor's enter/exit behavior. Monitor provides additional functionality such as TryEnter.
 
-### Q3. `lock` vs `Monitor`?
+Q4. `lock` vs `Mutex`?
 
-> **"`lock` is syntactic sugar around Monitor's enter/exit behavior. Monitor provides additional functionality such as TryEnter."**
+> `lock` is generally used for synchronization within a process, while Mutex can also provide cross-process synchronization. Mutex has more overhead.
 
----
+Q5. When would you use `SemaphoreSlim`?
 
-### Q4. `lock` vs `Mutex`?
+> I'd use SemaphoreSlim when I need asynchronous synchronization or need to limit concurrency, such as allowing only 10 concurrent API calls. `WaitAsync()` allows callers to wait without synchronously blocking a thread.
 
-> **"`lock` is generally used for synchronization within a process, while Mutex can also provide cross-process synchronization. Mutex has more overhead."**
+Q6. When would you use `Interlocked`?
 
----
+> For simple atomic operations such as incrementing, decrementing, exchanging, or compare-and-swap on shared values. It's preferable to a lock when the operation is simple enough.
 
-### Q5. When would you use `SemaphoreSlim`?
+Q7. What are Concurrent Collections?
 
-> **"I'd use SemaphoreSlim when I need asynchronous synchronization or need to limit concurrency, such as allowing only 10 concurrent API calls. `WaitAsync()` allows callers to wait without synchronously blocking a thread."**
+> They are thread-safe collection implementations such as ConcurrentDictionary and ConcurrentQueue that support concurrent access without requiring the caller to manually synchronize every collection operation.
 
----
-
-### Q6. When would you use `Interlocked`?
-
-> **"For simple atomic operations such as incrementing, decrementing, exchanging, or compare-and-swap on shared values. It's preferable to a lock when the operation is simple enough."**
-
----
-
-### Q7. What are Concurrent Collections?
-
-> **"They are thread-safe collection implementations such as ConcurrentDictionary and ConcurrentQueue that support concurrent access without requiring the caller to manually synchronize every collection operation."**
-
----
-
+----------------
+-----------------

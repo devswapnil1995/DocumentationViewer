@@ -10,6 +10,35 @@
 ---
 
 ## HTTP status codes
+|    Code | Name                      | Meaning                                         | Common API Scenario                       |
+| ------: | ------------------------- | ----------------------------------------------- | ----------------------------------------- |
+| **100** | Continue                  | Request headers received; client can continue   | Rarely handled manually                   |
+| **101** | Switching Protocols       | Server is switching protocols                   | WebSocket upgrade                         |
+| **200** | **OK**                    | Request succeeded                               | `GET`, successful general request         |
+| **201** | **Created**               | Resource successfully created                   | `POST /users`                             |
+| **202** | **Accepted**              | Request accepted but processing isn't complete  | Async/background processing               |
+| **204** | **No Content**            | Success, but no response body                   | `DELETE`, or update with no body          |
+| **301** | Moved Permanently         | Resource permanently moved                      | URL redirect                              |
+| **302** | Found                     | Temporary redirect                              | Temporary redirect                        |
+| **304** | Not Modified              | Cached version can be used                      | Conditional GET / caching                 |
+| **400** | **Bad Request**           | Request is invalid                              | Invalid JSON, validation/input problem    |
+| **401** | **Unauthorized**          | Authentication is missing/invalid               | No/invalid JWT token                      |
+| **403** | **Forbidden**             | Authenticated but not allowed                   | User lacks permission                     |
+| **404** | **Not Found**             | Resource doesn't exist                          | `/users/999` doesn't exist                |
+| **405** | Method Not Allowed        | HTTP method isn't supported                     | `POST` sent to GET-only endpoint          |
+| **406** | Not Acceptable            | Server can't provide requested representation   | Unsupported `Accept` header               |
+| **408** | Request Timeout           | Server timed out waiting for request            | Client took too long                      |
+| **409** | **Conflict**              | Request conflicts with current state            | Duplicate username / concurrency conflict |
+| **410** | Gone                      | Resource permanently removed                    | Deleted API/resource                      |
+| **415** | Unsupported Media Type    | Request content type isn't supported            | Sending XML when API expects JSON         |
+| **422** | Unprocessable Content     | Syntax is valid but semantic validation fails   | Invalid business/input data               |
+| **429** | **Too Many Requests**     | Rate limit exceeded                             | Too many API calls                        |
+| **500** | **Internal Server Error** | Unexpected server-side error                    | Unhandled exception                       |
+| **501** | Not Implemented           | Server doesn't support requested functionality  | Unsupported server feature                |
+| **502** | **Bad Gateway**           | Gateway received invalid response from upstream | API Gateway → service failure             |
+| **503** | **Service Unavailable**   | Server temporarily unavailable                  | Service down/overloaded                   |
+| **504** | **Gateway Timeout**       | Gateway didn't receive response in time         | API Gateway → backend timeout             |
+
 
 ## HTTP Verbs
 
@@ -168,6 +197,18 @@ app.UseCors(policy => policy.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader())
 - PUT replaces entire resource
 - PATCH updates only certain fields
 
+```
+POST instead of PUT
+→ Might create a NEW resource
+
+PUT instead of PATCH
+→ Might replace missing fields / reset them
+
+PATCH instead of PUT
+→ Might perform only partial modification
+   or return 405 if PATCH isn't supported
+```
+
 ---------------------------
 ---------------------------
 
@@ -314,6 +355,34 @@ _configuration["ConnectionStrings:DefaultConnection"]
 
 because `GetConnectionString()` clearly communicates what you're retrieving.
 
+```csharp
+
+// 1. appsettings.json
+builder.Configuration.AddJsonFile(
+    "appsettings.json",
+    optional: false,
+    reloadOnChange: true);
+
+// 2. appsettings.{Environment}.json
+builder.Configuration.AddJsonFile(
+    $"appsettings.{builder.Environment.EnvironmentName}.json",
+    optional: true,
+    reloadOnChange: true);
+
+// 3. User Secrets - Development
+if (builder.Environment.IsDevelopment())
+{
+    builder.Configuration.AddUserSecrets<Program>();
+}
+
+// 4. Environment Variables
+builder.Configuration.AddEnvironmentVariables();
+
+// 5. Command-line arguments
+builder.Configuration.AddCommandLine(args);
+
+```
+
 ### IOptions<T>
 
 > "IConfiguration is useful for reading configuration values, while the Options Pattern lets us bind a related configuration section to a strongly typed class 
@@ -422,7 +491,7 @@ IConfiguration
 
 ## Key Vault
 
-> **"I use Azure Key Vault to keep sensitive configuration outside my code and source control, integrate it with ASP.NET Core configuration, and use Managed Identity so the application can securely access those secrets without storing Azure credentials itself."**
+> I use Azure Key Vault to keep sensitive configuration outside my code and source control, integrate it with ASP.NET Core configuration, and use Managed Identity so the application can securely access those secrets without storing Azure credentials itself.
 
 Suppose your `appsettings.json` contains:
 
@@ -682,7 +751,7 @@ No application-stored Azure credential is needed.
 
 So the interview-friendly statement is:
 
-> **"When an application runs in Azure, Managed Identity is generally preferred for authenticating to Key Vault because it eliminates the need to store Azure credentials in the application."**
+> When an application runs in Azure, Managed Identity is generally preferred for authenticating to Key Vault because it eliminates the need to store Azure credentials in the application.
 
 **Good candidates for key vault**
 
@@ -706,6 +775,8 @@ So the interview-friendly statement is:
 ✗ Normal business data
 ```
 
+>In production, I would integrate Azure Key Vault using Managed Identity rather than storing a client secret in the application. I would enable a system-assigned managed identity on the App Service, grant that identity the Key Vault Secrets User RBAC role, and then use DefaultAzureCredential from Azure.Identity to authenticate to Key Vault. Locally, DefaultAzureCredential can use my developer credentials, while in Azure it can use the App Service managed identity. Alternatively, for App Service configuration values, I can use Key Vault References so the application doesn't need direct Key Vault configuration code
+
 Not every configuration value is a secret.
 
 ### The 5 things to remember for interviews
@@ -726,6 +797,27 @@ Not every configuration value is a secret.
 5. Options Pattern
    → Bind configuration into strongly typed classes.
 ```
+
+```
+App Service
+     │
+     │ Managed Identity
+     ↓
+Microsoft Entra ID
+     │
+     │ Token
+     ↓
+Key Vault
+     │
+     │
+     ├── DB-ConnectionString
+     ├── JWT-Secret
+     └── Payment-ApiKey
+
+dotnet add package Azure.Identity
+dotnet add package Azure.Extensions.AspNetCore.Configuration.Secrets
+```
+
 --------------------------
 --------------------------
 
@@ -1501,3 +1593,9 @@ Access-Control-Allow-Headers: Authorization, Content-Type
 `Access-Control-Allow-Credentials`
 
 Indicates whether credentials can be included in the cross-origin request.
+
+> CORS preflight is an OPTIONS request automatically sent by the browser before certain cross-origin requests. It is not always sent; simple requests can be sent directly. In ASP.NET Core, we configure the CORS policy to specify allowed origins, methods, and headers. We can also configure preflight caching using SetPreflightMaxAge() to reduce repeated OPTIONS requests.
+
+
+-----
+-----

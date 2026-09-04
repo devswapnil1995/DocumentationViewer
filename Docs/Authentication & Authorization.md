@@ -519,3 +519,508 @@ If rotation is NOT implemented, it returns only a new access token, and the same
 
 ---------------------
 ---------------------
+## 15 ways to improve ASP.NET Core API performance
+
+| #  | Optimization                      | What you do                                   |
+| -- | --------------------------------- | --------------------------------------------- |
+| 1  | **Database queries**              | Optimize SQL/EF queries                       |
+| 2  | **Indexes**                       | Add indexes to frequently queried columns     |
+| 3  | **Avoid N+1 queries**             | Use proper joins/projections/includes         |
+| 4  | **Projection**                    | Select only required columns                  |
+| 5  | **`AsNoTracking()`**              | Use for read-only EF queries                  |
+| 6  | **Pagination**                    | Don't return thousands/millions of records    |
+| 7  | **Async I/O**                     | Use `async/await` for DB/HTTP/file operations |
+| 8  | **Caching**                       | Cache frequently requested data/responses     |
+| 9  | **Compression**                   | Reduce response payload size                  |
+| 10 | **DTOs**                          | Return only required data                     |
+| 11 | **Avoid unnecessary allocations** | Reduce object creation/copies                 |
+| 12 | **Connection pooling**            | Reuse DB/HTTP connections                     |
+| 13 | **HTTP client reuse**             | Use `IHttpClientFactory`                      |
+| 14 | **Background processing**         | Move non-critical work out of request         |
+| 15 | **Measure/profile**               | Find actual bottleneck before optimizing      |
+
+> For a typical enterprise .NET API, I'd separate the API, Application, Domain, and Infrastructure concerns. Controllers remain thin and handle HTTP concerns. Application contains use cases and business orchestration. Domain contains core business rules and entities. Infrastructure handles EF Core, databases, external services, and other technical concerns. I use interfaces where they provide useful boundaries and DI to compose the implementations
+-------------
+-------------
+
+## Scaling
+
+> Scaling means increasing your system's capacity so it can handle **more users, requests, data, or workload** without becoming too slow or unavailable.
+
+For an API, imagine:
+
+```text
+100 users
+   ↓
+   API
+   ↓
+Database
+```
+
+Now users increase to:
+
+```text
+100,000 users
+```
+
+Your single API server may not be enough. You need to **scale**.
+
+There are two main approaches:
+
+```text
+                 Scaling
+                    |
+          +---------+---------+
+          |                   |
+     Vertical              Horizontal
+      Scaling                Scaling
+       (Scale Up)            (Scale Out)
+```
+
+**`Vertical Scaling — Scale Up`**
+
+You make the **existing server bigger**.
+
+Suppose your API server has:
+
+```text
+CPU: 2 cores
+RAM: 4 GB
+```
+
+You upgrade it to:
+
+```text
+CPU: 8 cores
+RAM: 32 GB
+```
+
+```text
+Before:
+
+       API Server
+     2 CPU / 4 GB
+          ↓
+       Database
+
+
+After:
+
+       API Server
+     8 CPU / 32 GB
+          ↓
+       Database
+```
+
+**Advantages**
+
+* Simple
+* Usually no application architecture changes
+* Easy to implement
+* Useful when workload is moderate
+
+**Disadvantages**
+
+* Hardware has a limit
+* Can become expensive
+* Single point of failure still exists
+* Eventually you cannot make the machine bigger
+
+---
+
+**`Horizontal Scaling — Scale Out`**
+
+Instead of making one server bigger, you create **multiple instances** of your API.
+
+```text
+                 Load Balancer
+                 /     |      \
+                /      |       \
+               ↓       ↓        ↓
+            API 1    API 2    API 3
+               \       |       /
+                \      |      /
+                   Database
+```
+
+Suppose one API server handles:
+
+```text
+1,000 requests/sec
+```
+
+Instead of upgrading it to a huge machine, you can have:
+
+```text
+API 1 → 1,000 req/sec
+API 2 → 1,000 req/sec
+API 3 → 1,000 req/sec
+```
+
+Potential capacity:
+
+```text
+~3,000 req/sec
+```
+
+assuming the rest of the architecture isn't the bottleneck.
+
+---
+
+**What does the Load Balancer do?**
+
+The Load Balancer distributes incoming requests.
+
+```text
+Request 1 → API 1
+Request 2 → API 2
+Request 3 → API 3
+Request 4 → API 1
+Request 5 → API 2
+```
+
+For example:
+
+```text
+                 Load Balancer
+                       |
+        +--------------+--------------+
+        ↓              ↓              ↓
+      API 1          API 2          API 3
+```
+
+Common cloud examples include Azure Application Gateway, Azure Load Balancer, and Azure Front Door, depending on the architecture.
+
+---
+
+**The BIG problem with Horizontal Scaling**
+
+Imagine you have:
+
+```text
+API 1
+  ↓
+IMemoryCache
+```
+
+and:
+
+```text
+API 2
+  ↓
+IMemoryCache
+```
+
+These are **different memory spaces**.
+
+```text
+        Load Balancer
+          /       \
+         ↓         ↓
+      API 1      API 2
+       ↓           ↓
+   Cache A      Cache B
+```
+
+If user requests:
+
+```text
+Request 1 → API 1
+```
+
+API 1 caches:
+
+```text
+user:123 → data
+```
+
+Then:
+
+```text
+Request 2 → API 2
+```
+
+API 2 doesn't have that cached value.
+
+This is why horizontally scaled applications should avoid depending on **local in-memory state** when that state needs to be shared across instances.
+
+Use something like:
+
+```text
+API 1 ──┐
+API 2 ──┼──→ Redis
+API 3 ──┘
+```
+
+instead.
+
+---
+
+**Session State**
+
+Another common problem:
+
+```text
+User
+ ↓
+API 1
+ ↓
+Session data stored in API 1 memory
+```
+
+Next request:
+
+```text
+User
+ ↓
+API 2
+```
+
+API 2 doesn't have that session data.
+
+Solutions include:
+
+* Distributed session
+* Redis
+* Database-backed state
+* Or preferably designing APIs to be **stateless** where practical
+
+**Why Stateless APIs are important**
+
+A horizontally scalable API should ideally be:
+
+```text
+Request
+   ↓
+Any API instance
+   ↓
+Process request
+   ↓
+Response
+```
+
+It shouldn't matter whether the request goes to:
+
+```text
+API 1
+API 2
+API 3
+```
+
+For example, don't store important user state only in:
+
+```csharp
+private static ...
+```
+
+or:
+
+```csharp
+IMemoryCache
+```
+
+if another instance needs that state.
+
+Instead:
+
+```text
+API instances
+      |
+      +----→ Database
+      |
+      +----→ Redis
+      |
+      +----→ Message Broker
+```
+
+---
+
+**Auto Scaling**
+
+In cloud environments, horizontal scaling can be automatic.
+
+For example:
+
+```text
+Normal traffic
+     ↓
+   API 2 instances
+
+
+Traffic increases
+     ↓
+   API 5 instances
+
+
+Traffic decreases
+     ↓
+   API 2 instances
+```
+
+This is called **autoscaling**.
+
+You can scale based on metrics such as:
+
+```text
+CPU
+Memory
+Request count
+Queue length
+Response latency
+```
+
+---
+
+**What about the Database?**
+
+This is where interviewers often go deeper.
+
+You may horizontally scale your API:
+
+```text
+        Load Balancer
+        /     |     \
+      API1   API2   API3
+        \     |     /
+         \    |    /
+          Database
+```
+
+But now the database may become the bottleneck.
+
+You might need:
+
+```text
+Database optimization
+        ↓
+Indexes
+        ↓
+Read replicas
+        ↓
+Caching
+        ↓
+Partitioning/sharding (when appropriate)
+```
+
+So scaling isn't simply:
+
+> "Add more API servers."
+
+You have to identify the **bottleneck**.
+
+---
+
+### Vertical vs Horizontal
+
+|                   | Vertical             | Horizontal              |
+| ----------------- | -------------------- | ----------------------- |
+| Also called       | Scale Up             | Scale Out               |
+| Approach          | Bigger machine       | More machines/instances |
+| Complexity        | Lower                | Higher                  |
+| Maximum capacity  | Hardware limit       | Can scale much further  |
+| Fault tolerance   | Lower                | Higher                  |
+| Load balancer     | Usually unnecessary  | Usually needed          |
+| Stateless design  | Less critical        | **Very important**      |
+| Cloud scalability | Limited              | **Excellent**           |
+| Cost              | Can become expensive | Often more flexible     |
+
+---
+
+### Real-world API architecture
+
+For a scalable .NET API, you might have:
+
+```text
+                    Internet
+                       |
+                       ↓
+              Load Balancer / Gateway
+                       |
+          +------------+------------+
+          |            |            |
+          ↓            ↓            ↓
+       .NET API     .NET API     .NET API
+       Instance 1   Instance 2   Instance 3
+          |            |            |
+          +------------+------------+
+                       |
+              +--------+--------+
+              |                 |
+              ↓                 ↓
+            Redis            Database
+              |
+              ↓
+        Shared Cache
+```
+
+And for asynchronous work:
+
+```text
+API
+ ↓
+Message Queue
+ ↓
+Background Workers
+ ↓
+Database / External services
+```
+
+---
+
+**When would you choose which?**
+
+### Small application
+
+```text
+1 API server
+   ↓
+Database
+```
+
+Vertical scaling is often perfectly fine.
+
+---
+
+### Growing application
+
+```text
+             Load Balancer
+              /          \
+            API 1        API 2
+               \          /
+                Database
+```
+
+Horizontal scaling starts becoming useful.
+
+---
+
+### High-scale application
+
+```text
+                 Gateway
+                    |
+          +---------+---------+
+          ↓         ↓         ↓
+        API 1     API 2     API 3
+          |         |         |
+          +---------+---------+
+                    |
+                  Redis
+                    |
+                 Database
+                    |
+              Read Replicas
+```
+
+You combine:
+
+> **Horizontal scaling + caching + database optimization + async processing + autoscaling**
+
+---
+
+**Vertical = make the server bigger.**
+**Horizontal = add more servers.**
+
+------------------------
+------------------------

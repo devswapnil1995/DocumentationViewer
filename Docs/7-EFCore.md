@@ -201,6 +201,7 @@ Common when:
 -------------------------------
 
 ## `DbContext` Lifecycle & Scope
+> Thread-safe = an object/component can be safely used by multiple threads concurrently without causing incorrect behavior or corrupting shared state.
 
 > `DbContext` represents a session/unit of work with the database.
 
@@ -1691,7 +1692,7 @@ Common attributes:
 
 ### Example: 
 
-**`1. [Required]`**
+**`[Required]`**
 
 ```csharp
 public class Employee
@@ -2282,6 +2283,45 @@ Anything fails → ROLLBACK ❌
 ```
 
 That's a transaction.
+
+> If the tables belong to the same database, I'd use an EF Core transaction when the operation spans multiple database operations that must succeed or fail together. I'd call BeginTransactionAsync(), perform the required changes, call SaveChangesAsync() as needed, and call CommitAsync() only after everything succeeds. If an exception occurs, I'd roll back and rethrow. If the changes are all part of one SaveChanges, EF Core normally provides a transaction automatically for relational providers. For operations spanning multiple services or databases, I'd consider a Saga rather than a local database transaction
+
+```csharp
+
+await using var transaction =
+    await _db.Database.BeginTransactionAsync();
+
+try
+{
+    // Operation 1
+    _db.Orders.Add(order);
+
+    await _db.SaveChangesAsync();
+
+
+    // Operation 2
+    product.Stock -= quantity;
+
+    await _db.SaveChangesAsync();
+
+
+    // Operation 3
+    customer.TotalOrders++;
+
+    await _db.SaveChangesAsync();
+
+
+    // Everything succeeded
+    await transaction.CommitAsync();
+}
+catch
+{
+    await transaction.RollbackAsync();
+    throw;
+}
+```
+
+
 
 ---
 
@@ -4093,7 +4133,7 @@ Don't say that every database has a `rowversion` column.
 
 ---
 
-### Optimistic vs Pessimistic Concurrency ⭐⭐
+### Optimistic vs Pessimistic Concurrency
 
 ### Optimistic
 

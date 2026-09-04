@@ -1469,7 +1469,7 @@ One service can fail without necessarily taking everything down.
 
 Different services can potentially use different technologies where justified.
 
-### Microservices Disadvantages ⭐⭐⭐
+### Microservices Disadvantages
 
 *`Complexity`*
 
@@ -2544,7 +2544,7 @@ because there isn't one.
 
 ---
 
-### Entity vs Value Object ⭐⭐⭐
+### Entity vs Value Object
 
 This is one of the most common interview questions.
 
@@ -2587,8 +2587,7 @@ CustomerRegistered
 Example:
 
 ```csharp
-public record OrderConfirmed(
-    Guid OrderId);
+public record OrderConfirmed(Guid OrderId);
 ```
 
 When Order is confirmed:
@@ -2728,7 +2727,7 @@ The simplest definition:
 
 > **Event-Driven Architecture (EDA) is an architecture where components communicate by producing and consuming events representing things that have happened.**
 
-## What Is an Event?
+### What Is an Event?
 
 An event represents:
 
@@ -2842,11 +2841,11 @@ That's:
 > **Loose coupling**
 
 
-## Publisher and Consumer
+### Publisher and Consumer
 
 Two important terms.
 
-### Publisher / Producer
+#### Publisher / Producer
 
 Creates/publishes the event.
 
@@ -2856,7 +2855,7 @@ Order Service
 OrderCreated
 ```
 
-### Consumer / Subscriber
+#### Consumer / Subscriber
 
 Consumes the event.
 
@@ -3372,7 +3371,7 @@ Consumer
 
 It's commonly used for reliable asynchronous communication in Azure-based .NET systems.
 
-### Channel vs Message Broker ⭐⭐⭐
+### Channel vs Message Broker
 
 We covered `Channel<T>` earlier.
 

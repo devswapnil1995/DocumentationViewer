@@ -382,6 +382,8 @@ Much better.
 
 ### `AsEnumerable()`
 
+> Once the query is exposed as IEnumerable, subsequent LINQ operators use LINQ-to-Objects, so filtering, projection, etc. after that point happen in memory rather than being translated to SQL. This can cause unnecessary data retrieval and memory usage.
+
 You can intentionally switch from queryable processing to in-memory processing.
 
 ```csharp
@@ -411,6 +413,8 @@ But don't use `AsEnumerable()`/`ToList()` blindly because you may pull more data
 
 
 ### `AsQueryable()`
+
+> List<T>.AsQueryable() creates an IQueryable backed by an in-memory provider. The query still executes against memory; it doesn't generate SQL. For normal in-memory collections, IEnumerable is generally the more natural abstraction.
 
 You'll also see:
 
