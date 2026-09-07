@@ -1596,6 +1596,521 @@ Indicates whether credentials can be included in the cross-origin request.
 
 > CORS preflight is an OPTIONS request automatically sent by the browser before certain cross-origin requests. It is not always sent; simple requests can be sent directly. In ASP.NET Core, we configure the CORS policy to specify allowed origins, methods, and headers. We can also configure preflight caching using SetPreflightMaxAge() to reduce repeated OPTIONS requests.
 
+-----
+-----
 
------
------
+## Collections in C#
+
+A collection is used to **store and manage multiple objects/values**.
+The important collections are:
+
+```text
+Collections
+│
+├── Array
+│
+├── List<T>
+├── LinkedList<T>
+├── Stack<T>
+├── Queue<T>
+│
+├── Dictionary<TKey,TValue>
+├── HashSet<T>
+│
+└── Concurrent Collections
+    ├── ConcurrentDictionary
+    ├── ConcurrentQueue
+    └── ConcurrentBag
+```
+
+---
+
+**`1. Array`**
+
+Fixed-size collection.
+
+```csharp
+int[] numbers = { 10, 20, 30, 40 };
+```
+
+Once created:
+
+```csharp
+numbers.Length // 4
+```
+
+You cannot directly increase its size.
+
+**When to use?**
+
+When you know the size and need efficient indexed access.
+
+```csharp
+numbers[2]; // O(1)
+```
+
+---
+
+**`2. List<T>`**
+
+Most commonly used collection.
+
+```csharp
+List<int> numbers = new List<int>();
+
+numbers.Add(10);
+numbers.Add(20);
+numbers.Add(30);
+```
+
+Access:
+
+```csharp
+numbers[1]; // 20
+```
+
+Internally, `List<T>` uses a **dynamic array**.
+
+When capacity is reached, it allocates a larger array and copies elements.
+
+**Complexity**
+
+| Operation             |        Typical |
+| --------------------- | -------------: |
+| Access by index       |           O(1) |
+| Add at end            | O(1) amortized |
+| Insert at beginning   |           O(n) |
+| Remove by value/index |           O(n) |
+| Search                |           O(n) |
+
+---
+
+**`3. LinkedList<T>`** 
+
+Elements are stored as nodes:
+
+```text id="x5j2f0"
+Node ↔ Node ↔ Node ↔ Node
+```
+
+Each node knows its neighboring nodes.
+
+```csharp
+LinkedList<int> numbers = new();
+
+numbers.AddLast(10);
+numbers.AddLast(20);
+numbers.AddFirst(5);
+```
+
+If you already have the node:
+
+```csharp
+numbers.AddAfter(node, 15);
+```
+
+Insertion/removal can be **O(1)** once the relevant node is known.
+
+But finding a node is:
+
+```text
+O(n)
+```
+
+> "LinkedList is always faster than List."
+
+It isn't.
+
+For many real-world workloads, `List<T>` performs better because its contiguous memory layout is cache-friendly and it has cheap indexing.
+
+--------
+
+**`4. Stack`**
+
+**LIFO — Last In, First Out**
+
+```text
+        30 ← Top
+        20
+        10
+```
+
+```csharp
+Stack<int> stack = new();
+
+stack.Push(10);
+stack.Push(20);
+stack.Push(30);
+
+int value = stack.Pop(); // 30
+```
+
+Common uses:
+
+* Undo operations
+* Expression evaluation
+* DFS
+* Function/call-stack-like algorithms
+
+---
+
+**`5. Queue`**
+
+**FIFO — First In, First Out**
+
+```text
+Front                 Rear
+ ↓                      ↓
+10 → 20 → 30 → 40
+```
+
+```csharp
+Queue<int> queue = new();
+
+queue.Enqueue(10);
+queue.Enqueue(20);
+queue.Enqueue(30);
+
+int value = queue.Dequeue(); // 10
+```
+
+Common uses:
+
+* Job processing
+* BFS
+* Request queues
+* Producer/consumer scenarios
+
+---
+
+**`6. Dictionary<TKey,TValue>`**
+
+Stores **key-value pairs**.
+
+```csharp
+Dictionary<int, string> users = new();
+
+users.Add(1, "Swapnil");
+users.Add(2, "Rahul");
+```
+
+Retrieve:
+
+```csharp
+var name = users[1];
+```
+
+Conceptually:
+
+```text
+Key → Value
+
+1   → Swapnil
+2   → Rahul
+3   → Amit
+```
+
+A `Dictionary` is hash-table based.
+
+Typical lookup:
+
+```text
+O(1) average
+```
+
+Worst-case behavior can degrade, but for normal use you think of dictionary lookup as **average O(1)**.
+
+Keys must be unique.
+
+```csharp
+users.Add(1, "ABC");
+users.Add(1, "XYZ"); // Exception
+```
+
+---
+
+**`7. HashSet<T>`**
+
+Stores **unique values**.
+
+```csharp
+HashSet<int> numbers = new();
+
+numbers.Add(10);
+numbers.Add(20);
+numbers.Add(10);
+```
+
+Result:
+
+```text
+10
+20
+```
+
+Duplicate `10` isn't added.
+
+Useful when your primary requirement is:
+
+> Does this value already exist?
+
+Typical:
+
+```csharp
+numbers.Contains(20);
+```
+
+Average lookup:
+
+```text
+O(1)
+```
+
+**Dictionary vs HashSet**
+
+Very common interview question.
+
+|                | Dictionary   | HashSet      |
+| -------------- | ------------ | ------------ |
+| Stores         | Key + Value  | Values       |
+| Duplicate      | Keys ❌       | Values ❌     |
+| Lookup         | By key       | By value     |
+| Example        | `Id → User`  | Unique IDs   |
+| Typical lookup | O(1) average | O(1) average |
+
+Think:
+
+```text
+Dictionary → "Give me the value for this KEY."
+
+HashSet → "Does this VALUE exist?"
+```
+
+---
+
+**`8. IEnumerable<T>, ICollection<T>, IList<T>`**
+
+These aren't concrete collection implementations like `List<T>`.
+
+They're **interfaces/abstractions**.
+
+A useful hierarchy to remember:
+
+```text
+IEnumerable<T>
+      ↑
+ICollection<T>
+      ↑
+IList<T>
+      ↑
+List<T>
+```
+
+**`IEnumerable<T>`**
+
+Mainly means:
+
+> I can enumerate/iterate over this collection.
+
+```csharp
+IEnumerable<int> numbers = new List<int>
+{
+    1, 2, 3
+};
+```
+
+You can:
+
+```csharp
+foreach (var n in numbers)
+{
+}
+```
+
+---
+
+**`ICollection<T>`**
+
+Adds collection operations such as:
+
+```csharp
+Add()
+Remove()
+Count
+Contains()
+```
+
+---
+
+**`IList<T>`**
+
+Adds indexed access:
+
+```csharp
+numbers[0]
+```
+
+---
+
+**`9. IReadOnlyCollection<T> IReadOnlyList<T>`**
+
+Useful when you want to expose data without allowing callers to modify the collection through the interface.
+
+```csharp
+public IReadOnlyList<User> GetUsers()
+{
+    return _users;
+}
+```
+
+This communicates:
+
+> You can read this collection, but you shouldn't modify it through this API.
+
+Be careful: **read-only interface does not necessarily mean the underlying object is immutable**.
+
+---
+
+**`10. Concurrent Collections`**
+
+These are designed for concurrent access from multiple threads.
+
+Examples:
+
+```text
+ConcurrentDictionary<TKey,TValue>
+ConcurrentQueue<T>
+ConcurrentStack<T>
+ConcurrentBag<T>
+```
+
+Example:
+
+```csharp
+ConcurrentDictionary<int, string> users = new();
+
+users.TryAdd(1, "Swapnil");
+```
+
+Useful when multiple threads/tasks access shared collection state.
+
+**`Dictionary` vs `ConcurrentDictionary`**
+
+```text
+Dictionary
+    ↓
+Not safe for concurrent writes
+
+ConcurrentDictionary
+    ↓
+Designed for concurrent access
+```
+
+Don't simply replace every `Dictionary` with `ConcurrentDictionary`. Concurrent collections have synchronization overhead; use them when concurrent access actually requires them.
+
+---
+
+**`11. Array vs List<T>`**
+
+|              | Array                    | List<T>                    |
+| ------------ | ------------------------ | -------------------------- |
+| Size         | Fixed                    | Dynamic                    |
+| Index access | O(1)                     | O(1)                       |
+| Add/remove   | Not dynamic              | Supported                  |
+| Memory       | Generally lower overhead | Some capacity overhead     |
+| Use          | Fixed-size data          | General-purpose collection |
+
+Example:
+
+```csharp
+int[] array = new int[10];
+
+List<int> list = new();
+```
+
+---
+
+**`12. List<T> vs LinkedList<T>`**
+
+|                               | List                 | LinkedList  |
+| ----------------------------- | -------------------- | ----------- |
+| Internal structure            | Dynamic array        | Nodes       |
+| Index access                  | O(1)                 | O(n)        |
+| Add at end                    | O(1) amortized       | O(1)        |
+| Insert/remove with known node | O(n) due to shifting | O(1)        |
+| Memory locality               | Better               | Worse       |
+| General-purpose choice        | **Usually**          | Specialized |
+
+For normal application development:
+
+> **Prefer `List<T>` unless you have a specific reason to use `LinkedList<T>`.**
+
+---
+
+**`13. Stack vs Queue`**
+
+Easy:
+
+```text
+Stack → LIFO
+Queue → FIFO
+```
+
+**Stack**
+
+```text
+Push A
+Push B
+Push C
+
+Pop → C
+```
+
+**Queue** 
+
+```text
+Enqueue A
+Enqueue B
+Enqueue C
+
+Dequeue → A
+```
+
+---------------
+
+**`14. Collection selection — how to decide?`**
+
+This is more useful than memorizing definitions.
+
+```text
+Need fixed size?
+       ↓
+     Array
+
+Need general-purpose ordered collection?
+       ↓
+    List<T>
+
+Need key → value?
+       ↓
+ Dictionary<TKey,TValue>
+
+Need unique values?
+       ↓
+   HashSet<T>
+
+Need LIFO?
+       ↓
+   Stack<T>
+
+Need FIFO?
+       ↓
+   Queue<T>
+
+Need concurrent shared collection?
+       ↓
+Concurrent* collection
+```
+
+----
+----

@@ -1626,6 +1626,660 @@ A good practical rule:
 -------------------
 -------------------
 
+## Redis Cache
+
+Redis is a **distributed, in-memory key-value data store** commonly used for caching.
+
+Instead of:
+
+```text
+API → Database → Response
+```
+
+we can have:
+
+```text
+API
+ ↓
+Redis
+ ↓ Cache HIT
+Response
+
+Cache MISS
+ ↓
+Database
+ ↓
+Redis
+ ↓
+Response
+```
+
+This reduces database load and improves response time.
+
+---
+
+**Why Redis instead of `IMemoryCache`?**
+
+This is especially important when we discussed **horizontal scaling**.
+
+`IMemoryCache`
+
+```text
+        Load Balancer
+        /           \
+       ↓             ↓
+    API 1          API 2
+      ↓              ↓
+   Cache A         Cache B
+```
+
+Each API instance has its own memory.
+
+`Redis`
+
+```text
+        Load Balancer
+        /           \
+       ↓             ↓
+    API 1          API 2
+       \             /
+        \           /
+           Redis
+```
+
+All API instances share the same cache.
+
+Therefore:
+
+> **IMemoryCache = local/in-process cache**
+
+> **Redis = distributed/shared cache**
+
+---
+
+**Install Redis package**
+
+For ASP.NET Core, commonly use:
+
+```bash
+dotnet add package Microsoft.Extensions.Caching.StackExchangeRedis
+```
+
+---
+
+**Configure Redis**
+
+Suppose `appsettings.json`:
+
+```json
+{
+  "ConnectionStrings": {
+    "Redis": "localhost:6379"
+  }
+}
+```
+
+Then:
+
+```csharp
+builder.Services.AddStackExchangeRedisCache(options =>
+{
+    options.Configuration =
+        builder.Configuration.GetConnectionString("Redis");
+
+    options.InstanceName = "MyApp:";
+});
+```
+
+Now ASP.NET Core can inject:
+
+```csharp
+IDistributedCache
+```
+
+---
+
+**Basic implementation with `IDistributedCache`**
+
+Suppose:
+
+```csharp
+public class ProductService
+{
+    private readonly IDistributedCache _cache;
+
+    public ProductService(IDistributedCache cache)
+    {
+        _cache = cache;
+    }
+}
+```
+
+**Get from Redis**
+
+```csharp
+var cachedData = await _cache.GetStringAsync("products");
+```
+
+If:
+
+```csharp
+cachedData != null
+```
+
+we have a cache hit.
+
+```text
+Redis
+  ↓
+"products" → JSON data
+```
+
+---
+
+**Cache-aside pattern**
+
+This is the most common pattern you should know.
+
+```text
+        Request
+           ↓
+        Redis?
+       /      \
+     HIT      MISS
+      ↓         ↓
+   Return    Database
+                ↓
+             Redis
+                ↓
+             Return
+```
+
+Example:
+
+```csharp
+public async Task<List<ProductDto>> GetProductsAsync()
+{
+    const string key = "products";
+
+    // 1. Check cache
+    var cached = await _cache.GetStringAsync(key);
+
+    if (cached != null)
+    {
+        return JsonSerializer.Deserialize<List<ProductDto>>(cached)!;
+    }
+
+    // 2. Cache miss → Database
+    var products = await _context.Products
+        .AsNoTracking()
+        .Select(x => new ProductDto
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Price = x.Price
+        })
+        .ToListAsync();
+
+    // 3. Store in Redis
+    var json = JsonSerializer.Serialize(products);
+
+    await _cache.SetStringAsync(
+        key,
+        json,
+        new DistributedCacheEntryOptions
+        {
+            AbsoluteExpirationRelativeToNow =
+                TimeSpan.FromMinutes(10)
+        });
+
+    return products;
+}
+```
+
+That's a very good interview example.
+
+---
+
+**What happens here?**
+
+First request:
+
+```text
+GET /products
+
+Redis:
+products → ❌
+
+Database:
+      ↓
+[Product 1, Product 2...]
+
+      ↓
+
+Redis:
+products → [Product 1, Product 2...]
+
+      ↓
+
+Response
+```
+
+Second request:
+
+```text
+GET /products
+
+Redis:
+products → ✅
+
+      ↓
+
+Response
+```
+
+Database isn't hit.
+
+---
+
+**Expiration / TTL**
+
+You generally shouldn't cache data forever.
+
+```csharp
+new DistributedCacheEntryOptions
+{
+    AbsoluteExpirationRelativeToNow =
+        TimeSpan.FromMinutes(10)
+}
+```
+
+This gives the entry a TTL.
+
+Conceptually:
+
+```text
+products
+TTL = 600 seconds
+
+600
+ ↓
+500
+ ↓
+300
+ ↓
+100
+ ↓
+0
+ ↓
+Expired
+```
+
+Redis removes/expires the entry according to its expiration semantics.
+
+---
+
+**Absolute vs Sliding Expiration**
+
+`Absolute`
+
+Expires after a fixed period:
+
+```csharp
+AbsoluteExpirationRelativeToNow =
+    TimeSpan.FromMinutes(10)
+```
+
+Example:
+
+```text
+Created at 10:00
+Expires around 10:10
+```
+
+Even if accessed repeatedly.
+
+`Sliding`
+
+Expiration is extended when accessed:
+
+```csharp
+SlidingExpiration =
+    TimeSpan.FromMinutes(10)
+```
+
+Conceptually:
+
+```text
+10:00 → access
+10:08 → access
+       ↓
+expiration gets extended
+```
+
+So:
+
+|            | Absolute                            | Sliding                  |
+| ---------- | ----------------------------------- | ------------------------ |
+| Expiration | Fixed from creation                 | Extended on access       |
+| Good for   | Data that must refresh periodically | Frequently accessed data |
+
+---
+
+**Cache Invalidation**
+
+This is one of the hardest parts of caching.
+
+Suppose Redis contains:
+
+```text
+Product:10 → Price = ₹100
+```
+
+You update DB:
+
+```text
+Product:10 → Price = ₹120
+```
+
+But Redis still has:
+
+```text
+Price = ₹100
+```
+
+Now you have **stale cache**.
+
+So after updating:
+
+```csharp
+await _context.SaveChangesAsync();
+
+await _cache.RemoveAsync("product:10");
+```
+
+Next request:
+
+```text
+Redis → MISS
+   ↓
+Database → ₹120
+   ↓
+Redis → store ₹120
+```
+
+This is cache invalidation.
+
+---
+
+**Cache key design**
+
+Don't just use:
+
+```text
+products
+```
+
+for everything.
+
+Use meaningful keys:
+
+```text
+product:10
+product:20
+user:123
+user:123:orders
+products:category:mobile
+```
+
+For multi-tenant/user-specific data:
+
+```text
+tenant:10:user:123:orders
+```
+
+This prevents different users/tenants from accidentally sharing cached data.
+
+---
+
+**JSON serialization**
+
+`IDistributedCache` essentially stores byte/string data, so objects are commonly serialized.
+
+```csharp
+var json = JsonSerializer.Serialize(product);
+
+await _cache.SetStringAsync(
+    "product:10",
+    json);
+```
+
+Then:
+
+```csharp
+var json = await _cache.GetStringAsync("product:10");
+
+var product =
+    JsonSerializer.Deserialize<ProductDto>(json!);
+```
+
+For more complex applications, you may create a reusable cache abstraction.
+
+---
+
+**Create your own `ICacheService`**
+
+Instead of putting Redis logic everywhere:
+
+```csharp
+public interface ICacheService
+{
+    Task<T?> GetAsync<T>(string key);
+
+    Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan expiration);
+
+    Task RemoveAsync(string key);
+}
+```
+
+Implementation:
+
+```csharp
+public class RedisCacheService : ICacheService
+{
+    private readonly IDistributedCache _cache;
+
+    public RedisCacheService(IDistributedCache cache)
+    {
+        _cache = cache;
+    }
+
+    public async Task<T?> GetAsync<T>(string key)
+    {
+        var json = await _cache.GetStringAsync(key);
+
+        if (json == null)
+            return default;
+
+        return JsonSerializer.Deserialize<T>(json);
+    }
+
+    public async Task SetAsync<T>(
+        string key,
+        T value,
+        TimeSpan expiration)
+    {
+        var json = JsonSerializer.Serialize(value);
+
+        await _cache.SetStringAsync(
+            key,
+            json,
+            new DistributedCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = expiration
+            });
+    }
+
+    public Task RemoveAsync(string key)
+    {
+        return _cache.RemoveAsync(key);
+    }
+}
+```
+
+Register:
+
+```csharp
+builder.Services.AddScoped<ICacheService, RedisCacheService>();
+```
+
+Now:
+
+```csharp
+public class ProductService
+{
+    private readonly ICacheService _cache;
+
+    public ProductService(ICacheService cache)
+    {
+        _cache = cache;
+    }
+}
+```
+
+This is cleaner because your business service doesn't need to know the details of Redis.
+
+---
+
+**Redis in a horizontally scaled API**
+
+This is where Redis becomes especially valuable.
+
+```text
+                    Load Balancer
+                   /      |      \
+                  ↓       ↓       ↓
+               API 1    API 2    API 3
+                  \       |       /
+                   \      |      /
+                      Redis
+                        |
+                     Database
+```
+
+Request 1:
+
+```text
+API 1 → Redis → MISS → DB → Redis
+```
+
+Request 2:
+
+```text
+API 2 → Redis → HIT
+```
+
+Request 3:
+
+```text
+API 3 → Redis → HIT
+```
+
+All instances share the same cache.
+
+---
+
+**Where should you use Redis?**
+
+Good candidates:
+
+```text
+✅ Frequently accessed data
+✅ Data that is expensive to calculate
+✅ Reference/master data
+✅ Session/distributed state
+✅ Rate limiting counters
+✅ Distributed locks (with appropriate design)
+```
+
+Examples:
+
+```text
+Product catalog
+Country/state lists
+Configuration/reference data
+Popular search results
+User session data
+```
+
+Don't blindly cache everything.
+
+---
+
+**Redis vs Output Cache**
+
+Since we just discussed Output Caching:
+
+`Redis`
+
+You cache **data**:
+
+```text
+Redis
+ ↓
+Product object/data
+```
+
+`Output Cache`
+
+You cache the **HTTP response**:
+
+```text
+Output Cache
+ ↓
+HTTP response
+```
+
+You can even use Redis as the backing store for some caching scenarios, but they solve different concerns.
+
+---
+
+### The flow you should remember
+
+```text
+READ:
+
+API
+ ↓
+Redis?
+ ├── HIT  → Return
+ │
+ └── MISS
+       ↓
+     DB
+       ↓
+     Redis
+       ↓
+     Return
+
+
+WRITE:
+
+API
+ ↓
+Database
+ ↓
+Invalidate/Update Redis
+```
+
+That **cache-aside + TTL + invalidation + distributed cache** combination is the core Redis caching knowledge I'd expect you to know for a .NET backend interview.
+
+------------
+------------
+
 ## Dependency Injection (DI) lifetimes
 
 > Dependency Injection is a design pattern where an object's dependencies (the other objects/services it needs to work) are provided from outside, rather than the object creating them itself. It's a specific form of Inversion of Control (IoC).
@@ -1637,7 +2291,7 @@ The DI container manages:
 * Managing their lifetime
 * Disposing them when appropriate
 
-### Service Lifetimes in .NET DI Container
+**Service Lifetimes in .NET DI Container**
 
 **``1. Transient``**
 
