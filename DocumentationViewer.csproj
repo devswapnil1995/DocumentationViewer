@@ -35,6 +35,12 @@
     <None Update="Docs\8- Async Programming &amp; Multithreading.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Docs\Angular Fundamentals.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Docs\AngularDoc.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\Architecture &amp; System Design.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
