@@ -1,4 +1,4 @@
-﻿## Angular Rendering Strategies
+## Angular Rendering Strategies
 
 Rendering strategy decides **where and when Angular generates the HTML**. Angular has 3 main strategies: **CSR, SSG, and SSR**. 
 

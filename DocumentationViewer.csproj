@@ -50,6 +50,12 @@
     <None Update="Docs\Design Patterns.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Docs\Q&amp;A.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Docs\SelfQ&amp;A.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\SOLID.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
