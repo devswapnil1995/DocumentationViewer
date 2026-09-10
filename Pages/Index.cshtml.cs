@@ -40,5 +40,11 @@ public class IndexModel : PageModel
         {
             Documents = _markdownService.GetAllDocuments();
         }
+
+        // Sort by step number (numerical), then by title (alphabetical fallback)
+        Documents = Documents
+            .OrderBy(x => x.GetSortOrder())
+            .ThenBy(x => x.Title)
+            .ToList();
     }
 }

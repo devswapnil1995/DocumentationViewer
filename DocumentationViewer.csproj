@@ -11,52 +11,52 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Docs\1-NET Interview Preparation.md">
+    <None Update="Docs\Step 1 - OOP Fundamentals.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\2-OOP Fundamentals.md">
+    <None Update="Docs\Step 10 - Configuration &amp; Hosting.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\3-C# Language Deep Dive.md">
+    <None Update="Docs\Step 2 - C# Language Deep Dive.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\4-Core Web API.md">
+    <None Update="Docs\Step 3 - Core Web API.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\5-Core Web API - Part 2.md">
+    <None Update="Docs\Step 4 - Core Web API - Part 2.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\6-LINQ.md">
+    <None Update="Docs\Step 5 - LINQ.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\7-EFCore.md">
+    <None Update="Docs\Step 6 - EFCore.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\8- Async Programming &amp; Multithreading.md">
+    <None Update="Docs\Step 7 - Async Programming &amp; Multithreading.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Angular Fundamentals.md">
+    <None Update="Docs\Step 13 - Angular Fundamentals.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\AngularDoc.md">
+    <None Update="Docs\Step 14 - AngularDoc.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Architecture &amp; System Design.md">
+    <None Update="Docs\Step 8 - Architecture &amp; System Design.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Authentication &amp; Authorization.md">
+    <None Update="Docs\Step 9 - Authentication &amp; Authorization.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Design Patterns.md">
+    <None Update="Docs\Step 11 - Design Patterns.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Q&amp;A.md">
+    <None Update="Docs\Step 15 - Q&amp;A.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\SelfQ&amp;A.md">
+    <None Update="Docs\Step 16 - SelfQ&amp;A.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\SOLID.md">
+    <None Update="Docs\Step 12 - SOLID.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
