@@ -14,67 +14,6 @@
 
 > Deferred execution means a LINQ query is not executed when it is defined; execution happens when the sequence is enumerated. Immediate execution forces the query to execute immediately, typically through operators such as `ToList()`, `Count()`, or `First()`.
 
-Example:
-
-```csharp
-var numbers = new List<int> { 1, 2, 3, 4, 5 };
-
-var result = numbers.Where(x => x > 2);
-```
-
-At this point:
-
-```text
-Where() called
-     ↓
-Query is created
-     ↓
-❌ Data is NOT actually filtered yet
-```
-
-Now:
-
-```csharp
-foreach (var number in result)
-{
-    Console.WriteLine(number);
-}
-```
-
-The query executes here:
-
-```text
-foreach
-   ↓
-Where(x => x > 2)
-   ↓
-1 → No
-2 → No
-3 → Yes
-4 → Yes
-5 → Yes
-```
-
-Output:
-
-```text
-3
-4
-5
-```
-
-**Why is it called "Deferred"?**
-
-> "Remember this query. I'll execute it when I need the data."
-
-Because execution is **deferred/postponed** until you actually need the results.
-
-```csharp
-var result = numbers.Where(x => x > 2);
-```
-
-**See the difference with changing data**
-
 This example makes deferred execution very clear:
 
 ```csharp
@@ -490,7 +429,7 @@ LINQ provides **two ways** to write queries:
 
 Both can often produce the same result.
 
-> **"Method syntax and query syntax are two ways of expressing LINQ queries; query syntax is compiled into method-call syntax, so the choice is primarily about readability rather than performance."**
+> "Method syntax and query syntax are two ways of expressing LINQ queries; query syntax is compiled into method-call syntax, so the choice is primarily about readability rather than performance."
 
 
 **`1. Method Syntax`**
@@ -661,7 +600,7 @@ How efficiently does the database execute it?
 
 **"What is the difference between method syntax and query syntax?"**
 
-> **"LINQ supports both method syntax and query syntax. Method syntax uses extension methods such as `Where`, `Select`, and `OrderBy`, while query syntax provides SQL-like keywords such as `from`, `where`, and `select`. The compiler translates query syntax into method calls, so for equivalent queries there is generally no inherent performance difference."**
+> "LINQ supports both method syntax and query syntax. Method syntax uses extension methods such as `Where`, `Select`, and `OrderBy`, while query syntax provides SQL-like keywords such as `from`, `where`, and `select`. The compiler translates query syntax into method calls, so for equivalent queries there is generally no inherent performance difference."
 
 --------------
 --------------
@@ -725,7 +664,7 @@ var first = activeEmployees.First();
 var list = activeEmployees;
 ```
 
-> **"Multiple enumeration occurs when a deferred LINQ query is enumerated multiple times, potentially repeating expensive operations. If I need to reuse the results, I can materialize the query once with `ToList()` or `ToArray()`."**
+> "Multiple enumeration occurs when a deferred LINQ query is enumerated multiple times, potentially repeating expensive operations. If I need to reuse the results, I can materialize the query once with `ToList()` or `ToArray()`."
 
 
 ***`2. Calling ToList() Too Early`***
@@ -783,7 +722,7 @@ Only required rows
 Application
 ```
 
-> **"I avoid materializing an EF Core query too early because it can cause unnecessary data to be loaded into memory. I prefer to compose the query first and call `ToList()` when I actually need the results."**
+> "I avoid materializing an EF Core query too early because it can cause unnecessary data to be loaded into memory. I prefer to compose the query first and call `ToList()` when I actually need the results."
 
 ***`3. N+1 Query Problem`***
 
@@ -1200,9 +1139,9 @@ Order
 The question is: **when should `Customer` be loaded?**
 
 
-### Eager Loading
+**Eager Loading**
 
-> **Load the related data together with the main entity in the initial query.**
+> Load the related data together with the main entity in the initial query.
 
 Use:
 
@@ -1279,9 +1218,9 @@ So eager loading or, often even better, **projection** is appropriate.
 
 ---
 
-### Lazy Loading
+**Lazy Loading**
 
-> **Load related data automatically only when you access the navigation property.**
+> Load related data automatically only when you access the navigation property.
 
 Suppose:
 
@@ -1397,9 +1336,9 @@ That's why you need to be careful with Lazy Loading.
 
 ---
 
-### Explicit Loading 
+**Explicit Loading**
 
-> **You manually tell EF Core when to load related data.**
+> You manually tell EF Core when to load related data.
 
 Example:
 
@@ -1455,9 +1394,9 @@ if (needCustomer)
 
 You only load Customer when it's actually required.
 
-### Interview Scenario
+**Interview Scenarios**
 
-### Interviewer:
+**Interviewer:**
 
 -> You are developing an Order API. The response needs Order + Customer + OrderItems. What loading strategy would you use?
 
@@ -1469,7 +1408,7 @@ You only load Customer when it's actually required.
 
 -> Which is better, eager or lazy loading?
 
-> **"Neither is universally better. It depends on the use case. If I know I need the related data, eager loading or projection is usually more predictable. Lazy loading is convenient when related data is rarely accessed, but I need to be careful about N+1 queries."**
+> "Neither is universally better. It depends on the use case. If I know I need the related data, eager loading or projection is usually more predictable. Lazy loading is convenient when related data is rarely accessed, but I need to be careful about N+1 queries."
 
 ```text
 Need specific fields?
@@ -1489,6 +1428,6 @@ Want automatic loading?
    Lazy Loading 
 ```
 
-> The key interview point:** Don't choose loading strategy based only on "which is faster." Choose based on **what data you need, how much data you need, and how many database queries your approach generates.
+> The key interview point:**Don't choose loading strategy based only on "which is faster." Choose based on **what data you need, how much data you need, and how many database queries your approach generates.
 -----------------
 -----------------

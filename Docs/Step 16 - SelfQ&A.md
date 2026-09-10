@@ -1,6 +1,4 @@
-﻿# Self Interview Q&A: Real-World Experience
-
-## Microfrontends & Architecture
+﻿## Microfrontends & Architecture
 
 ### 1. What microfrontend implementation have you done?
 
@@ -825,23 +823,23 @@ var ordersByCustomer = context.Orders
 **Solution Process:**
 
 ```bash
-# Step 1: Update .NET target
+##### Step 1: Update .NET target
 dotnet nuget update --outdated
-# OR manually edit .csproj
+##### OR manually edit .csproj
 
-# Step 2: Update problematic packages one by one
+##### Step 2: Update problematic packages one by one
 dotnet package add EntityFrameworkCore --version 10.*
 dotnet package add Serilog --version 5.*
 dotnet package add Newtonsoft.Json --version 13.*
 
-# Step 3: Check dependency tree
+##### Step 3: Check dependency tree
 dotnet nuget locals all --clear
 dotnet restore
 
-# Step 4: Run tests
+##### Step 4: Run tests
 dotnet test
 
-# Step 5: Resolve conflicts manually if needed
+##### Step 5: Resolve conflicts manually if needed
 ```
 
 **Challenge 5: Async/Await & Performance Changes**
@@ -1119,13 +1117,13 @@ export class DashboardComponent { }
 
 **Automated Migration:**
 ```bash
-# Angular provides automatic migration
+##### Angular provides automatic migration
 ng update @angular/core
 
-# This automatically converts:
-# - *ngIf to @if
-# - *ngFor to @for
-# - But manual review recommended
+###### This automatically converts:
+###### - *ngIf to @if
+###### - *ngFor to @for
+###### - But manual review recommended
 ```
 
 **Challenge 3: Signals Introduction**

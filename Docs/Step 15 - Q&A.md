@@ -1,6 +1,4 @@
-﻿# Q&A Interview Guide
-
-## .NET Performance & Optimization
+﻿## .NET Performance & Optimization
 
 ### General Performance
 

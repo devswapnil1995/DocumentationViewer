@@ -25,27 +25,6 @@ Unlike a simple JavaScript library, Angular gives you many things you need to bu
 
 ---
 
-**Angular vs React**
-
-You may get this question in an interview.
-
-| Angular                                  | React                        |
-| ---------------------------------------- | ---------------------------- |
-| Framework                                | Library/UI-focused library   |
-| TypeScript-first                         | JavaScript/TypeScript        |
-| Routing available through Angular Router | Usually additional library   |
-| DI built in                              | No built-in Angular-style DI |
-| Forms support                            | Libraries/common patterns    |
-| RxJS commonly integrated                 | Not built in                 |
-| More opinionated                         | More flexible                |
-| Full application framework               | UI-focused                   |
-
-Simple answer:
-
-> Angular is a more complete and opinionated framework, while React primarily focuses on the UI layer and lets you choose additional libraries for many application concerns.
-
----
-
 **Angular Application Structure**
 
 A modern Angular application looks roughly like:
@@ -1862,7 +1841,7 @@ You rarely need to change it.
 
 ---
 
-**`3. CUSTOM_ELEMENTS_SCHEMA`
+**`3. CUSTOM_ELEMENTS_SCHEMA`**
 
 By default, Angular reports an error for an unknown HTML element.
 

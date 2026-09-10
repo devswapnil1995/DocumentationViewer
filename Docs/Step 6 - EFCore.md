@@ -193,9 +193,9 @@ Common when:
 
 ### Interview Question
 
-**"What is the difference between Code First and Database First?"**
+What is the difference between Code First and Database First?
 
-> **"In Code First, we define the entity model in C# and use EF Core migrations to create and evolve the database schema. In Database First, the database schema already exists and we scaffold the entity classes and DbContext from the database. Code First is commonly used for new applications, while Database First is useful when working with existing or legacy databases."**
+> In Code First, we define the entity model in C# and use EF Core migrations to create and evolve the database schema. In Database First, the database schema already exists and we scaffold the entity classes and DbContext from the database. Code First is commonly used for new applications, while Database First is useful when working with existing or legacy databases.
 
 -------------------------------
 -------------------------------
@@ -548,11 +548,11 @@ Database changed
 
 **`migrations add`**
 
-> **Creates a migration describing the changes between the current model and the previous migration.**
+> Creates a migration describing the changes between the current model and the previous migration.
 
 **`database update`**
 
-> **Applies pending migrations to the database.**
+> Applies pending migrations to the database.
 
 Remember:
 
@@ -660,8 +660,7 @@ dotnet ef migrations script
 This generates SQL that can be reviewed/deployed through the organization's database deployment process.
 
 
-> **"In development it's common to use `dotnet ef database update`. In production, I would follow the team's deployment process, often generating a migration SQL script or using a controlled migration mechanism through CI/CD, so that database changes can be reviewed, tested, and deployed safely."**
-
+> "In development it's common to use `dotnet ef database update`. In production, I would follow the team's deployment process, often generating a migration SQL script or using a controlled migration mechanism through CI/CD, so that database changes can be reviewed, tested, and deployed safely."
 
 > "EF Core maintains a migration history table, typically `__EFMigrationsHistory`, in the database."
 
@@ -672,7 +671,7 @@ This generates SQL that can be reviewed/deployed through the organization's data
 
 ## EF Core Change Tracking
 
-> **Change Tracking is how EF Core keeps track of entities it has loaded so it knows what changed and what needs to be saved to the database.**
+> Change Tracking is how EF Core keeps track of entities it has loaded so it knows what changed and what needs to be saved to the database.
 
 
 **Simple Example**
@@ -1517,7 +1516,7 @@ This is very common in real-world applications.
 
 ---
 
-**One-to-One
+**`One-to-One`**
 
 One record corresponds to exactly one record.
 
@@ -1620,11 +1619,11 @@ Be careful with cascade deletes in large relationship graphs because one delete 
 
 And remember:
 
-> **Relationship = how entities are connected.**
+> Relationship = how entities are connected.
 
-> **Loading = when related data is fetched.**
+> Loading = when related data is fetched.
 
-> **Change Tracking = whether EF Core tracks entity changes.**
+> Change Tracking = whether EF Core tracks entity changes.
 
 These are three separate concepts, but they work together in EF Core.
 
@@ -2705,7 +2704,7 @@ Isolation determines what A can see from B and vice versa.
 
 You don't need to memorize every detail initially. For interviews, understand the concept:
 
-> **Higher isolation generally provides stronger consistency guarantees but can reduce concurrency and increase locking/contention.**
+> Higher isolation generally provides stronger consistency guarantees but can reduce concurrency and increase locking/contention.
 
 ------------------
 ------------------
@@ -2740,7 +2739,7 @@ Then raw SQL can be useful.
 
 ---
 
-### `FromSql` — Query Entities
+**`FromSql` — Query Entities**
 
 Suppose you want to execute:
 
@@ -2772,7 +2771,7 @@ The important point is that this form supports parameterization.
 
 ---
 
-### SQL Injection
+**SQL Injection**
 
 Never do this with user input:
 
@@ -2791,7 +2790,7 @@ The problem is directly concatenating untrusted input into SQL.
 
 ---
 
-### Safe Parameterization
+**Safe Parameterization**
 Prefer parameterized SQL.
 
 For example:
@@ -2818,7 +2817,7 @@ The value is sent as a SQL parameter rather than being directly concatenated int
 
 ---
 
-### `FromSqlInterpolated` vs `FromSqlRaw`
+**`FromSqlInterpolated` vs `FromSqlRaw`**
 
 You may see older code like:
 
@@ -2835,7 +2834,7 @@ and:
 The important distinction:
 
 ---
-### `FromSqlRaw`
+**`FromSqlRaw`**
 
 You are responsible for making sure values are parameterized correctly.
 
@@ -2845,7 +2844,7 @@ var sql = "SELECT * FROM Employees WHERE Name = {0}";
 db.Employees.FromSqlRaw(sql, name);
 ```
 ---
-### `FromSql`
+**`FromSql`**
 
 Modern EF Core provides:
 
@@ -2857,7 +2856,7 @@ which is designed to parameterize interpolated values.
 
 ---
 
-### `ExecuteSql` — INSERT / UPDATE / DELETE
+**`ExecuteSql` — INSERT / UPDATE / DELETE**
 
 `FromSql` is primarily for queries that return entity data.
 
@@ -2888,7 +2887,7 @@ This executes the command directly against the database.
 
 ---
 
-### `ExecuteSqlRaw`
+**`ExecuteSqlRaw`**
 
 You can also use:
 
@@ -2903,7 +2902,7 @@ Again, parameterization is important.
 
 ---
 
-### `FromSql` vs `ExecuteSql`
+**`FromSql` vs `ExecuteSql`**
 
 Very important interview distinction:
 
@@ -2929,7 +2928,7 @@ ExecuteSql
 
 ---
 
-### Stored Procedures
+**Stored Procedures**
 
 Suppose your database already contains:
 
@@ -2954,7 +2953,7 @@ The exact syntax depends on the database provider.
 
 ---
 
-### Raw SQL Doesn't Mean EF Core Stops Existing
+**Raw SQL Doesn't Mean EF Core Stops Existing**
 
 This is important.
 
@@ -2985,7 +2984,7 @@ Change Tracking
 can still apply.
 
 ---
-### Raw SQL vs LINQ 
+**Raw SQL vs LINQ**
 
 **LINQ**
 
@@ -3020,21 +3019,21 @@ is preferable because it is:
 
 ---
 
-### When Would You Actually Use Raw SQL?
+**When Would You Actually Use Raw SQL?**
 
 A good interview answer is:
 
-> **"I prefer LINQ for most queries because it provides type safety, maintainability, and database abstraction. I would use raw SQL when I have a specific requirement such as an existing stored procedure, database-specific functionality, or a query that is difficult to express efficiently with LINQ."**
+> "I prefer LINQ for most queries because it provides type safety, maintainability, and database abstraction. I would use raw SQL when I have a specific requirement such as an existing stored procedure, database-specific functionality, or a query that is difficult to express efficiently with LINQ."
 
 That's a strong answer.
 
 ---
 
-### Don't Use Raw SQL Just Because You Think It's Faster 🚨
+**Don't Use Raw SQL Just Because You Think It's Faster 🚨**
 
 A common misconception:
 
-> ❌ "Raw SQL is always faster than LINQ."
+> ❌ Raw SQL is always faster than LINQ.
 
 Not necessarily.
 
@@ -3065,7 +3064,7 @@ Performance should be measured using:
 
 ## EF Core Performance Optimization
 
-> **"Your EF Core query is slow. How will you improve it?"**
+> "Your EF Core query is slow. How will you improve it?"
 
 Don't answer only:
 
@@ -3122,9 +3121,7 @@ var employees = await db.Employees
 
 Now the database can return only the required columns.
 
-### Interview line:
-
-> **"I prefer projection with `Select()` to retrieve only the columns required by the API."**
+> I prefer projection with `Select()` to retrieve only the columns required by the API.
 
 ---
 
@@ -3191,7 +3188,7 @@ Only matching rows
 Application
 ```
 
-> **Filter as early as possible at the database level.**
+> Filter as early as possible at the database level.
 
 ---
 
@@ -3575,11 +3572,11 @@ if (await db.Employees.AnyAsync())
 
 You're asking:
 
-> **"Does at least one record exist?"**
+> "Does at least one record exist?"
 
 rather than:
 
-> **"How many records are there?"**
+> "How many records are there?"
 
 ---
 
@@ -3640,7 +3637,7 @@ var result = await db.Departments
 
 Again:
 
-> **Don't load entities just to throw most of the data away.**
+> Don't load entities just to throw most of the data away.
 
 ---
 
@@ -3788,7 +3785,7 @@ The database matters enormously.
 
 ## EF Core Concurrency
 
-> **What happens when two users try to update the same record at the same time?**
+> What happens when two users try to update the same record at the same time?
 
 **The Problem**
 
@@ -3845,7 +3842,7 @@ EF Core commonly uses **optimistic concurrency**.
 
 The idea is:
 
-> **Assume conflicts are uncommon, but detect them when they happen.**
+> Assume conflicts are uncommon, but detect them when they happen.
 
 Instead of locking the record while the user is editing it, we store a **concurrency token/version**.
 
@@ -3895,7 +3892,7 @@ And the update fails.
 
 ---
 
-### RowVersion / Timestamp 
+**RowVersion / Timestamp**
 
 With SQL Server, a common approach is a `rowversion` column.
 
@@ -3939,7 +3936,7 @@ When the row changes, the database generates a new version value.
 
 ---
 
-### What SQL Does EF Core Generate?
+**What SQL Does EF Core Generate?**
 
 Suppose:
 
@@ -3988,7 +3985,7 @@ DbUpdateConcurrencyException
 
 ---
 
-### Handling `DbUpdateConcurrencyException`
+**Handling `DbUpdateConcurrencyException`**
 
 Example:
 
@@ -4013,7 +4010,7 @@ because the client's update conflicts with a newer version of the resource.
 
 ---
 
-### Real API Example
+**Real API Example**
 
 Suppose:
 
@@ -4070,7 +4067,7 @@ with something like:
 
 ---
 
-### Concurrency Token
+**Concurrency Token**
 
 `RowVersion` isn't the only way.
 
@@ -4115,7 +4112,7 @@ Concurrency conflict
 
 ---
 
-### RowVersion vs Concurrency Token
+**RowVersion vs Concurrency Token**
 
 |                          | RowVersion                | Concurrency Token            |
 | ------------------------ | ------------------------- | ---------------------------- |
@@ -4127,7 +4124,7 @@ Concurrency conflict
 
 Important:
 
-> **`rowversion` is SQL Server-specific terminology.**
+> `rowversion` is SQL Server-specific terminology.
 
 Don't say that every database has a `rowversion` column.
 
@@ -4135,7 +4132,7 @@ Don't say that every database has a `rowversion` column.
 
 ### Optimistic vs Pessimistic Concurrency
 
-### Optimistic
+`Optimistic`
 
 ```text
 Read
@@ -4157,7 +4154,7 @@ Conflicts are relatively uncommon
 
 ---
 
-### Pessimistic
+**`Pessimistic`**
 
 The idea is:
 
@@ -4188,7 +4185,7 @@ This can be useful in specific high-contention scenarios, but it can also introd
 
 ---
 
-### Optimistic vs Pessimistic
+**Optimistic vs Pessimistic**
 
 |                                  | Optimistic                                         | Pessimistic                   |
 | -------------------------------- | -------------------------------------------------- | ----------------------------- |
@@ -4201,11 +4198,11 @@ This can be useful in specific high-contention scenarios, but it can also introd
 
 For most normal web applications:
 
-> **Optimistic concurrency is the common approach.**
+> Optimistic concurrency is the common approach.
 
 ---
 
-### 🔥 Remember these 5 points:
+**Remember these 5 points:**
 
 ```text
 1. Concurrent users can overwrite each other's changes.
@@ -4220,8 +4217,8 @@ For most normal web applications:
 5. API commonly returns 409 Conflict.
 ```
 
-> **Transaction = "all operations together."**
+> Transaction = "all operations together."
 
-> **Concurrency = "what if someone else changes the same data?"**
+> Concurrency = "what if someone else changes the same data?"
 ---
 

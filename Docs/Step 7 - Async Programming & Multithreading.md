@@ -161,7 +161,7 @@ Return result
 You don't manually implement this state machine. The C# compiler generates the machinery for you.
 
 
-### What is a `Task`?
+**What is a `Task`?**
 
 A `Task` represents an **asynchronous operation**.
 
@@ -193,7 +193,7 @@ Eventually:
 int result
 ```
 
-### `Task` vs Result
+**`Task` vs Result**
 
 This is important.
 
@@ -236,7 +236,7 @@ int result = await task;
 ```
 
 
-### `Task` vs `Task<T>`
+**`Task` vs `Task<T>`**
 
 **`Task`**
 
@@ -273,7 +273,7 @@ Task<T>
 Result of type T
 ```
 
-### Async vs Parallelism
+**Async vs Parallelism**
 
 These are **not the same thing**.
 
@@ -281,7 +281,7 @@ These are **not the same thing**.
 
 Usually about:
 
-> **Not blocking while waiting for an asynchronous operation.**
+> Not blocking while waiting for an asynchronous operation.
 
 Example:
 
@@ -293,7 +293,7 @@ var employee = await GetEmployeeAsync();
 
 About:
 
-> **Doing multiple pieces of work at the same time.**
+> Doing multiple pieces of work at the same time.
 
 Example:
 
@@ -475,9 +475,9 @@ Database
 This is often called:
 
 > **Async all the way.**
+-----------
 
-
-### What is `ValueTask`? 
+**What is `ValueTask`? **
 Now the more advanced part.
 
 Normally:
@@ -550,9 +550,9 @@ public ValueTask<int> GetCachedValueAsync()
 The exact benefit depends on the workload.
 
 
-> **"`Task` should generally be the default. `ValueTask` is useful in performance-sensitive scenarios where an operation frequently completes synchronously and avoiding task allocations provides a measurable benefit."**
+> `Task` should generally be the default. `ValueTask` is useful in performance-sensitive scenarios where an operation frequently completes synchronously and avoiding task allocations provides a measurable benefit.
 
-### Final Mental Model
+**Final Mental Model**
 
 ```text
                  async / await
@@ -575,7 +575,7 @@ The exact benefit depends on the workload.
                   performance case exists
 ```
 
-### Remember these 7 points:
+**Remember these 7 points:**
 
 ```text
 1. async ≠ new thread
@@ -814,7 +814,7 @@ because EF Core already provides asynchronous database operations.
 
 For normal application development:
 
-> **Prefer Tasks over manually creating Threads.**
+> Prefer Tasks over manually creating Threads.
 
 --------------------------------
 --------------------------------
@@ -1480,7 +1480,7 @@ It can still:
 
 So the recommendation remains:
 
-> **Don't synchronously block on asynchronous operations.**
+> Don't synchronously block on asynchronous operations.*
 
 
 **Deadlock vs ThreadPool Starvation**
@@ -1581,7 +1581,7 @@ Thread 2 ──holds──→ B
 
 💥 Deadlock.
 
-### Four Conditions for a Classic Deadlock 
+**Four Conditions for a Classic Deadlock**
 
 A deadlock traditionally requires four conditions:
 
@@ -1767,7 +1767,7 @@ doesn't automatically kill your method.
 
 It simply says:
 
-> **"Please cancel."**
+> "Please cancel."
 
 The operation must cooperate.
 
@@ -3090,7 +3090,7 @@ Best practice:
 
 > Always acquire multiple locks in a consistent order.
 
-### `lock` vs `SemaphoreSlim` — Interview Question
+**`lock` vs `SemaphoreSlim` — Interview Question**
 
 > "I need to protect an async method. Should I use lock?"
 
@@ -3111,11 +3111,11 @@ finally
 }
 ```
 
-### Interview Questions
+**Interview Questions**
 
 Q1. What is a race condition?
 
-> **"A race condition occurs when multiple threads access shared mutable state concurrently and the result depends on the timing or ordering of their execution."**
+> "A race condition occurs when multiple threads access shared mutable state concurrently and the result depends on the timing or ordering of their execution."
 
 Q2. What is `lock`?
 

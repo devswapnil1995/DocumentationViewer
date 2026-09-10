@@ -735,8 +735,6 @@ Key Vault
 
 Now you have another secret to protect.
 
-😐
-
 With Managed Identity:
 
 ```text
@@ -1027,21 +1025,9 @@ So now, you only add extra NuGet packages if you use third-party libraries or op
 
 > RESTful API = Resources + HTTP methods + stateless communication + standard HTTP semantics.
 
-### What is a REST API?
+**REST API?**
 
-Suppose you have an Employee application.
-
-Your main resource is:
-
-```text
-Employee
-```
-
-A REST API exposes that resource through a URL:
-
-```http
-/api/employees
-```
+> Each request should contain the information necessary for the server to process it; the server should not depend on remembering client session state between requests.
 
 Then HTTP methods tell the API what you want to do.
 
@@ -1052,14 +1038,6 @@ Then HTTP methods tell the API what you want to do.
 | PUT         | Replace/update | `PUT /api/employees/10`    |
 | PATCH       | Partial update | `PATCH /api/employees/10`  |
 | DELETE      | Delete         | `DELETE /api/employees/10` |
-
-So REST is heavily based on:
-
-```text
-Resource + URL + HTTP Method
-```
-
-> **Each request should contain the information necessary for the server to process it; the server should not depend on remembering client session state between requests.**
 
 Example:
 
@@ -1093,7 +1071,7 @@ The API shouldn't need:
 "Remember what this client did in request 1."
 ```
 
-### REST principles
+**REST principles**
 
 The classic REST constraints are:
 
@@ -1150,29 +1128,15 @@ The server can optionally send executable code to the client.
 
 This is the least commonly discussed constraint in typical Web API interviews.
 
+1. REST is an architectural style, not a protocol.
+2. URL represents a resource.
+3. HTTP method represents the operation.
+4. REST APIs are generally stateless.
+5. Use proper HTTP status codes.
+6. PUT = replacement/update; PATCH = partial modification.
+7. Controllers/Minimal APIs are implementation mechanisms; REST is the design style.
 
-### REST vs SOAP
-
-Another common interview question.
-
-| REST                       | SOAP                                     |
-| -------------------------- | ---------------------------------------- |
-| Architectural style        | Protocol                                 |
-| Usually HTTP               | Can use multiple transports              |
-| Commonly JSON              | Commonly XML                             |
-| Lightweight                | More specification-heavy                 |
-| Resource-oriented          | Operation/service-oriented               |
-| Common for modern Web APIs | Common in some enterprise/legacy systems |
-
-
-1. **REST is an architectural style, not a protocol.**
-2. **URL represents a resource.**
-3. **HTTP method represents the operation.**
-4. **REST APIs are generally stateless.**
-5. **Use proper HTTP status codes.**
-6. **PUT = replacement/update; PATCH = partial modification.**
-7. **Controllers/Minimal APIs are implementation mechanisms; REST is the design style.**
-
+-------------------------------------
 -------------------------------------
 
 ## API Management?
@@ -1516,8 +1480,6 @@ If the API hasn't allowed the frontend origin, the browser can block the respons
 
 ### What Is a Preflight Request?
 
-This is a common interview question.
-
 Sometimes the browser sends an `OPTIONS` request before the actual request.
 
 For example:
@@ -1540,8 +1502,9 @@ This is called a:
 
 > **CORS preflight request**
 
+> CORS preflight is an OPTIONS request automatically sent by the browser before certain cross-origin requests. It is not always sent; simple requests can be sent directly. In ASP.NET Core, we configure the CORS policy to specify allowed origins, methods, and headers. We can also configure preflight caching using SetPreflightMaxAge() to reduce repeated OPTIONS requests.
 
-### Why Does Preflight Happen?
+**Why Does Preflight Happen?**
 
 For certain **non-simple cross-origin requests**, the browser checks with the server first.
 
@@ -1593,8 +1556,6 @@ Access-Control-Allow-Headers: Authorization, Content-Type
 `Access-Control-Allow-Credentials`
 
 Indicates whether credentials can be included in the cross-origin request.
-
-> CORS preflight is an OPTIONS request automatically sent by the browser before certain cross-origin requests. It is not always sent; simple requests can be sent directly. In ASP.NET Core, we configure the CORS policy to specify allowed origins, methods, and headers. We can also configure preflight caching using SetPreflightMaxAge() to reduce repeated OPTIONS requests.
 
 -----
 -----
