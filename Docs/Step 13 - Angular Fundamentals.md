@@ -1821,7 +1821,7 @@ Check relevant component
 
 ---
 
-**`2. preserveWhitespaces`
+**`2. preserveWhitespaces`**
 
 Angular normally removes/collapses unnecessary whitespace in templates.
 

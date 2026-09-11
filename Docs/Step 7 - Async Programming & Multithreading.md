@@ -477,7 +477,7 @@ This is often called:
 > **Async all the way.**
 -----------
 
-**What is `ValueTask`? **
+**What is `ValueTask`?**
 Now the more advanced part.
 
 Normally:
@@ -1211,7 +1211,7 @@ public async Task<PaymentResult> ProcessAsync()
 
 This communicates:
 
-> **"The continuation doesn't depend on the caller's context."**
+> "The continuation doesn't depend on the caller's context."
 
 **What Does "Continuation" Mean?**
 
@@ -2474,7 +2474,7 @@ lock (_lock)
 
 It means:
 
-> **Only one thread at a time can execute this critical section for that lock object.**
+> Only one thread at a time can execute this critical section for that lock object.
 
 Conceptually:
 
@@ -2619,7 +2619,7 @@ else
 }
 ```
 
-> **"`lock` is a convenient C# syntax around Monitor. Monitor provides additional capabilities such as TryEnter and explicit control over entering and exiting the critical section."**
+> "`lock` is a convenient C# syntax around Monitor. Monitor provides additional capabilities such as TryEnter and explicit control over entering and exiting the critical section."
 
 **`lock` vs `Monitor`**
 
@@ -2633,7 +2633,7 @@ else
 
 Usually:
 
-> **Use `lock` unless you specifically need Monitor functionality.**
+> Use `lock` unless you specifically need Monitor functionality.
 
 **`Mutex`**
 
@@ -2658,7 +2658,7 @@ finally
 
 The important distinction:
 
-> **A Mutex can provide synchronization across processes.**
+> A Mutex can provide synchronization across processes.
 
 For example:
 
@@ -3141,5 +3141,52 @@ Q7. What are Concurrent Collections?
 
 > They are thread-safe collection implementations such as ConcurrentDictionary and ConcurrentQueue that support concurrent access without requiring the caller to manually synchronize every collection operation.
 
+
+
+```text
+Single variable atomic operation?
+        ↓
+   Interlocked
+
+
+Need exclusive access to shared memory?
+        ↓
+      lock
+
+
+Need lock + Wait/Pulse?
+        ↓
+     Monitor
+
+
+Need async mutual/concurrency limiting?
+        ↓
+  SemaphoreSlim
+
+
+Need cross-process synchronization?
+        ↓
+ Mutex / Semaphore
+
+
+Many readers + few writers?
+        ↓
+ReaderWriterLockSlim
+
+
+Producer / Consumer async queue?
+        ↓
+    Channel<T>
+
+
+Wait for N operations?
+        ↓
+CountdownEvent
+
+
+Multiple phases must synchronize?
+        ↓
+     Barrier
+```
 ----------------
 -----------------

@@ -59,7 +59,7 @@ At that time, the list already contained:
 
 ### Immediate Execution
 
-> **The query executes immediately and the result is materialized/returned at that point.**
+> The query executes immediately and the result is materialized/returned at that point.
 
 For example:
 
@@ -91,9 +91,9 @@ doesn't change `result`.
 
 Because `result` is already a separate `List<int>`.
 
-### Most important operators
+**Most important operators**
 
-***Deferred execution***
+***`Deferred execution`***
 
 Common examples:
 
@@ -113,7 +113,7 @@ For example:
 var result = employees.Where(e => e.IsActive);
 ```
 
-***Immediate execution***
+***`Immediate execution`***
 
 Common examples:
 
@@ -509,9 +509,9 @@ var result = employees
 
 So:
 
-> **Query syntax is essentially syntactic sugar over LINQ method calls.**
+> Query syntax is essentially syntactic sugar over LINQ method calls.
 
-### Simple comparison
+**Simple comparison**
 
 ***`Method Syntax`***
 

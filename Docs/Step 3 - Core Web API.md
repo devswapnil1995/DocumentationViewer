@@ -324,7 +324,7 @@ Return response
 STOP
 ```
 
-### Four common ways to create middleware
+**Four common ways to create middleware**
 
 ***Approach 1 — Inline middleware***
 
@@ -800,7 +800,7 @@ Always consider performance + security.
 
 ## Routing (attribute routing, conventional routing)
 
-> **Routing decides which endpoint should handle an incoming HTTP request.**
+> Routing decides which endpoint should handle an incoming HTTP request.
 
 Suppose the client sends:
 
@@ -1459,7 +1459,8 @@ Suppose you want to measure how long every controller action takes.
 ```csharp
 public class ExecutionTimeFilter : IAsyncActionFilter
 {
-    public async Task OnActionExecutionAsync( ActionExecutingContext context, ActionExecutionDelegate next)
+    public async Task OnActionExecutionAsync( 
+        ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var stopwatch = Stopwatch.StartNew();
         await next();
@@ -2123,9 +2124,9 @@ V2 representation
 
 ## Content Negotiation
 
-> "Content negotiation is the process by which ASP.NET Core determines the representation format of an HTTP response based on the client's `Accept` header and the formatters configured by the application. For example, a client can request `application/json` or `application/xml`, and ASP.NET Core selects a suitable output formatter to serialize the response. `Content-Type`, on the other hand, describes the format of the request body being sent by the client."
+> Content negotiation is the process by which ASP.NET Core determines the representation format of an HTTP response based on the client's `Accept` header and the formatters configured by the application. For example, a client can request `application/json` or `application/xml`, and ASP.NET Core selects a suitable output formatter to serialize the response. `Content-Type`, on the other hand, describes the format of the request body being sent by the client.
 
-### Remember these 4 things:
+**Remember these 4 things:**
 
 ```text
 Accept
@@ -2161,7 +2162,7 @@ Accept: application/json
 
 Tells the server:
 
-> **"What format is the data I'm sending?"**
+> What format is the data I'm sending?
 
 Example:
 
@@ -2178,7 +2179,7 @@ These are often confused.
 
 ## Rate Limiting
 
-> **Rate limiting controls how many requests a client is allowed to make within a certain period of time.**
+> Rate limiting controls how many requests a client is allowed to make within a certain period of time.
 
 For example:
 
@@ -2203,7 +2204,7 @@ The API can reject request #101, typically with:
 429 Too Many Requests
 ```
 
-### ASP.NET Core has built-in rate limiting
+**ASP.NET Core has built-in rate limiting**
 
 Modern ASP.NET Core provides rate-limiting middleware through:
 
@@ -2290,7 +2291,7 @@ Database-intensive operation
 CPU-intensive processing
 ```
 
-### Fixed Window example in ASP.NET Core
+**Fixed Window example in ASP.NET Core**
 
 You can configure a named policy:
 
@@ -2473,7 +2474,7 @@ Cache Hit = data found in cache.
 
 Cache Miss = data not found, so you need to retrieve it.
 
-### Types of caching in ASP.NET Core
+**Types of caching in ASP.NET Core**
 
 1. In-memory caching
 2. Distributed caching

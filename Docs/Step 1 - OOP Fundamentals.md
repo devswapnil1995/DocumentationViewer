@@ -26,7 +26,8 @@
 - It allow us to hide unnecessary details and expose only what’s needed.
 E.g.
 ```csharp
-    Console.WriteLine(); // We just call this method we never care about how it is working internally
+    Console.WriteLine(); 
+    // We just call this method we never care about how it is working internally
 ```
 
 > Abstraction is “To represent the essential feature without representing the background details.”
@@ -67,7 +68,7 @@ We use access specifiers to achieve encapsulation
 
 #### 3. Polymorphism
 
-- Meaning of this is “One name, multiple form”.
+- Meaning of this is **“One name, multiple form”**.
 - It allows method to behave differently based on the object that is calling them.
 - This makes your code flexible, reusable and easier to maintain.
 - In polymorphism, we have same method name but different behaviors.
@@ -132,7 +133,6 @@ We use access specifiers to achieve encapsulation
 ##### Types of inheritance:
 
 1. Single Inheritance -  One parent, one child
- The `Dog` class **reuses** the `MakeSound()` method from `Animal`. This is **single inheritance** in action!
 2. Multilevel Inheritance - Parent, Child & Grand child (child class will be parent of another child class)
  In **multilevel inheritance**, a child class inherits from another child class.
 3. Hierarchical Inheritance  - One parent, multiple child
@@ -239,10 +239,10 @@ We use access specifiers to achieve encapsulation
 
 ## Static & Instance Method
 
-- Static Method:
+**Static Method:**
 > A method that belongs to the class itself, not to any specific instance. Called on the class, not on objects.
 
-- Instance Method:
+**Instance Method:**
 > A method that belongs to a specific object instance. Each instance can have different behavior and access instance data.
 
 - In C#, “static” means “relating to the type itself, rather than an instance of the type”. You access a static member using the type name instead of a reference or a value e.g  [`Guid().New`]
@@ -268,7 +268,7 @@ We use access specifiers to achieve encapsulation
 | 3. We can’t use this keyword inside the Static Method | 3. We can use thiskeyword inside Non Static Method |
 | 4. Static Method uses the memory of Class | 4. Non Static Method uses a memory of an object |
 
--> When interviewer asks: "Should this be static or normal?"
+—> When interviewer asks: "Should this be static or normal?"
             
 1. Ask clarifying questions:  
    - "Do we need multiple instances?"
@@ -298,7 +298,7 @@ We use access specifiers to achieve encapsulation
 
 > A constructor is a special method, which gets invoked when object of class created. It should be a same name as class name. It cannot have return type.
 
-### Types of constructor:
+**Types of constructor:**
 - Default constructor - Takes no parameter
 - Parameterized constructor - Takes one or more parameter
 - Copy constructor - Creates copy of existing object
@@ -373,14 +373,14 @@ We use access specifiers to achieve encapsulation
 
 ## Boxing And Unboxing
 
-### Boxing
+**Boxing**
 
-- The process of converting a [**Value Type**](https://www.geeksforgeeks.org/c-sharp/c-sharp-data-types/) variable (char, int etc.) to a [**Reference Type**](https://www.geeksforgeeks.org/c-sharp/c-sharp-data-types/) variable (object) is called Boxing.
+- The process of converting a Value Type, variable (char, int etc.) to a Reference Type variable (object) is called Boxing.
 - Boxing is an implicit conversion process where a value type is wrapped inside an object instance and stored on the heap.
 - Value-type variables are generally stored on the stack when they are local variables. When they are fields within a reference type, they are part of the heap-allocated memory for the reference type.
 - Reference type variables store memory addresses (references) on the stack, while their actual data is stored on the heap (except in some optimizations like String Interning).
 
-### UnBoxing
+**UnBoxing**
 
 - Unboxing is the process of explicitly converting a boxed object back into its original value type. It is an explicit conversion process. We can also say that the reverse process of boxing.
 
@@ -412,7 +412,7 @@ We use access specifiers to achieve encapsulation
 
 | Concept | Value Type | Reference Type |
 | --- | --- | --- |
-| Examples | `int`, `bool`, `struct`, `enum` | `class`, `string`, array |
+| Examples | `int`, `bool`, `struct`, `enum` | `class`, `string`, `array` |
 | Variable contains | Actual value | Reference to object |
 | Assignment | Copies value | Copies reference |
 | Independent copy | Yes | No, unless explicitly cloned |

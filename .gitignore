@@ -1,0 +1,89 @@
+## Ignore Visual Studio temporary files, build results, and user-specific files
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio workspace caches
+.vs/
+
+# Build results
+[Bb]in/
+[Oo]bj/
+**/bin/**
+**/obj/**
+out/
+artifacts/
+
+# Publish folder
+publish/
+
+# NuGet
+packages/
+*.nupkg
+.nuget/
+
+# Rider
+.idea/
+
+# VS Code
+.vscode/
+
+# Logs and databases
+*.log
+*.sql
+*.sqlite
+*.db
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# ReSharper
+_ReSharper*/
+*.DotSettings.user
+
+# Temporary files
+*.tmp
+*.temp
+~$*
+
+# SDK tooling
+project.lock.json
+project.fragment.lock.json
+
+# Symbol files
+*.pdb
+
+# Node modules (if present in repo)
+node_modules/
+
+# Pack output
+*.symbols.nupkg
+
+# Sensitive files (uncommitted local secrets)
+secrets.json
+
+# Visual Studio publish pipeline artifacts
+**/publish/**
+
+# Rider and Resharper caches
+/.idea/
+
+# Windows image file caches
+Thumbs.db
+
+# JetBrains Rider
+/.idea/
+
+# Coverage files
+*.coverage
+*.coveragexml
+
+# Generated files by Jet
+*.generated.cs
+
+# End of file

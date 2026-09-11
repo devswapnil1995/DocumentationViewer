@@ -1399,7 +1399,7 @@ Policies can do things like:
 
 **CORS = Cross-Origin Resource Sharing**
 
-> **CORS is a browser security mechanism that controls whether a web page from one origin is allowed to make requests to a different origin.**
+> CORS is a browser security mechanism that controls whether a web page from one origin is allowed to make requests to a different origin.
 
 
 **What is an Origin?**

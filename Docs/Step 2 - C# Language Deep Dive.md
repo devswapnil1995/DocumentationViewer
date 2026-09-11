@@ -22,17 +22,17 @@ The easiest interview mental model is:
 
 **`in` = read only** 
 
-### ref:
+**ref:**
 
 - The `ref` is a keyword in C# which is used for the passing the arguments by a reference
 - We can say that if any changes made in this argument in the method will reflect in that variable when the control return to the calling method.
-- The ref parameter does not pass the [**property**](https://www.geeksforgeeks.org/c-sharp/c-sharp-properties/).
+- The ref parameter does not pass the property.
 - It is necessary the parameters should initialize before it pass to ref.
 - It is not necessary to initialize the value of a parameter before returning to the calling method.
 - The passing of value through ref parameter is useful when the called method also need to change the value of passed parameter.
 - When ref keyword is used the data may pass in bi-directional.
 
-### out:
+**out:**
 
 - The `out` is a keyword in C# which is used for the passing the arguments to methods as a reference type. It is generally used when a method returns multiple values. The out parameter does not pass the property.
 - It is not necessary to initialize parameters before it pass to out.
@@ -40,7 +40,7 @@ The easiest interview mental model is:
 - The declaring of parameter through out parameter is useful when a method return multiple values.
 - When out keyword is used the data only passed in unidirectional.
 
-### in:
+**in:**
 
 - Pass the argument by reference, but the method cannot modify it.
 - I only need to read this value. Don't give me a writable copy; give me read-only reference access
@@ -98,21 +98,21 @@ The easiest interview mental model is:
           record struct
 ```
 
-### **Class (`class`)**
+**`class`**
 
 - Classes are the foundational building blocks of Object-Oriented Programming (OOP) in C#. They track identity and maintain an evolving state over time.
 - **Memory**: Allocated on the managed heap. Variables store a pointer to the memory location.
 - **Equality**: Two variables are only equal if they point to the exact same object in memory, even if their internal data matches perfectly.
 - **Best Used For**: Complex business logic, entities with state that changes frequently (e.g., a `BankAccount` with `Deposit()` methods), and architectures relying heavily on inheritance.
 
-### **Struct (`struct`)**
+**`struct`**
 
 - Structs are lightweight data containers designed to minimize memory overhead for short-lived data.
 - **Memory**: Allocated on the stack or inline inside containing types.
 - **Performance Trap**: Traditional structs use reflection to determine value equality, making operations like `Equals()` notably slow.
 - **Best Used For**: Small, lightweight, primitive-like data structures with minimal to no behavior (e.g., a 2D `Point(x, y)`, `Color(r, g, b)`, or vectors).
 
-### **Record (`record` or `record class`)**
+**`record` or `record class`**
 
 - Introduced in C# 9, records are specialized classes designed to act as transparent, immutable data containers.
 - Reference Type
@@ -120,7 +120,7 @@ The easiest interview mental model is:
 - **Nondestructive Mutation**: Because they are immutable by default, you modify them using the `with` keyword, which safely clones the record with specified modifications.
 - **Best Used For**: Data Transfer Objects (DTOs), API request/response payloads, and configuration settings where data remains constant.
 
-### **Record Struct (`record struct`)**
+**`record struct`**
 
 - Introduced in C# 10, these combine the stack allocation benefits of a struct with the compiler-generated enhancements of a record.
 - Value Type
@@ -151,7 +151,7 @@ use a **class for identity**, a **record for data/value-oriented reference types
 
 ### Key Characteristics of Records
  
-#### 1. **Immutability by Default**
+**1. Immutability by Default**
  
 Records are designed to be immutable. Use `init` accessors instead of `set`.
  
@@ -166,7 +166,7 @@ var person = new Person("Alice", 30);
 var updatedPerson = person with { Name = "Bob" };
 ```
  
-#### 2. **Value-Based Equality**
+**2. Value-Based Equality**
  
 Records use structural equality (comparing property values), not reference equality.
  
@@ -193,7 +193,7 @@ var classP2 = new PersonClass { Name = "Alice", Age = 30 };
 Console.WriteLine(classP1 == classP2);  // ❌ FALSE (reference-based)
 ```
  
-#### 3. **ToString() Override**
+**3. ToString() Override**
  
 Records automatically override ToString() to display properties.
  
@@ -205,7 +205,7 @@ Console.WriteLine(person);
 // Output: Person { Name = Alice, Age = 30 }
 ```
  
-#### 4. **Copy Constructor (with expression)**
+**4. Copy Constructor (with expression)**
  
 Use `with` to create a new instance with modified properties.
  
@@ -224,7 +224,7 @@ Console.WriteLine(person2.Name);  // Bob
 Console.WriteLine(person3.Age);   // 31
 ```
  
-#### 5. **Deconstruction**
+**5. Deconstruction**
  
 Records can be deconstructed into their properties.
  
@@ -239,7 +239,7 @@ Console.WriteLine($"{name}, {age}, {email}");
 // Output: Alice, 30, alice@example.com
 ```
  
-### When to Use Records
+**When to Use Records**
  
 | Scenario | Use | Reason |
 |----------|-----|--------|
@@ -545,13 +545,13 @@ Product → product name
 
 Whenever your question is:
 
-> **"Give me something back."** Think **`Func`**.
+> "Give me something back." Think **`Func`**.
 
 
 **2. Use `Predicate` when you're asking a YES/NO question**
 
 ***Scenario: Is employee active?***
-
+ 
 ```csharp
 Predicate<Employee> isActive = employee => employee.IsActive;
 ```
@@ -578,7 +578,7 @@ Is number even?
 
 Whenever your question is:
 
-> **"Is this true?"**
+> "Is this true?"
 
 Think **`Predicate`**.
 
@@ -612,7 +612,7 @@ Notify user
 
 Whenever your question is:
 
-> **"Perform this operation."**
+> "Perform this operation."
 
 Think **`Action`**.
 
@@ -936,7 +936,7 @@ By defining the LogError extension method, every class implementing ILogger auto
 
 ## `Span<T>`, `Memory<T>` (performance-focused topics)
 
-### **Span<T>**
+**`Span<T>`**
 A **stack-only type** that provides a lightweight, type-safe view over a contiguous sequence of elements in memory. Cannot escape the stack (no heap allocation).
  
 **Introduced in:** C# 7.2
@@ -945,7 +945,7 @@ A **stack-only type** that provides a lightweight, type-safe view over a contigu
 Span<int> span = new Span<int>(new int[] { 1, 2, 3 });
 ```
  
-### **Memory<T>**
+**`Memory<T>`**
 A **heap-compatible type** that provides a memory-safe view over a contiguous sequence of elements. Can be passed around, stored, and used in async contexts.
  
 **Introduced in:** C# 7.2
@@ -1357,9 +1357,9 @@ But:
 employee.Name = "Rahul"; // ❌ Compilation error
 ```
 
-### Think of `init` as:
+**Think of `init` as:**
 
-> "You can set this property only while creating the object."
+> You can set this property only while creating the object.
 
 ```text
 new Employee
@@ -1370,7 +1370,7 @@ new Employee
 employee.Name = ...   ← ❌
 ```
 
-### `required` does NOT mean `init`
+**`required` does NOT mean `init`**
 
 This is extremely important.
 
