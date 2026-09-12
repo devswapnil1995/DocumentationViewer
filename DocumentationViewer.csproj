@@ -11,6 +11,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Docs\Step 17 - SQL &amp; DB.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\Step 1 - OOP Fundamentals.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -1399,3 +1399,38 @@ describe('Angular 17 Upgrade Validation', () => {
 | **State Management** | Centralized Redux store with memoized selectors |
 | **.NET 7→10 Upgrade** | Plan phased migration, handle nullable types, test database queries |
 | **Angular 12→17 Upgrade** | Adopt standalone components, signals, and new control flow syntax |
+
+
+--------
+-------
+
+## Professional Introduction
+
+My name is **Swapnil Bhoir**, and I am a **Full-Stack Software Engineer with over 8.5 years of professional experience** in designing, developing, modernizing, and maintaining enterprise applications. My primary technical expertise includes **C#, .NET, Angular, JavaScript, SQL, REST APIs, Azure, micro frontends, and cloud-based application development**.
+
+I started my career in **2018 at HRMantra Pvt. Ltd.**, an HRMS SaaS product company. I initially worked on the **Performance Management System (PMS)** and **Learning Management System (LMS)** modules, contributing to the development of Angular applications integrated with the existing ASP.NET product.
+
+Later, I moved to the **Research and Development team**, where I worked on an **Angular 8 application** and implemented a dynamic forms solution. This functionality allowed clients to create customized forms according to their business requirements, including different field types and master-table integrations.
+
+During my time at HRMantra, I also contributed to the development of a **mobile application using Xamarin**. The application was deployed to production and included features such as **geo-tagging and geo-fencing**.
+
+In **2022, I joined BPK Tech**, where I worked on a US-based dental product called **FUSE**. My responsibilities included migrating an existing application from **AngularJS to modern Angular**, developing backend services using **.NET 7**, and implementing APIs along with a **Backend-for-Frontend (BFF)** architecture.
+
+I was later given the responsibility of implementing a **micro-frontend architecture**. I designed and implemented the solution using **single-spa**, integrating three applications: the existing AngularJS application, the migrated Angular 13 application, and a newly developed Angular 18 application. This enabled the applications to be rendered and managed based on individual business modules.
+
+I also worked as a **Technical Lead for approximately two years**, leading a team of six members, including two QA engineers. In this role, I was involved in technical decision-making, solution design, code reviews, mentoring team members, coordinating development activities, and ensuring the delivery of high-quality software.
+
+In **2025, I joined Civica as a Senior Software Engineer**, working on a product for an Australian local government organization. The product uses **Vue.js on the frontend and .NET 7 APIs on the backend**.
+
+My key responsibilities and contributions at Civica include:
+
+* Migrating the application’s **Node.js version from 10 to 18**.
+* Migrating backend services from **.NET 7 to .NET 10**.
+* Working on **Azure Key Vault integration and secret-management functionality**, allowing users to update secrets securely.
+* Working with **Content Manager and SharePoint integrations**.
+* Managing and supporting CI/CD processes using **Azure Pipelines and GitHub Actions**.
+* Contributing to application modernization, technical improvements, troubleshooting, and production support.
+
+Overall, I have experience working across the complete software development lifecycle, from understanding requirements and designing solutions to development, testing, deployment, modernization, and production support.
+
+I enjoy solving complex technical problems, learning new technologies, improving existing systems, and collaborating with teams to build scalable, maintainable, and reliable applications.
