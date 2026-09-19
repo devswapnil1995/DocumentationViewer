@@ -20,6 +20,9 @@
     <None Update="Docs\Step 10 - Configuration &amp; Hosting.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Docs\Step 18 - Microservices.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\Step 2 - C# Language Deep Dive.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
