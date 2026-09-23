@@ -71,6 +71,9 @@
     <None Update="Docs\Step 12 - SOLID.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Docs\Steps 21 - Question &amp; Ans.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>
