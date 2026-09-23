@@ -3470,3 +3470,655 @@ Reporting/data warehouse → Sometimes denormalized
 
 ---------
 ---------
+
+## UNION vs UNION ALL
+
+Both are used to **combine the result of two or more `SELECT` queries vertically**.
+
+`UNION`
+
+`UNION` combines results and **removes duplicate rows**.
+
+```sql
+SELECT Name FROM Employees
+UNION
+SELECT Name FROM Managers;
+```
+
+If both queries return:
+
+```text
+Swapnil
+Rahul
+Amit
+```
+
+Result:
+
+```text
+Swapnil
+Rahul
+Amit
+```
+
+Duplicate values are returned only once.
+
+---
+
+`UNION ALL`
+
+`UNION ALL` combines results and **keeps duplicates**.
+
+```sql
+SELECT Name FROM Employees
+UNION ALL
+SELECT Name FROM Managers;
+```
+
+If both return:
+
+```text
+Swapnil
+Rahul
+Amit
+```
+
+Result:
+
+```text
+Swapnil
+Rahul
+Amit
+Swapnil
+Rahul
+Amit
+```
+
+----
+
+**Important Rule**
+
+Both queries must have:
+
+* Same number of columns
+* Compatible data types
+* Corresponding columns in the same order
+
+Valid:
+
+```sql
+SELECT EmployeeId, Name
+FROM Employees
+
+UNION ALL
+
+SELECT ManagerId, Name
+FROM Managers;
+```
+
+Invalid:
+
+```sql
+SELECT EmployeeId, Name
+FROM Employees
+
+UNION ALL
+
+SELECT ManagerId
+FROM Managers;
+```
+
+Because the first query returns **2 columns** and the second returns **1 column**.
+
+-----
+-----
+
+## ROW_NUMBER vs RANK vs DENSE_RANK
+
+These are **SQL window functions** used to assign numbers/ranks to rows based on an `ORDER BY`.
+
+Let's use this example:
+
+```sql
+CREATE TABLE Employees (
+    EmployeeId INT,
+    EmployeeName VARCHAR(100),
+    Department VARCHAR(50),
+    Salary INT
+);
+```
+
+Data:
+
+```text
+EmployeeId  EmployeeName  Department  Salary
+----------  ------------  ----------  ------
+1           Amit          IT          90000
+2           Rahul         IT          80000
+3           Swapnil       IT          80000
+4           Priya         HR          70000
+5           Neha          HR          70000
+6           Raj           HR          60000
+```
+
+---
+
+**`1. ROW_NUMBER()`**
+
+`ROW_NUMBER()` gives every row a **unique sequential number**.
+
+```sql
+SELECT
+    EmployeeName,
+    Salary,
+    ROW_NUMBER() OVER (ORDER BY Salary DESC) AS RowNum
+FROM Employees;
+```
+
+Result:
+
+```text
+EmployeeName  Salary  RowNum
+------------  ------  ------
+Amit          90000   1
+Rahul         80000   2
+Swapnil       80000   3
+Priya         70000   4
+Neha          70000   5
+Raj           60000   6
+```
+
+Even when salaries are the same, each row gets a different number.
+
+**Use when:**
+
+You need **unique numbering**.
+
+Common example:
+
+```text
+Pagination
+Top N rows
+Latest record per customer
+Deduplication
+```
+
+---
+
+**`2. RANK()`**
+
+`RANK()` gives the **same rank to tied values**, but leaves gaps after the tie.
+
+```sql
+SELECT
+    EmployeeName,
+    Salary,
+    RANK() OVER (ORDER BY Salary DESC) AS SalaryRank
+FROM Employees;
+```
+
+Result:
+
+```text
+EmployeeName  Salary  SalaryRank
+------------  ------  ----------
+Amit          90000   1
+Rahul         80000   2
+Swapnil       80000   2
+Priya         70000   4
+Neha          70000   4
+Raj           60000   6
+```
+
+Notice:
+
+```text
+90000 → Rank 1
+80000 → Rank 2
+80000 → Rank 2
+70000 → Rank 4
+70000 → Rank 4
+60000 → Rank 6
+```
+
+Why did `70000` get rank 4?
+
+Because two employees occupied rank 2:
+
+```text
+1
+2
+2
+4
+```
+
+The next rank is therefore **4**.
+
+---
+
+**3. DENSE_RANK()**
+
+`DENSE_RANK()` also gives the same rank to tied values, but **does not leave gaps**.
+
+```sql
+SELECT
+    EmployeeName,
+    Salary,
+    DENSE_RANK() OVER (ORDER BY Salary DESC) AS SalaryRank
+FROM Employees;
+```
+
+Result:
+
+```text
+EmployeeName  Salary  SalaryRank
+------------  ------  ----------
+Amit          90000   1
+Rahul         80000   2
+Swapnil       80000   2
+Priya         70000   3
+Neha          70000   3
+Raj           60000   4
+```
+
+So:
+
+```text
+90000 → 1
+80000 → 2
+80000 → 2
+70000 → 3
+70000 → 3
+60000 → 4
+```
+
+---
+**PARTITION BY**
+
+This is a common interview question.
+
+`PARTITION BY` allows you to rank **within each group**.
+
+For example, rank employees separately within each department:
+
+```sql
+SELECT
+    EmployeeName,
+    Department,
+    Salary,
+    RANK() OVER (
+        PARTITION BY Department
+        ORDER BY Salary DESC
+    ) AS SalaryRank
+FROM Employees;
+```
+
+Result conceptually:
+
+```text
+IT
+
+Amit       90000   1
+Rahul      80000   2
+Swapnil    80000   2
+
+
+HR
+
+Priya      70000   1
+Neha       70000   1
+Raj        60000   3
+```
+
+Without `PARTITION BY`, everyone is ranked together.
+
+With:
+
+```sql
+PARTITION BY Department
+```
+
+the ranking **restarts for every department**.
+
+---
+
+**Common Interview Question**
+
+`Find the 2nd highest salary`
+
+Using `DENSE_RANK()`:
+
+```sql
+WITH RankedEmployees AS
+(
+    SELECT
+        EmployeeName,
+        Salary,
+        DENSE_RANK() OVER (
+            ORDER BY Salary DESC
+        ) AS SalaryRank
+    FROM Employees
+)
+SELECT *
+FROM RankedEmployees
+WHERE SalaryRank = 2;
+```
+
+This returns **all employees having the second-highest distinct salary**.
+
+For our data:
+
+```text
+Rahul     80000
+Swapnil   80000
+```
+
+This is why `DENSE_RANK()` is often useful when the question says **"second highest salary"** and you want all employees sharing that salary.
+
+---
+---
+
+# What is a Temporary Table in SQL?
+
+A **temporary table** is a table created for **temporary use**, usually to store intermediate results while executing a query, stored procedure, or transaction.
+
+In SQL Server, temporary tables are commonly created using `#`.
+
+```sql
+CREATE TABLE #EmployeeTemp
+(
+    EmployeeId INT,
+    EmployeeName VARCHAR(100),
+    Salary INT
+);
+```
+
+You can use it like a normal table:
+
+```sql
+INSERT INTO #EmployeeTemp
+VALUES
+(1, 'Swapnil', 90000),
+(2, 'Rahul', 80000);
+
+SELECT *
+FROM #EmployeeTemp;
+```
+
+When the temporary table is no longer needed, you can explicitly remove it:
+
+```sql
+DROP TABLE #EmployeeTemp;
+```
+
+SQL Server also automatically removes a local temporary table when its scope ends.
+
+---
+
+# Why Do We Use Temp Tables?
+
+Suppose you have a complicated query where you need to perform multiple operations on an intermediate result.
+
+Instead of calculating everything repeatedly, you can store the intermediate result:
+
+```sql
+SELECT
+    EmployeeId,
+    EmployeeName,
+    Salary
+INTO #HighSalaryEmployees
+FROM Employees
+WHERE Salary > 80000;
+```
+
+Then use it later:
+
+```sql
+SELECT *
+FROM #HighSalaryEmployees
+WHERE EmployeeName LIKE 'S%';
+```
+
+You can also join it:
+
+```sql
+SELECT
+    t.EmployeeName,
+    d.DepartmentName
+FROM #HighSalaryEmployees t
+JOIN Departments d
+    ON t.DepartmentId = d.DepartmentId;
+```
+
+---
+
+## Types of Temporary Tables in SQL Server
+
+`1. Local Temporary Table — #`
+
+```sql
+CREATE TABLE #Employees
+(
+    EmployeeId INT,
+    EmployeeName VARCHAR(100)
+);
+```
+
+Starts with:
+
+```text
+#
+```
+
+It is generally available only within the current session/scope.
+
+Example:
+
+```sql
+CREATE PROCEDURE GetHighSalaryEmployees
+AS
+BEGIN
+
+    CREATE TABLE #HighSalary
+    (
+        EmployeeId INT,
+        Salary INT
+    );
+
+    INSERT INTO #HighSalary
+    SELECT EmployeeId, Salary
+    FROM Employees
+    WHERE Salary > 80000;
+
+    SELECT *
+    FROM #HighSalary;
+
+END;
+```
+
+When the procedure finishes, the temporary table is automatically cleaned up.
+
+---
+
+`2. Global Temporary Table — ##`
+
+```sql
+CREATE TABLE ##Employees
+(
+    EmployeeId INT,
+    EmployeeName VARCHAR(100)
+);
+```
+
+Starts with:
+
+```text
+##
+```
+
+A global temporary table can be accessed by **multiple sessions**, subject to its lifetime and locking/access behavior.
+
+It is much less commonly used in normal application development.
+
+---
+
+## Temp Table vs CTE
+
+This is a common interview topic.
+
+`CTE`
+
+A CTE is useful for defining a temporary result **within a single SQL statement**.
+
+```sql
+WITH HighSalaryEmployees AS
+(
+    SELECT *
+    FROM Employees
+    WHERE Salary > 80000
+)
+SELECT *
+FROM HighSalaryEmployees;
+```
+
+Once the statement finishes, the CTE is gone.
+
+`Temp Table`
+
+A temp table physically stores the intermediate result and can be used across **multiple statements** within its scope.
+
+```sql
+SELECT *
+INTO #HighSalaryEmployees
+FROM Employees
+WHERE Salary > 80000;
+
+SELECT *
+FROM #HighSalaryEmployees;
+
+SELECT COUNT(*)
+FROM #HighSalaryEmployees;
+```
+
+So remember:
+
+```text
+CTE
+→ Temporary result for one statement
+
+Temp Table
+→ Temporary table that can be used by multiple statements
+```
+
+---
+
+`Temp Table vs Table Variable`
+
+Another important interview question.
+
+Table variable:
+
+```sql
+DECLARE @Employees TABLE
+(
+    EmployeeId INT,
+    EmployeeName VARCHAR(100)
+);
+
+INSERT INTO @Employees
+VALUES
+(1, 'Swapnil'),
+(2, 'Rahul');
+
+SELECT *
+FROM @Employees;
+```
+
+Temp table:
+
+```sql
+CREATE TABLE #Employees
+(
+    EmployeeId INT,
+    EmployeeName VARCHAR(100)
+);
+```
+
+Simple rule:
+
+```text
+Small/simple temporary data
+        ↓
+Table variable can be suitable
+
+Larger/intermediate datasets
+        ↓
+Temp table is often more suitable
+```
+
+The exact choice depends on the query, SQL Server version, statistics, indexes, row counts, and execution plan.
+
+---
+
+`Can We Create Indexes on Temp Tables?`
+
+**Yes.**
+
+For example:
+
+```sql
+CREATE TABLE #Employees
+(
+    EmployeeId INT,
+    DepartmentId INT,
+    Salary INT
+);
+
+CREATE INDEX IX_Employees_DepartmentId
+ON #Employees(DepartmentId);
+```
+
+This can be useful when you're storing a larger intermediate dataset and querying it multiple times.
+
+---
+
+**Real-World Example**
+
+Imagine a stored procedure that needs to:
+
+1. Find active employees.
+2. Calculate their total sales.
+3. Filter high-performing employees.
+4. Join them with department information.
+5. Generate a final report.
+
+You might first create:
+
+```sql
+SELECT
+    EmployeeId,
+    SUM(SalesAmount) AS TotalSales
+INTO #EmployeeSales
+FROM Sales
+GROUP BY EmployeeId;
+```
+
+Then:
+
+```sql
+SELECT
+    e.EmployeeName,
+    d.DepartmentName,
+    s.TotalSales
+FROM #EmployeeSales s
+JOIN Employees e
+    ON e.EmployeeId = s.EmployeeId
+JOIN Departments d
+    ON d.DepartmentId = e.DepartmentId
+WHERE s.TotalSales > 100000;
+```
+
+Here `#EmployeeSales` acts as an **intermediate staging area**.
+
+---
+---

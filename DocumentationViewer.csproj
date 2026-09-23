@@ -23,7 +23,13 @@
     <None Update="Docs\Step 18 - Microservices.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Docs\Step 19 - Azure.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\Step 2 - C# Language Deep Dive.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Docs\Step 20 - LinqQueries.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Docs\Step 3 - Core Web API.md">

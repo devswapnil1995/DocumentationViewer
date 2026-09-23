@@ -2075,3 +2075,405 @@ Concurrent* collection
 
 ----
 ----
+
+## Reflection in .NET
+
+> **Reflection** is the ability of .NET to **inspect types, classes, methods, properties, constructors, and attributes at runtime**, and in some cases **invoke or create them dynamically**.
+
+Simple definition for interview:
+
+> **Reflection allows us to examine and interact with .NET types at runtime instead of knowing everything at compile time.**
+
+---
+
+**Simple example**
+
+Suppose we have:
+
+```csharp
+public class Employee
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    public void Display()
+    {
+        Console.WriteLine($"Employee: {Name}");
+    }
+}
+```
+
+Normally:
+
+```csharp
+var employee = new Employee();
+
+employee.Name = "Swapnil";
+employee.Display();
+```
+
+With Reflection:
+
+```csharp
+var employee = new Employee();
+
+Type type = employee.GetType();
+
+Console.WriteLine(type.Name);
+```
+
+Output:
+
+```text
+Employee
+```
+
+Now we can inspect its properties:
+
+```csharp
+var properties = type.GetProperties();
+
+foreach (var property in properties)
+{
+    Console.WriteLine(property.Name);
+}
+```
+
+Output:
+
+```text
+Id
+Name
+```
+
+---
+
+**What can Reflection do?**
+
+Reflection can inspect:
+
+```text
+Assembly
+   ↓
+Types / Classes
+   ↓
+ ┌──────────────┬──────────────┬──────────────┐
+Properties     Methods       Constructors
+Fields         Attributes     Interfaces
+```
+
+For example:
+
+```csharp
+Type type = typeof(Employee);
+
+Console.WriteLine(type.Name);
+
+foreach (var property in type.GetProperties())
+{
+    Console.WriteLine(property.Name);
+}
+
+foreach (var method in type.GetMethods())
+{
+    Console.WriteLine(method.Name);
+}
+```
+
+---
+
+**Calling a method using Reflection**
+
+Normally:
+
+```csharp
+employee.Display();
+```
+
+Reflection:
+
+```csharp
+var method = type.GetMethod("Display");
+
+method?.Invoke(employee, null);
+```
+
+So the method name can be determined **at runtime**.
+
+---
+
+**Creating an object dynamically**
+
+Normally:
+
+```csharp
+var employee = new Employee();
+```
+
+Reflection:
+
+```csharp
+Type type = typeof(Employee);
+
+var employee =
+    Activator.CreateInstance(type);
+```
+
+Now .NET creates the object dynamically.
+
+---
+
+**Reading property values dynamically**
+
+```csharp
+var employee = new Employee
+{
+    Id = 10,
+    Name = "Swapnil"
+};
+
+Type type = employee.GetType();
+
+var property = type.GetProperty("Name");
+
+var value = property?.GetValue(employee);
+
+Console.WriteLine(value);
+```
+
+Output:
+
+```text
+Swapnil
+```
+
+We didn't directly write:
+
+```csharp
+employee.Name
+```
+
+Instead, we discovered the property at runtime.
+
+---
+
+**Where is Reflection actually used?**
+
+This is the important interview part.
+
+Reflection is heavily used internally by frameworks and libraries.
+
+`Dependency Injection`
+
+When you register:
+
+```csharp
+services.AddTransient<IMyService, MyService>();
+```
+
+the DI system needs to understand:
+
+```text
+IMyService
+      ↓
+MyService
+      ↓
+Constructor
+      ↓
+Dependencies
+```
+
+Reflection can be involved in discovering constructors and creating objects.
+
+---
+
+`ASP.NET Core`
+
+Frameworks need to discover things such as:
+
+```csharp
+[HttpGet]
+public IActionResult Get()
+```
+
+Attributes and metadata can be inspected at runtime.
+
+---
+
+`Entity Framework Core`
+
+EF Core needs information about:
+
+```text
+Entity
+ ↓
+Properties
+ ↓
+Keys
+ ↓
+Relationships
+ ↓
+Attributes/configuration
+```
+
+Reflection is one of the mechanisms used by .NET libraries/frameworks for runtime type inspection, although modern frameworks often combine reflection with caching and compiled metadata/expression techniques for performance.
+
+---
+
+`Serialization`
+
+For example:
+
+```csharp
+JsonSerializer.Serialize(employee);
+```
+
+The serializer needs to understand the object's structure:
+
+```text
+Employee
+ ├── Id
+ └── Name
+```
+
+Modern .NET serialization can use source generation as well, so don't say "JSON serialization always uses reflection" in an interview.
+
+---
+
+`Plugin systems`
+
+Suppose your application has:
+
+```text
+Plugins/
+   PluginA.dll
+   PluginB.dll
+   PluginC.dll
+```
+
+You can load an assembly and discover implementations dynamically.
+
+Conceptually:
+
+```csharp
+var assembly = Assembly.LoadFrom("PluginA.dll");
+
+var types = assembly.GetTypes();
+
+foreach (var type in types)
+{
+    // Find classes implementing IPlugin
+}
+```
+
+This is a very good real-world Reflection use case.
+
+---
+
+**Reflection vs normal code**
+
+| Normal code            | Reflection                    |
+| ---------------------- | ----------------------------- |
+| Compile-time knowledge | Runtime discovery             |
+| Faster                 | Generally slower              |
+| Type-safe              | Less compile-time safety      |
+| Easy to refactor       | More fragile if using strings |
+| `employee.Name`        | `GetProperty("Name")`         |
+| `employee.Display()`   | `GetMethod("Display")`        |
+
+---
+**Important classes/namespaces**
+
+Most Reflection functionality comes from:
+
+```csharp
+using System.Reflection;
+```
+
+Important APIs:
+
+```csharp
+typeof(Employee)
+```
+
+```csharp
+employee.GetType()
+```
+
+```csharp
+Type
+```
+
+```csharp
+Assembly
+```
+
+```csharp
+GetProperties()
+```
+
+```csharp
+GetMethods()
+```
+
+```csharp
+GetFields()
+```
+
+```csharp
+GetConstructors()
+```
+
+```csharp
+GetCustomAttributes()
+```
+
+```csharp
+MethodInfo
+```
+
+```csharp
+PropertyInfo
+```
+
+```csharp
+Activator.CreateInstance()
+```
+
+---
+
+**`typeof()` vs `GetType()`**
+
+This is a common interview question.
+
+`typeof()`
+
+```csharp
+Type type = typeof(Employee);
+```
+
+You know the type at **compile time**.
+
+`GetType()`
+
+```csharp
+Employee employee = new Employee();
+
+Type type = employee.GetType();
+```
+
+You get the **runtime type of the object**.
+
+Think:
+
+```text
+typeof(Employee)
+      ↓
+"I know Employee"
+
+employee.GetType()
+      ↓
+"What type is this object at runtime?"
+```
+----
+----
