@@ -1,4 +1,16 @@
-﻿## What is SQL?
+﻿- SQL
+- Constraint
+- Key in SQL
+- Index
+- Function
+- Stored Procedure
+- Indexes and Constraints in EF Core Code First
+- Normalization in SQL
+- UNION vs UNION ALL
+- ROW_NUMBER vs RANK vs DENSE_RANK
+- Temporary Table
+
+## SQL
 
 > SQL (Structured Query Language) is a programming language used to communicate with and manage relational databases.
 
@@ -371,7 +383,6 @@ Super keys are a database theory concept. In SQL, uniqueness can be enforced usi
 
 --------
 
-
 **`Candidate Key`**
 
 A Candidate Key is a minimal super key.
@@ -611,9 +622,7 @@ CREATE TABLE StudentCourses (
     PRIMARY KEY (StudentId, CourseId)
 );
 ```
-
 Here:
-
 ```
 (StudentId, CourseId)
 ```
@@ -637,8 +646,6 @@ You can also create a composite `UNIQUE` constraint.
 **Example**
 
 Suppose a company wants to prevent duplicate employee names within the same department.
-
-SQL
 
 ```
 CREATE TABLE Employees (
@@ -694,12 +701,9 @@ then inserting another record with the same combination violates the composite u
 
 A composite key can be:
 
-* A composite primary key.
-
+* A composite primary key
 * A composite candidate key.
-
 * A composite alternate key.
-
 * A composite unique constraint.
 
 ----------
@@ -756,20 +760,18 @@ If neither column is unique individually but the combination is unique, then it 
 An index works similarly to the index of a book:
 
 * Without an index, you may need to scan every page to find a topic.
-
 * With an index, you can directly locate the required page.
 
 In the same way:
 
 * Without an SQL index, the database may scan many or all rows.
-
 * With an SQL index, the database can locate matching rows more efficiently.
 
 **Example Without an Index**
 
 Suppose we have an `Employees` table:
 
-```SQL
+```
 CREATE TABLE Employees
 (
     EmployeeId INT PRIMARY KEY,
@@ -781,7 +783,7 @@ CREATE TABLE Employees
 
 Now execute:
 
-``` SQL
+``` 
 SELECT *
 FROM Employees
 WHERE DepartmentId = 10;
@@ -822,29 +824,20 @@ The database can use the index to locate matching rows instead of checking every
 The actual index usage depends on factors such as:
 
 * Number of rows in the table
-
 * Number of matching rows
-
 * Query structure
-
 * Available indexes
-
 * Statistics
-
 * Database optimizer decisions
 
 ----------
 **Why Do We Use Indexes?**
 
-**1. Faster Data Retrieval**: Indexes improve the performance of queries that use:
-
-**2. Faster Searching**: Indexes are useful when frequently searching by a particular column.
-
-**3. Faster Sorting**: Indexes can help queries that use `ORDER BY`
-
-**4. Faster Joins**: Indexes can improve queries that join tables using a particular column.
-
-**5. Faster Grouping**: Indexes may help queries using `GROUP BY`
+1. **Faster Data Retrieval**: Indexes improve the performance of queries that use
+2. **Faster Searching**: Indexes are useful when frequently searching by a particular column.
+3. **Faster Sorting**: Indexes can help queries that use `ORDER BY`
+4. **Faster Joins**: Indexes can improve queries that join tables using a particular column.
+5. **Faster Grouping**: Indexes may help queries using `GROUP BY`
 
 ----------
 **How to Create an Index**
@@ -878,9 +871,7 @@ IX_Employees_DepartmentId
 Here:
 
 * `IX` means index.
-
 * `Employees` is the table name.
-
 * `DepartmentId` is the indexed column.
 
 **How to Remove an Index**
@@ -915,11 +906,8 @@ ON Employees (EmployeeId);
 **Important points:**
 
 * A table can have only one clustered index.
-
 * The table data is organized according to the clustered index.
-
 * A clustered index is often created on the primary key by default.
-
 * The primary key is not automatically clustered in every database or every configuration.
 
 Example:
@@ -936,7 +924,6 @@ CREATE TABLE Employees
 **`2. Nonclustered Index`**
 
 A nonclustered index is a separate structure that stores indexed column values and references to the corresponding table rows.
-
 
 A table can have multiple nonclustered indexes. This is default index.
 
@@ -1093,15 +1080,10 @@ because the first indexed column, `DepartmentId`, is not being filtered.
 For a composite index, place columns based on:
 
 * How queries filter the data
-
 * How queries join tables
-
 * How queries sort the data
-
 * Column selectivity
-
 * Equality predicates
-
 * Range predicates
 
 A common practical pattern is:
@@ -1148,9 +1130,7 @@ INCLUDE
 Here:
 
 * `DepartmentId` is the indexed key column.
-
 * `EmployeeName` and `Salary` are included columns.
-
 * Included columns help the index return the required data without accessing the base table in many cases.
 
 This is a SQL Server example.
@@ -1180,9 +1160,7 @@ WHERE Status = 'Pending'
 Filtered indexes can be useful when:
 
 * Only a small percentage of rows meet the condition.
-
 * Queries frequently access that subset.
-
 * The filtered condition is stable and useful.
 
 Filtered indexes are supported by SQL Server. Other databases may provide similar features under different names.
@@ -1205,11 +1183,8 @@ The primary key generally gets a unique index internally.
 However, you should remember:
 
 * A primary key is a constraint.
-
 * An index is a performance and storage structure.
-
 * A primary key is not conceptually the same thing as an index.
-
 * The database often uses an index to enforce the primary key efficiently.
 
 **Are Foreign Keys Automatically Indexed?**
@@ -1245,13 +1220,9 @@ ON Employees (DepartmentId);
 An index on a foreign key can help with:
 
 * Joins
-
 * Filtering
-
 * Deleting a referenced parent row
-
-* Updating referenced key values
-
+* Updating referenced key value
 * Referential integrity checks
 
 -------------
@@ -1264,17 +1235,11 @@ A function in SQL is a reusable database object or built-in operation that perfo
 Functions are commonly used to:
 
 * Perform calculations
-
 * Manipulate strings
-
 * Work with dates
-
 * Handle `NULL` values
-
 * Convert data types
-
 * Aggregate multiple rows
-
 * Return calculated results
 
 ```
@@ -1304,15 +1269,10 @@ Built-in functions are already provided by the database system.
 Examples include:
 
 * String functions
-
 * Numeric functions
-
 * Date and time functions
-
 * Aggregate functions
-
 * Conversion functions
-
 * NULL-handling functions
 
 The exact functions vary between SQL Server, PostgreSQL, MySQL, Oracle, and other databases.
@@ -1425,19 +1385,12 @@ A stored procedure is a named collection of one or more SQL statements stored in
 It is used to perform a specific task, such as:
 
 * Fetching data
-
 * Inserting records
-
 * Updating records
-
 * Deleting records
-
 * Performing business logic
-
 * Executing multiple SQL statements
-
 * Managing transactions
-
 * Generating reports
 
 Instead of writing the same SQL statements repeatedly, we can store them inside a procedure and execute the procedure whenever required.
@@ -1616,15 +1569,10 @@ Business logic can be kept inside the database.
 For example:
 
 * Calculate an order total
-
 * Validate an employee record
-
 * Create an order
-
 * Update inventory
-
 * Transfer money between accounts
-
 * Generate a report
 
 **`3. Better Security`**
@@ -1738,21 +1686,13 @@ FUNCTION
 To improve the performance of a stored procedure, we need to identify the slow part and optimize:
 
 * SQL queries
-
 * Indexes
-
 * Joins
-
 * Filters
-
 * Parameters
-
 * Transactions
-
 * Temporary tables
-
 * Execution plans
-
 * Returned data
 
 A stored procedure itself is not automatically fast. Its performance depends mainly on the SQL statements inside it and how the database executes them.
@@ -1792,11 +1732,8 @@ Do not optimize blindly. First identify the actual bottleneck.
 Indexes can improve performance when columns are frequently used in:
 
 * `WHERE`
-
 * `JOIN`
-
 * `ORDER BY`
-
 * `GROUP BY`
 
 Suppose the stored procedure contains:
@@ -1830,9 +1767,7 @@ This may eliminate additional lookups.
 However, do not add every column to an index. Larger indexes require:
 
 * More storage
-
 * More maintenance
-
 * More work during inserts and updates
 
 **`4. Avoid SELECT *`**
@@ -1849,13 +1784,9 @@ Prefer selecting only the required columns:
 Benefits:
 
 * Less data transferred
-
 * Less memory usage
-
 * Smaller result sets
-
 * Better chance of using a covering index
-
 * Easier maintenance
 
 **`5. Filter Data as Early as Possible`**
@@ -1917,9 +1848,7 @@ WHERE EmployeeName LIKE 'Swap%';
 For advanced text searching, consider:
 
 * Full-text search
-
 * Specialized search tools
-
 * Appropriate database-specific text indexes
 
 **`8. Use Appropriate Joins`**
@@ -1928,11 +1857,8 @@ Make sure join columns are indexed when necessary.
 Also:
 
 * Join using compatible data types.
-
 * Avoid unnecessary joins.
-
 * Avoid joining tables when their data is not needed.
-
 * Check whether joins produce duplicate rows unintentionally.
 
 **`9. Avoid Unnecessary Temporary Tables`**
@@ -1942,11 +1868,8 @@ Temporary tables can be useful, but creating them unnecessarily can increase ove
 However, temporary tables can improve performance when:
 
 * A complex result is reused multiple times.
-
 * Intermediate data needs indexing.
-
 * The query needs multiple processing stages.
-
 * Breaking a complex query improves the execution plan.
 
 The correct choice depends on the workload.
@@ -2004,9 +1927,7 @@ after every statement.
 **Benefits:**
 
 * Reduces unnecessary network messages.
-
 * Can improve performance in procedures containing many statements.
-
 * Is commonly used in SQL Server stored procedures.
 
 It does not eliminate the actual database work.
@@ -2054,13 +1975,9 @@ Isolation levels control how transactions interact with each other.
 Poorly chosen isolation levels can cause:
 
 * Blocking
-
 * Locking
-
 * Deadlocks
-
 * Dirty reads
-
 * Inconsistent results
 
 Do not use `NOLOCK` simply because a query is slow.
@@ -2080,11 +1997,8 @@ Choose the isolation level based on the application's consistency requirements.
 Dynamic SQL can be useful when the query structure genuinely needs to change, but careless dynamic SQL can cause:
 
 * SQL injection risks
-
 * Plan-cache problems
-
 * Difficult debugging
-
 * Poor maintainability
 
 If dynamic SQL is required, use `sp_executesql` with parameters.
@@ -2185,11 +2099,8 @@ When using Entity Framework Core Code First, you usually do not need to create p
 You define them in your:
 
 * Entity classes
-
 * Data annotations
-
 * `OnModelCreating()`
-
 * Fluent API configuration
 
 Then EF Core generates a migration, and the migration creates or modifies the database objects.
@@ -2567,9 +2478,7 @@ migrationBuilder.CreateIndex(
 Important points:
 
 * `IncludeProperties()` is provider-specific.
-
 * This example is intended for SQL Server.
-
 * Other database providers may support different syntax or may not support included columns in the same way.
 
 **`8. Filtered Index`**
@@ -2774,13 +2683,9 @@ ON Employees (DepartmentId);
 However, manually creating an index may be appropriate when:
 
 * The database is managed separately from EF Core.
-
 * You are working with an existing production database.
-
 * You need a database-specific feature not supported directly by EF Core.
-
 * Your organization uses database deployment scripts.
-
 * You need advanced provider-specific index options.
 
 --------
@@ -2791,13 +2696,9 @@ However, manually creating an index may be appropriate when:
 Normalization is the process of organizing data in a database to:
 
 * Reduce duplicate data.
-
 * Avoid data inconsistency.
-
 * Prevent update, insert, and delete anomalies.
-
 * Improve data integrity.
-
 * Make relationships between tables clear.
 
 Instead of storing all information in one large table, we divide it into smaller, related tables.
@@ -2818,11 +2719,8 @@ Here, the student name and course information are repeated.
 For example:
 
 * `Swapnil` is repeated for every course.
-
 * `SQL` and `Amit` are repeated for every student taking that course.
-
 * If the instructor name changes, multiple rows must be updated.
-
 * If we delete the only student enrolled in a course, we may lose the course information.
 
 These are signs of poor database design.
@@ -2910,11 +2808,8 @@ WHERE Courses LIKE '%SQL%';
 This is unreliable because:
 
 * It may match partial words.
-
 * It is difficult to join with a course table.
-
 * It is difficult to enforce referential integrity.
-
 * It is difficult to store course-specific information.
 
 **Correct 1NF Design**
@@ -2945,9 +2840,7 @@ The values are now atomic, but the student name is repeated. We can improve this
 A table is in Second Normal Form when:
 
 * It is already in 1NF.
-
 * Every non-key column depends on the entire primary key.
-
 * There is no partial dependency on only part of a composite key.
 
 2NF mainly matters when a table has a composite primary key.
@@ -2973,9 +2866,7 @@ The primary key is:
 But:
 
 * `StudentName` depends only on `StudentId`.
-
 * `CourseName` depends only on `CourseId`.
-
 * `EnrollmentDate` depends on both `StudentId` and `CourseId`.
 
 Therefore:
@@ -3020,9 +2911,7 @@ CREATE TABLE StudentCourses (
 Now:
 
 * Student information belongs in `Students`.
-
 * Course information belongs in `Courses`.
-
 * Enrollment information belongs in `StudentCourses`.
 
 **`3NF — Third Normal Form`**
@@ -3030,9 +2919,7 @@ Now:
 A table is in Third Normal Form when:
 
 * It is already in 2NF.
-
 * Non-key columns do not depend on other non-key columns.
-
 * There are no transitive dependencies.
 
 Consider this table:
@@ -3086,9 +2973,7 @@ CREATE TABLE Employees (
 Now:
 
 * Department details are stored once.
-
 * Employees refer to departments using `DepartmentId`.
-
 * Updating a department location requires changing only one row.
 ------------
 **Practical Example: Normalizing an Order Table**
@@ -3121,9 +3006,7 @@ OrderId  OrderDate    CustomerId  CustomerName  ProductId  ProductName  ProductP
 There is significant duplication:
 
 * Customer information is repeated.
-
 * Order information is repeated for every product.
-
 * Product information is repeated across orders.
 
 A normalized design would be:
@@ -3289,7 +3172,7 @@ OrderId  OrderDate    CustomerName  ProductName  CurrentPrice  Quantity  LineTot
 
 In real applications, normalization is usually performed during database design.
 
--> Step 1: Identify the Business Entities
+—> Step 1: Identify the Business Entities
 
 For an e-commerce application, entities may include:
 
@@ -3312,7 +3195,7 @@ Project
 EmployeeProject
 ```
 
--> Step 2: Identify Attributes
+—> Step 2: Identify Attributes
 
 For an employee:
 
@@ -3332,7 +3215,7 @@ DepartmentName
 DepartmentLocation
 ```
 
--> Step 3: Identify Relationships
+—> Step 3: Identify Relationships
 
 Examples:
 
@@ -3359,30 +3242,23 @@ StudentCourses
 Courses
 ```
 
--> Step 4: Apply Normal Forms
+—> Step 4: Apply Normal Forms
 
 Check the design:
 
 * Are columns atomic? Apply 1NF.
-
 * Do columns depend on the complete composite key? Apply 2NF.
-
 * Do non-key columns depend on other non-key columns? Apply 3NF.
 
--> Step 5: Add Keys and Constraints
+—> Step 5: Add Keys and Constraints
 
 Use:
 
 * Primary keys.
-
 * Foreign keys.
-
 * Unique constraints or unique indexes.
-
 * `NOT NULL`.
-
 * `CHECK`.
-
 * `DEFAULT`.
 
 Example:
@@ -3399,17 +3275,12 @@ CREATE TABLE Employees (
 );
 ```
 
--> Step 6: Add Indexes Based on Queries
+—> Step 6: Add Indexes Based on Queries
 
 Normalization and indexing solve different problems.
 
 * Normalization organizes data and reduces duplication.
-
 * Indexes improve query performance.
-
-For example:
-
-SQL
 
 ```
 CREATE INDEX IX_Employees_DepartmentId
@@ -3426,13 +3297,9 @@ This can improve queries that frequently filter employees by department.
 Use normalization when:
 
 * Data consistency is important.
-
 * The system performs many inserts and updates.
-
 * The same information is reused in many places.
-
 * You need strong referential integrity.
-
 * You are designing transactional systems such as banking, HR, orders, and inventory.
 
 **`Denormalization`**
@@ -3454,11 +3321,8 @@ Although these values can be obtained through joins, storing some calculated or 
 However, denormalization introduces additional responsibilities:
 
 * Keeping duplicated values synchronized.
-
 * Handling updates carefully.
-
 * Preventing inconsistent data.
-
 * Managing extra storage.
 
 A common real-world approach is:
@@ -3533,7 +3397,6 @@ Swapnil
 Rahul
 Amit
 ```
-
 ----
 
 **Important Rule**
@@ -3567,7 +3430,6 @@ UNION ALL
 SELECT ManagerId
 FROM Managers;
 ```
-
 Because the first query returns **2 columns** and the second returns **1 column**.
 
 -----
@@ -3812,13 +3674,12 @@ For our data:
 Rahul     80000
 Swapnil   80000
 ```
-
 This is why `DENSE_RANK()` is often useful when the question says **"second highest salary"** and you want all employees sharing that salary.
 
 ---
 ---
 
-# What is a Temporary Table in SQL?
+## Temporary Table
 
 A **temporary table** is a table created for **temporary use**, usually to store intermediate results while executing a query, stored procedure, or transaction.
 
@@ -3855,7 +3716,7 @@ SQL Server also automatically removes a local temporary table when its scope end
 
 ---
 
-# Why Do We Use Temp Tables?
+Why Do We Use Temp Tables?
 
 Suppose you have a complicated query where you need to perform multiple operations on an intermediate result.
 
@@ -3889,10 +3750,9 @@ FROM #HighSalaryEmployees t
 JOIN Departments d
     ON t.DepartmentId = d.DepartmentId;
 ```
-
 ---
 
-## Types of Temporary Tables in SQL Server
+**Types of Temporary Tables in SQL Server**
 
 `1. Local Temporary Table — #`
 
@@ -3907,7 +3767,7 @@ CREATE TABLE #Employees
 Starts with:
 
 ```text
-#
+ #
 ```
 
 It is generally available only within the current session/scope.
@@ -3959,126 +3819,6 @@ Starts with:
 A global temporary table can be accessed by **multiple sessions**, subject to its lifetime and locking/access behavior.
 
 It is much less commonly used in normal application development.
-
----
-
-## Temp Table vs CTE
-
-This is a common interview topic.
-
-`CTE`
-
-A CTE is useful for defining a temporary result **within a single SQL statement**.
-
-```sql
-WITH HighSalaryEmployees AS
-(
-    SELECT *
-    FROM Employees
-    WHERE Salary > 80000
-)
-SELECT *
-FROM HighSalaryEmployees;
-```
-
-Once the statement finishes, the CTE is gone.
-
-`Temp Table`
-
-A temp table physically stores the intermediate result and can be used across **multiple statements** within its scope.
-
-```sql
-SELECT *
-INTO #HighSalaryEmployees
-FROM Employees
-WHERE Salary > 80000;
-
-SELECT *
-FROM #HighSalaryEmployees;
-
-SELECT COUNT(*)
-FROM #HighSalaryEmployees;
-```
-
-So remember:
-
-```text
-CTE
-→ Temporary result for one statement
-
-Temp Table
-→ Temporary table that can be used by multiple statements
-```
-
----
-
-`Temp Table vs Table Variable`
-
-Another important interview question.
-
-Table variable:
-
-```sql
-DECLARE @Employees TABLE
-(
-    EmployeeId INT,
-    EmployeeName VARCHAR(100)
-);
-
-INSERT INTO @Employees
-VALUES
-(1, 'Swapnil'),
-(2, 'Rahul');
-
-SELECT *
-FROM @Employees;
-```
-
-Temp table:
-
-```sql
-CREATE TABLE #Employees
-(
-    EmployeeId INT,
-    EmployeeName VARCHAR(100)
-);
-```
-
-Simple rule:
-
-```text
-Small/simple temporary data
-        ↓
-Table variable can be suitable
-
-Larger/intermediate datasets
-        ↓
-Temp table is often more suitable
-```
-
-The exact choice depends on the query, SQL Server version, statistics, indexes, row counts, and execution plan.
-
----
-
-`Can We Create Indexes on Temp Tables?`
-
-**Yes.**
-
-For example:
-
-```sql
-CREATE TABLE #Employees
-(
-    EmployeeId INT,
-    DepartmentId INT,
-    Salary INT
-);
-
-CREATE INDEX IX_Employees_DepartmentId
-ON #Employees(DepartmentId);
-```
-
-This can be useful when you're storing a larger intermediate dataset and querying it multiple times.
 
 ---
 

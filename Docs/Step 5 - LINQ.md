@@ -1,18 +1,19 @@
 ﻿- Deferred vs Immediate Execution
 - IEnumerable vs IQueryable
-- Common operators: Where, Select, GroupBy, Join, Aggregate, SelectMany
 - Method syntax vs Query syntax
 - LINQ performance pitfalls (multiple enumeration, N+1 issues)
+- Eager vs Lazy vs Explicit Loading
 - Custom LINQ extension methods
 
 ---
-## Deferred vs Immediate Execution in LINQ
+## Deferred vs Immediate Execution
 
-### Deferred Execution
+**`Deferred Execution`**
 
 > The LINQ query is created now, but executed later when you actually enumerate/use the result.
 
-> Deferred execution means a LINQ query is not executed when it is defined; execution happens when the sequence is enumerated. Immediate execution forces the query to execute immediately, typically through operators such as `ToList()`, `Count()`, or `First()`.
+- Deferred execution means a LINQ query is not executed when it is defined; execution happens when the sequence is enumerated. 
+- Immediate execution forces the query to execute immediately, typically through operators such as `ToList()`, `Count()`, or `First()`.
 
 This example makes deferred execution very clear:
 
@@ -57,7 +58,7 @@ At that time, the list already contained:
 1, 2, 3, 4
 ```
 
-### Immediate Execution
+**`Immediate Execution`**
 
 > The query executes immediately and the result is materialized/returned at that point.
 
@@ -134,15 +135,13 @@ Any()
 All()
 ```
 
-### Interview trap
+**Interview trap**
 
-> "Does `Where()` execute immediately?"
+—> Does `Where()` execute immediately?
 
-> "Normally, `Where()` uses deferred execution. It creates an enumerable query, and the filtering happens when the sequence is enumerated, such as through `foreach` or when a terminal operation like `ToList()` is called."
+> Normally, `Where()` uses deferred execution. It creates an enumerable query, and the filtering happens when the sequence is enumerated, such as through `foreach` or when a terminal operation like `ToList()` is called.
 
-> "All LINQ operators are deferred."
-
-That's wrong.
+—> "All LINQ operators are deferred." —> That's wrong.
 
 Some operators need to produce a final value and therefore execute immediately.
 
@@ -169,9 +168,9 @@ needs to execute to find the first element.
 
 > Enumeration = iterating (looping) through a collection one element at a time.
 
-> **`IEnumerable` → work with data in memory**
+> `IEnumerable` → work with data in memory
 
-> **`IQueryable` → build a query that can be executed by the data source, commonly the database**
+> `IQueryable` → build a query that can be executed by the data source, commonly the database
 
 
 ***`IEnumerable<T>`***
@@ -383,7 +382,7 @@ It doesn't.
 
 ### Interview scenario
 
-> "You have 1 million records in a database. How would you filter only active employees with salary greater than 50,000?"
+—> You have 1 million records in a database. How would you filter only active employees with salary greater than 50,000?
 
 ```csharp
 var employees = dbContext.Employees
@@ -391,7 +390,7 @@ var employees = dbContext.Employees
     .ToList();
 ```
 
-> "Because EF Core exposes the DbSet as IQueryable, I would compose the filtering before materializing the results. EF Core can translate the LINQ expression to SQL so the filtering happens in the database rather than loading all records into memory."
+> Because EF Core exposes the DbSet as IQueryable, I would compose the filtering before materializing the results. EF Core can translate the LINQ expression to SQL so the filtering happens in the database rather than loading all records into memory.
 
 **The biggest performance mistake**
 
@@ -424,13 +423,12 @@ The second lets the database filter.
 
 LINQ provides **two ways** to write queries:
 
-1. **Method Syntax**
-2. **Query Syntax**
+1. Method Syntax
+2. Query Syntax
 
 Both can often produce the same result.
 
-> "Method syntax and query syntax are two ways of expressing LINQ queries; query syntax is compiled into method-call syntax, so the choice is primarily about readability rather than performance."
-
+> Method syntax and query syntax are two ways of expressing LINQ queries; query syntax is compiled into method-call syntax, so the choice is primarily about readability rather than performance.
 
 **`1. Method Syntax`**
 
@@ -463,7 +461,6 @@ Select()
    ↓
 result
 ```
-
 
 **`2. Query Syntax`**
 
@@ -1000,15 +997,15 @@ when you only need a yes/no answer.
 
 ---
 
-**"How do you improve LINQ/EF Core query performance?"**
+—> How do you improve LINQ/EF Core query performance?
 
 > "I try to keep filtering, projection, grouping and other translatable operations in the database by composing the `IQueryable` before materialization. I avoid unnecessary `ToList()` calls, avoid multiple enumeration, select only required columns, use `Any()` for existence checks, and watch for N+1 queries by using appropriate eager loading or projection."
 
-**Custom LINQ Extension Methods**
+—> Custom LINQ Extension Methods
 
 > You can create your own methods that work like LINQ methods such as `Where()`, `Select()`, etc.
 
-Suppose your application frequently needs:
+—> Suppose your application frequently needs:
 
 > Get active employees whose salary is greater than 50,000.
 
@@ -1123,7 +1120,7 @@ Database queries
 
 These three terms answer one question:
 
-> **"When and how should related data be loaded?"**
+> When and how should related data be loaded?
 
 Suppose we have:
 
@@ -1398,17 +1395,17 @@ You only load Customer when it's actually required.
 
 **Interviewer:**
 
--> You are developing an Order API. The response needs Order + Customer + OrderItems. What loading strategy would you use?
+—> You are developing an Order API. The response needs Order + Customer + OrderItems. What loading strategy would you use?
 
 > If I need the related entities as part of the response, I can use eager loading with `Include()`. However, for a read-only API, I would generally prefer projection with `Select()` so that EF Core retrieves only the fields required by the response. I would avoid lazy loading because it can introduce unexpected additional queries and N+1 problems.
 
--> When would you use explicit loading?
+—> When would you use explicit loading?
 
 > I would use explicit loading when related data is needed conditionally and I want precise control over when that additional query is executed.
 
--> Which is better, eager or lazy loading?
+—> Which is better, eager or lazy loading?
 
-> "Neither is universally better. It depends on the use case. If I know I need the related data, eager loading or projection is usually more predictable. Lazy loading is convenient when related data is rarely accessed, but I need to be careful about N+1 queries."
+> Neither is universally better. It depends on the use case. If I know I need the related data, eager loading or projection is usually more predictable. Lazy loading is convenient when related data is rarely accessed, but I need to be careful about N+1 queries.
 
 ```text
 Need specific fields?

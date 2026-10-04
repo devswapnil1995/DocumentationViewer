@@ -1,4 +1,12 @@
-﻿## `appsettings.json`
+﻿- appsettings.json
+- Options Pattern
+- Dependency Injection Container Internals
+- Hosted Services
+- BackgroundService
+- Logging
+- Correlation ID
+
+## `appsettings.json`
 
 ASP.NET Core applications commonly store configuration in:
 
@@ -123,7 +131,7 @@ Command-line arguments
 
 Generally:
 
-> **Later providers override earlier providers when the same key exists.**
+> Later providers override earlier providers when the same key exists.
 
 For example:
 
@@ -289,11 +297,15 @@ _options.OnChange(options =>
 
 ### Easy interview memory
 
-> IOptions = once
 
-> IOptionsSnapshot = per scope/request
+Remember this table:
 
-> IOptionsMonitor = monitor changes
+| Type                  | Lifetime / Behavior                                     | Typical use                  |
+| --------------------- | ------------------------------------------------------- | ---------------------------- |
+| `IOptions<T>`         | Singleton-style options access; doesn't observe changes | Static configuration         |
+| `IOptionsSnapshot<T>` | Scoped; recalculates per request                        | Request-scoped configuration |
+| `IOptionsMonitor<T>`  | Singleton; supports change notifications                | Dynamic configuration        |
+
 
 ---------
 ---------
@@ -346,21 +358,6 @@ services.AddScoped<IOrderService, OrderService>();
 
 services.AddSingleton<ICacheService, CacheService>();
 ```
-
-**Important interview point**
-
-A singleton can live for the entire application lifetime.
-
-Therefore, don't blindly inject a scoped service into a singleton:
-
-```text
-Singleton
-   ↓
-Scoped ❌
-```
-
-because their lifetimes don't align.
-
 ------------
 ------------
 
@@ -805,7 +802,7 @@ TraceId: ABC123
 
 Tools such as Application Insights, OpenTelemetry, Jaeger, etc. can use this information to visualize the complete distributed request.
 
-**Correlation ID = "Show me everything that happened for this request."**
+Correlation ID = Show me everything that happened for this request.
 
 -----------------
 ------------------

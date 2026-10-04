@@ -1,4 +1,15 @@
-## Angular Rendering Strategies
+- Rendering Strategies
+- Routing
+- Route Loading Strategies
+- Router Lifecycle & Events
+- Forms
+- Signal Forms
+- HTTP Client
+- RxJS
+- Subjects
+- RxJS Operators
+
+## Rendering Strategies
 
 Rendering strategy decides **where and when Angular generates the HTML**. Angular has 3 main strategies: **CSR, SSG, and SSR**. 
 
@@ -150,7 +161,431 @@ where price, inventory, or other information changes frequently.
 ------
 ------
 
-## Angular Router Lifecycle & Events
+## Routing
+
+> Routing decides which component should be displayed for a given URL, without doing a full page reload.
+
+Think:
+
+```text
+URL
+ ↓
+Router
+ ↓
+Matching Route
+ ↓
+Component
+ ↓
+<router-outlet>
+```
+
+---
+
+**1. Define Routes**
+
+```typescript
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: 'users',
+    component: UsersComponent
+  },
+  {
+    path: 'products',
+    component: ProductsComponent
+  }
+];
+```
+
+Now:
+
+```text
+/users     → UsersComponent
+/products  → ProductsComponent
+```
+
+---
+
+**2. `router-outlet`**
+
+This is the **placeholder where Angular renders the active route component**.
+
+```html
+<nav>
+  <a routerLink="/users">Users</a>
+  <a routerLink="/products">Products</a>
+</nav>
+
+<router-outlet />
+```
+
+If URL is:
+
+```text
+/products
+```
+
+Angular renders:
+
+```text
+<router-outlet>
+      ↓
+ProductsComponent
+```
+
+Routes, outlets, and links are the three core building blocks of Angular routing. 
+
+---
+
+**3. `routerLink`**
+
+Used for navigation from the template.
+
+```html
+<a routerLink="/users">Users</a>
+```
+
+Instead of:
+
+```html
+<a href="/users">Users</a>
+```
+
+`routerLink` lets Angular Router handle the navigation without a full page reload.
+
+You can also bind it:
+
+```html
+<a [routerLink]="['/users', userId]">
+  View User
+</a>
+```
+
+---
+
+**`4. Route Parameters`**
+
+Useful when the URL contains an identifier.
+
+```typescript
+{
+  path: 'users/:id',
+  component: UserComponent
+}
+```
+
+URL:
+
+```text
+/users/101
+```
+
+Read it using `ActivatedRoute`:
+
+```typescript
+private route = inject(ActivatedRoute);
+
+userId = this.route.snapshot.paramMap.get('id');
+```
+
+Mental model:
+
+```text
+/users/:id
+     ↓
+/users/101
+     ↓
+id = 101
+```
+
+---
+
+**`5. Query Parameters`**
+
+Useful for filters, sorting, pagination, etc.
+
+URL:
+
+```text
+/products?category=laptop&page=2
+```
+
+Navigate:
+
+```typescript
+this.router.navigate(
+  ['/products'],
+  {
+    queryParams: {
+      category: 'laptop',
+      page: 2
+    }
+  }
+);
+```
+
+Read:
+
+```typescript
+this.route.queryParams.subscribe(params => {
+  console.log(params['category']);
+});
+```
+
+---
+
+**`6. Programmatic Navigation`**
+
+Instead of clicking a link:
+
+```typescript
+private router = inject(Router);
+
+openUser() {
+  this.router.navigate(['/users', 101]);
+}
+```
+
+Useful after:
+
+```text
+Login successful
+      ↓
+Navigate to dashboard
+```
+
+or:
+
+```text
+Form submitted
+      ↓
+Navigate to confirmation page
+```
+
+---
+
+**`7. Nested Routes`
+
+You can have routes inside routes.
+
+```text
+/dashboard
+    ├── /overview
+    ├── /orders
+    └── /settings
+```
+
+Example:
+
+```typescript
+{
+  path: 'dashboard',
+  component: DashboardComponent,
+  children: [
+    {
+      path: 'orders',
+      component: OrdersComponent
+    },
+    {
+      path: 'settings',
+      component: SettingsComponent
+    }
+  ]
+}
+```
+
+The parent component needs its own:
+
+```html
+<router-outlet />
+```
+
+for the child route.
+
+---
+
+**`8. Wildcard Route`**
+
+Handle unknown URLs:
+
+```typescript
+{
+  path: '**',
+  component: NotFoundComponent
+}
+```
+
+Example:
+
+```text
+/random-url
+     ↓
+NotFoundComponent
+```
+
+Usually keep it **last** because route matching order matters.
+
+---
+
+**`9. Lazy Loading`**
+
+Instead of loading every component when the application starts:
+
+```typescript
+{
+  path: 'admin',
+  loadComponent: () =>
+    import('./admin/admin.component')
+      .then(m => m.AdminComponent)
+}
+```
+
+Angular loads the component when the route is needed.
+
+For larger features:
+
+```typescript
+{
+  path: 'admin',
+  loadChildren: () =>
+    import('./admin/admin.routes')
+      .then(m => m.ADMIN_ROUTES)
+}
+```
+
+This helps reduce the initial application bundle.
+
+----------------
+----------------
+
+## Route Loading Strategies
+
+Angular has **2 main route loading strategies**:
+
+```text
+Route Loading
+├── Eager
+└── Lazy
+```
+
+The choice affects your **initial bundle size and application startup performance**. 
+
+---
+
+**`1. Eager Loading`**
+
+If you directly reference a component in the route:
+
+```typescript
+import { HomeComponent } from './home.component';
+
+export const routes: Routes = [
+  {
+    path: '',
+    component: HomeComponent
+  }
+];
+```
+
+Angular includes that component in the initial JavaScript bundle. 
+
+```text
+Application starts
+      ↓
+Download JS
+      ↓
+HomeComponent already available
+```
+
+**Use when**
+
+Usually for your **main landing page** or small, frequently used pages.
+
+---
+
+**`2. Lazy Loading`**
+
+Load the component **only when the user navigates to that route**.
+
+`loadComponent`
+
+```typescript
+export const routes: Routes = [
+  {
+    path: 'reports',
+    loadComponent: () =>
+      import('./reports/reports.component')
+  }
+];
+```
+
+Angular creates a separate JS chunk and downloads it when `/reports` becomes active. 
+
+```text
+Initial application
+      ↓
+Reports code NOT downloaded
+      ↓
+User opens /reports
+      ↓
+Download reports chunk
+      ↓
+Render ReportsComponent
+```
+
+---
+
+`loadChildren`
+
+Used to lazy-load a **route tree/child routes**.
+
+```typescript
+export const routes: Routes = [
+  {
+    path: 'admin',
+    loadChildren: () =>
+      import('./admin/admin.routes')
+  }
+];
+```
+
+Good for large features:
+
+```text
+/admin
+   ├── users
+   ├── products
+   ├── reports
+   └── settings
+```
+
+The entire admin route configuration can be loaded only when needed. 
+
+---
+
+**`loadComponent` vs `loadChildren`**
+
+|          | `loadComponent` | `loadChildren`       |
+| -------- | --------------- | -------------------- |
+| Loads    | One component   | Route tree           |
+| Good for | Individual page | Large feature/module |
+| Example  | `/login`        | `/admin/*`           |
+
+Mental model:
+
+```text
+One lazy page
+     ↓
+loadComponent()
+
+Entire feature with routes
+     ↓
+loadChildren()
+```
+-------------
+-------------
+## Router Lifecycle & Events
 
 | Event                  | Meaning                                   |
 | ---------------------- | ----------------------------------------- |
@@ -173,7 +608,7 @@ where price, inventory, or other information changes frequently.
 --------
 --------
 
-## Angular Forms
+## Forms
 
 Angular provides **two traditional approaches** for forms:
 
@@ -196,8 +631,6 @@ Angular's current docs also introduce **Signal Forms**, but for interviews and e
 | Testing     | Easier                                  | More dependent on rendering |
 | Scalability | ⭐⭐⭐⭐⭐                                   | ⭐⭐⭐                         |
 | Best for    | Complex forms                           | Simple forms                |
-
-**Interview answer:**
 
 > Use **Reactive Forms** for complex, scalable, reusable and testable forms. Use **Template-driven Forms** for simple forms with minimal logic. 
 
@@ -339,8 +772,6 @@ Angular forms are mainly built around:
 | `FormArray`            | Dynamic collection                                   |
 | `ControlValueAccessor` | Bridge between Angular forms and custom/DOM controls |
 
-
-
 ---
 
 **Template-driven Forms**
@@ -376,7 +807,6 @@ Angular's `NgModel` directive internally creates and manages a `FormControl`.
 
 </form>
 ```
-
 ---
 
 **Reactive Form Validation**
@@ -420,7 +850,6 @@ Validators.min(18)
 Validators.max(100)
 Validators.pattern(...)
 ```
-
 ---
 
 **`valueChanges`**
@@ -503,7 +932,6 @@ Important properties:
 | `pending`   | Async validation in progress   |
 
 ---
-
 **`ControlValueAccessor`**
 
 `ControlValueAccessor` is the bridge between Angular Forms and a custom form control.
@@ -530,11 +958,12 @@ Angular uses value accessors internally for native controls as well.
 ---------
 ---------
 
-## Angular Signal Forms
+## Signal Forms
 
-**Signal Forms** is Angular's newer form system built on **Signals**. It provides automatic two-way synchronization, type-safe field access, and schema-based validation. 
-
-> **Important:** Signal Forms require **Angular v21+** and are currently best suited for **new applications built with Signals**. For existing applications using Reactive Forms, Angular recommends continuing with Reactive Forms when production stability is important. 
+- Signal Forms** is Angular's newer form system built on **Signals**. 
+- It provides automatic two-way synchronization, type-safe field access, and schema-based validation. 
+- Signal Forms require **Angular v21+** and are currently best suited for **new applications built with Signals**. 
+- For existing applications using Reactive Forms, Angular recommends continuing with Reactive Forms when production stability is important. 
 
 **Why Signal Forms?**
 
@@ -663,11 +1092,9 @@ Angular specifically states that Signal Forms work best for new applications bui
 --------
 --------
 
-## Angular HTTP Client
+## HTTP Client
 
 Angular provides `HttpClient` from `@angular/common/http` for communicating with backend APIs over HTTP. It supports typed responses, error handling, interceptors, and testing utilities. 
-
----
 
 **Setup `HttpClient`**
 
@@ -832,7 +1259,7 @@ request$.subscribe();
 -----------
 -----------
 
-## What is RxJS?
+## RxJS?
 
 > **RxJS (Reactive Extensions for JavaScript)** is a library for working with **asynchronous and event-based data using Observables**.
 
@@ -1020,7 +1447,7 @@ Angular
 ---
 ---
 
-## Subjects in RxJS
+## Subjects
 
 > A **Subject** is a special type of Observable that can do **two things**:
 
@@ -1235,8 +1662,6 @@ Last value after complete
 
 ## RxJS Operators
 
-Your notes cover **Creation, Transformation, and Filtering operators**. For interview preparation, I would organize them like this:
-
 **1. Creation Operators**
 
 Create Observables from different sources. 
@@ -1375,7 +1800,6 @@ mergeMap   → Parallel
 concatMap  → Queue
 exhaustMap → Busy → Ignore
 ```
-
 ---
 
 **3. Filtering Operators**

@@ -1,4 +1,8 @@
-﻿Design patterns are **reusable solutions to commonly occurring software design problems**.
+﻿- Design patterns
+
+## Design patterns
+
+> Design patterns are **reusable solutions to commonly occurring software design problems**.
 
 The classic **GoF (Gang of Four)** patterns are divided into 3 categories:
 
@@ -22,7 +26,7 @@ Design Patterns
 
 ### 1. Creational Patterns
 
-> **Concerned with object creation.**
+> Concerned with object creation.
 
 | Pattern              | Purpose                                        | Example                |
 | -------------------- | ---------------------------------------------- | ---------------------- |
@@ -87,7 +91,7 @@ everywhere, creation is centralized.
 
 ### 2. Structural Patterns
 
-> **Concerned with how classes and objects are combined to form larger structures.**
+> Concerned with how classes and objects are combined to form larger structures.
 
 | Pattern       | Purpose                                          |
 | ------------- | ------------------------------------------------ |
@@ -99,7 +103,7 @@ everywhere, creation is centralized.
 | **Flyweight** | Share objects to reduce memory                   |
 | **Proxy**     | Control access to another object                 |
 
-### Most important for .NET
+***Most important for .NET***
 
 **Adapter, Decorator, Facade, Proxy**
 
@@ -162,7 +166,7 @@ StripeClient
 
 ### 3. Behavioral Patterns
 
-> **Concerned with communication, responsibilities, and behavior between objects.**
+> Concerned with communication, responsibilities, and behavior between objects.
 
 | Pattern                     | Purpose                                                         |
 | --------------------------- | --------------------------------------------------------------- |
@@ -192,7 +196,7 @@ Mediator
 Command
 State
 ```
-
+---------------------
 **Strategy Pattern**
 
 This one is extremely useful.
@@ -418,7 +422,7 @@ UPIPayment
 
 `Strategy`
 
-> **Which behavior/algorithm should I use?**
+> Which behavior/algorithm should I use?
 
 ```text
 PaymentService
@@ -438,7 +442,7 @@ Strategy → BEHAVIOR
 ---
 ---
 
-> **Don't use patterns just because they exist. Use a pattern when it solves an actual design problem.**
+> Don't use patterns just because they exist. Use a pattern when it solves an actual design problem.
 
 **Example: E-commerce .NET API**
 
@@ -547,11 +551,11 @@ OrderService
 
 Repository handles:
 
-> **How do I access data?**
+> How do I access data?
 
 Strategy handles:
 
-> **Which business behavior should I use?**
+> Which business behavior should I use?
 
 Different problems → different patterns.
 
@@ -703,8 +707,47 @@ A mature application could look something like:
 └─────────────────────────────────────────┘
 ```
 
-**"Can you use multiple design patterns in one application?"**
+—> Can you use multiple design patterns in one application?
 
-> **"Yes. Design patterns solve different types of problems, so it's common to combine them. For example, an application might use Factory and Strategy for selecting business behavior, Repository for data access, Decorator for cross-cutting concerns, and Chain of Responsibility for request processing. The patterns should be introduced based on actual design problems rather than forcing patterns into the application."**
+> Yes. Design patterns solve different types of problems, so it's common to combine them. For example, an application might use Factory and Strategy for selecting business behavior, Repository for data access, Decorator for cross-cutting concerns, and Chain of Responsibility for request processing. The patterns should be introduced based on actual design problems rather than forcing patterns into the application.
 ----
 ----
+
+
+**One Important Architecture Principle Moduler MOnolith**
+
+Right now we have:
+
+```text
+Controller
+   ↓
+Returns response
+```
+
+Eventually we **do not want**:
+
+```text
+Controller
+   ↓
+EF Core
+   ↓
+SQL
+```
+
+Instead:
+
+```text
+Controller
+    ↓
+MediatR / Application
+    ↓
+Domain
+    ↓
+Repository
+    ↓
+EF Core
+    ↓
+SQL
+```
+
+This is one of the architectural improvements we'll build gradually.

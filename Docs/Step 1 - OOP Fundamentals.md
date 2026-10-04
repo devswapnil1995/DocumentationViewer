@@ -1,14 +1,15 @@
-- Four Pillars: Abstraction, Encapsulation, Inheritance, Polymorphism
-- Method Overloading vs Overriding
+- OOP & Four Pillars: Abstraction, Encapsulation, Inheritance, Polymorphism
 - Abstract Class vs Interface
 - Sealed Classes and Methods
 - Static vs Instance members
+- Static vs Singletone class
 - Constructors (default, parameterized, static, private)
-- Composition vs Inheritance ("has-a" vs "is-a")
+- Access Modifiers
+- Composition
 - Boxing and Unboxing
+- Value Types vs Reference Types
 
 ---
-
 ## What is OOP?
 
 - OPP is standing for object oriented programming.
@@ -110,16 +111,16 @@ We use access specifiers to achieve encapsulation
     ```
     
 
-—> For example, We have multiple payment method, but internally it is calling make payment method which execute it functionality based on method type.
+For example, We have multiple payment method, but internally it is calling make payment method which execute it functionality based on method type.
 
-#### Two Types of polymorphism
+##### Two Types of polymorphism
 
-##### —> Compile time polymorphism (Method overloading)
+***—> Compile time polymorphism (Method overloading)***
 > Same method name, different parameter. Compiler decide based on parameters which method should get execute. No need of inheritance in this.
 
 [Click here for Method overloading Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverloadingExample.cs)
 
-##### —> Runtime polymorphism (Method overriding)
+***—> Runtime polymorphism (Method overriding)***
 > The child class redefines method from parent class, basically we required inheritance here. Method name and signature should be same but implementation will be differ. We need to defined method with virtual keyword in parent class and use override in child class.
 
 [Click here for Method overriding Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/MethodOverridingExample.cs)
@@ -180,7 +181,7 @@ We use access specifiers to achieve encapsulation
 
 > C# 8 introduced default interface methods, allowing interfaces to contain method implementations primarily so interfaces can evolve without breaking existing implementations.
 
-#### Type of interface:
+**Type of interface:**
 
 1. Basic Interface - Defining contract
     - An **interface in C#** is simply a contract. Let’s create a **basic interface** and implement it in a class.
@@ -193,13 +194,13 @@ We use access specifiers to achieve encapsulation
 
 [Click here for Interface Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/InterfaceExample.cs)
 
-##### Use Abstract Classes When:
+***Use Abstract Classes When:***
 
 - You have common behavior to share across multiple classes.
 - You need to provide default implementations for some methods.
 - You want to enforce certain behaviors but also allow overrides.
 
-##### Use Interfaces When:
+***Use Interfaces When:***
 
 - You only need to define a contract without implementation.
 - You want to support multiple inheritance (C# doesn’t support multiple base classes).
@@ -293,7 +294,78 @@ We use access specifiers to achieve encapsulation
 > No. Static members belong to the type rather than an instance, so I access them using the class name. The class itself doesn't have to be declared static. An instance is required only for non-static members.
 ---
 ---
+## Static class vs Singletone class
 
+> Static class = no object, type-level utility.
+
+> Singleton = one object/instance shared by the application.
+
+
+```text
+static class
+    ↓
+No instance
+No DI lifecycle
+No interface implementation in the normal instance sense
+
+Singleton
+    ↓
+One instance
+Can implement interface
+Managed by DI
+Can have dependencies
+```
+
+
+> A static class is a type-level construct that cannot be instantiated and is mainly used for stateless utilities, whereas a Singleton is an actual object with exactly one shared instance and can participate in interfaces, dependency injection, and maintain state.
+
+|                      | Static Class                   | Singleton                                    |
+| -------------------- | ------------------------------ | -------------------------------------------- |
+| Object/instance      | ❌ No                           | ✅ One                                        |
+| `new` allowed        | ❌                              | Constructor private, access through instance |
+| Instance state       | Not applicable                 | ✅ Can maintain state                         |
+| Interfaces           | ❌ Cannot implement as instance | ✅ Can implement                              |
+| Dependency Injection | ❌ Not normally injectable      | ✅ `AddSingleton()`                           |
+| Polymorphism         | ❌                              | ✅                                            |
+| Typical use          | Utilities                      | Shared application service/state             |
+
+**Static Class**
+```
+public static class MathHelper
+{
+    public static int Add(int a, int b)
+    {
+        return a + b;
+    }
+}
+
+//To call method
+var result = MathHelper.Add(10, 20);
+```
+
+**Singleton class**
+```
+public sealed class AppConfiguration
+{
+    private static readonly Lazy<AppConfiguration> _instance =
+        new(() => new AppConfiguration());
+
+    private AppConfiguration() { }
+
+    public static AppConfiguration Instance => _instance.Value;
+
+    public string Environment { get; set; }
+}
+
+//Get object/instance
+var config1 = AppConfiguration.Instance;
+var config2 = AppConfiguration.Instance;
+
+Console.WriteLine(config1 == config2); // true
+```
+
+---
+---
 ## Constructor
 
 > A constructor is a special method, which gets invoked when object of class created. It should be a same name as class name. It cannot have return type.
@@ -424,3 +496,197 @@ We use access specifiers to achieve encapsulation
 
 ---
 ---
+
+## Fields
+
+A field is a variable declared inside a class.
+
+Example:
+
+```csharp
+public class Product
+{
+    private int _stock;
+}
+```
+
+Here:
+
+```csharp
+private int _stock;
+```
+
+is a **field**.
+
+A common naming convention for private fields is:
+
+```text
+_stock
+_name
+_price
+```
+
+---
+
+### Fields vs Properties
+
+This is very important.
+
+`Field`
+
+```csharp
+private decimal _price;
+```
+
+`Property`
+
+```csharp
+public decimal Price { get; set; }
+```
+
+A property provides controlled access to data.
+
+Think:
+
+```text
+Field
+ ↓
+Actual internal storage/state
+
+Property
+ ↓
+Public access mechanism
+```
+
+Don't simply say:
+
+> Property is a variable.
+
+That's not technically accurate.
+
+---
+
+***Why Properties?***
+
+Suppose we expose:
+
+```csharp
+public decimal Price;
+```
+
+Now anyone can directly modify it.
+
+But with:
+
+```csharp
+public decimal Price { get; set; }
+```
+
+we have a property abstraction.
+
+More importantly, properties can contain logic:
+
+```csharp
+public decimal Price
+{
+    get
+    {
+        return _price;
+    }
+
+    set
+    {
+        if (value < 0)
+            throw new ArgumentException("Price cannot be negative.");
+
+        _price = value;
+    }
+}
+```
+
+Now we control how the value is changed.
+
+This leads directly into **encapsulation**, which we'll formally cover in the next step.
+
+`private set`
+
+Another very important pattern:
+
+```csharp
+public int Id { get; private set; }
+```
+
+Now:
+
+```text
+Outside class
+    ↓
+Can GET
+    ↓
+Cannot SET
+
+Inside class
+    ↓
+Can GET
+    ↓
+Can SET
+```
+
+Example:
+
+```csharp
+public class Product
+{
+    public int Id { get; private set; }
+
+    public void SetId(int id)
+    {
+        Id = id;
+    }
+}
+```
+
+This is frequently used in domain models.
+
+---
+
+***Why `private set` Is Useful***
+
+Suppose we have:
+
+```csharp
+public decimal Price { get; set; }
+```
+
+Any caller can do:
+
+```csharp
+product.Price = -500;
+```
+
+That's potentially invalid.
+
+Instead:
+
+```csharp
+public decimal Price { get; private set; }
+```
+
+means external code cannot arbitrarily modify the property.
+
+The class controls how its state changes.
+
+That's an important part of **encapsulation**.
+
+-----
+-----
+
+`readonly` means the field can be assigned:
+
+- At declaration
+- In the constructor
+
+but not arbitrarily later.
+
+-----
+-----

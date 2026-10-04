@@ -32,6 +32,9 @@
     <None Update="Docs\Step 20 - LinqQueries.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Docs\Step 22 - Architecture.md">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Docs\Step 3 - Core Web API.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -50,7 +53,7 @@
     <None Update="Docs\Step 13 - Angular Fundamentals.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Step 14 - AngularDoc.md">
+    <None Update="Docs\Step 14 - Angular Doc.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="Docs\Step 8 - Architecture &amp; System Design.md">
@@ -71,7 +74,7 @@
     <None Update="Docs\Step 12 - SOLID.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Docs\Steps 21 - Question &amp; Ans.md">
+    <None Update="Docs\Step 21 - Question &amp; Ans.md">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

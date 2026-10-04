@@ -1,14 +1,14 @@
 ﻿- Code First vs Database First
 - DbContext lifecycle & scope
-- Migrations — Add-Migration, Update-Database
+- EF Core Migrations 
 - Change Tracking — Tracking vs AsNoTracking()
 - Relationships — One-to-Many, Many-to-Many, One-to-One
 - Fluent API vs Data Annotations
-- Lazy vs Eager (Include) vs Explicit Loading
+- Loading Strategies - Lazy vs Eager (Include) vs Explicit Loading
 - Transactions in EF Core
 - Raw SQL — FromSqlRaw, ExecuteSqlRaw
-- Concurrency handling — Optimistic concurrency
 - Performance — AsNoTracking, compiled queries, avoiding N+1
+- Concurrency handling — Optimistic concurrency
 ---------------------
 
 ## Code First vs Database First
@@ -191,9 +191,9 @@ Common when:
 | Developer-driven              | Usually          | Often DBA/database-driven |
 
 
-### Interview Question
+***Interview Question***
 
-What is the difference between Code First and Database First?
+—> What is the difference between Code First and Database First?
 
 > In Code First, we define the entity model in C# and use EF Core migrations to create and evolve the database schema. In Database First, the database schema already exists and we scaffold the entity classes and DbContext from the database. Code First is commonly used for new applications, while Database First is useful when working with existing or legacy databases.
 
@@ -201,6 +201,7 @@ What is the difference between Code First and Database First?
 -------------------------------
 
 ## `DbContext` Lifecycle & Scope
+
 > Thread-safe = an object/component can be safely used by multiple threads concurrently without causing incorrect behavior or corrupting shared state.
 
 > `DbContext` represents a session/unit of work with the database.
@@ -258,7 +259,6 @@ By default, `AddDbContext<T>()` registers the `DbContext` as:
 > **Scoped**
 
 This is extremely important.
-
 
 **Why NOT Singleton?**
 
@@ -373,7 +373,7 @@ Much more appropriate.
 
 ---
 
-### `IDbContextFactory`
+***`IDbContextFactory`***
 
 What if you need a DbContext outside the normal HTTP request scope?
 
@@ -432,7 +432,7 @@ This creates a context for the operation and disposes it afterward.
 
 The easiest way to remember:
 
-> **Migration = a version-controlled record of database schema changes.**
+> Migration = a version-controlled record of database schema changes.
 
 
 **Why do we need migrations?**
@@ -660,19 +660,18 @@ dotnet ef migrations script
 This generates SQL that can be reviewed/deployed through the organization's database deployment process.
 
 
-> "In development it's common to use `dotnet ef database update`. In production, I would follow the team's deployment process, often generating a migration SQL script or using a controlled migration mechanism through CI/CD, so that database changes can be reviewed, tested, and deployed safely."
+> In development it's common to use `dotnet ef database update`. In production, I would follow the team's deployment process, often generating a migration SQL script or using a controlled migration mechanism through CI/CD, so that database changes can be reviewed, tested, and deployed safely.
 
-> "EF Core maintains a migration history table, typically `__EFMigrationsHistory`, in the database."
+> EF Core maintains a migration history table, typically `__EFMigrationsHistory`, in the database.
 
-> "Migrations are part of the application's database schema evolution and should normally be version controlled."
+> Migrations are part of the application's database schema evolution and should normally be version controlled.
 
 --------------------------------
 --------------------------------
 
-## EF Core Change Tracking
+## Change Tracking
 
 > Change Tracking is how EF Core keeps track of entities it has loaded so it knows what changed and what needs to be saved to the database.
-
 
 **Simple Example**
 
@@ -973,7 +972,7 @@ var employees = await db.Employees
 
 This tells EF Core:
 
-> "I only want to read these entities; don't track them."
+> I only want to read these entities; don't track them.
 
 Conceptually:
 
@@ -1216,7 +1215,7 @@ Useful for debugging and understanding what EF Core is tracking.
 ----------------------------
 ----------------------------
 
-## EF Core Relationships
+## Relationships
 
 > A relationship defines how two entities are connected.
 
@@ -1228,17 +1227,9 @@ Department
     │ has many
     ↓
 Employees
-```
 
-or:
-
-```text
 Student ←→ Course
-```
 
-or:
-
-```text
 Person ←→ Passport
 ```
 
@@ -1395,7 +1386,7 @@ Course A
 
 That's:
 
-> **Many Students ↔ Many Courses**
+> Many Students ↔ Many Courses
 
 **Database Representation**
 
@@ -1632,7 +1623,7 @@ These are three separate concepts, but they work together in EF Core.
 
 ## Fluent API vs Data Annotations
 
-Both are used to **configure how your C# classes map to database tables**.
+Both are used to configure how your C# classes map to database tables.
 
 For example, you may want to define:
 
@@ -1689,7 +1680,7 @@ Common attributes:
 [DatabaseGenerated]
 ```
 
-### Example: 
+***Example:*** 
 
 **`[Required]`**
 
@@ -1769,7 +1760,6 @@ public class Employee
 }
 ```
 
-
 ***Fluent API for Relationships***
 
 This is where Fluent API becomes especially useful.
@@ -1828,7 +1818,6 @@ modelBuilder.Entity<Employee>()
 ```
 
 Now deleting a Department won't automatically delete its Employees through a cascade relationship.
-
 
 **Where should Fluent API go?**
 
@@ -1897,18 +1886,18 @@ IEntityTypeConfiguration<T>
 
 ### One-line interview memory:
 
-> **Data Annotations = simple configuration close to the model.**
+> Data Annotations = simple configuration close to the model.
 
-> **Fluent API = powerful, explicit, centralized configuration.**
+> Fluent API = powerful, explicit, centralized configuration.
 
-> **Large project = Fluent API + `IEntityTypeConfiguration<T>`.**
+> Large project = Fluent API + `IEntityTypeConfiguration<T>`.
 
 ------------------------
 ------------------------
 
-## EF Core Loading Strategies 
+## Loading Strategies 
 
-We already introduced **Eager, Lazy, and Explicit Loading**, but let's make this interview-ready and connect it with performance.
+We already introduced Eager, Lazy, and Explicit Loading, but let's make this interview-ready and connect it with performance.
 
 Assume:
 
@@ -1925,7 +1914,7 @@ public class Order
 
 ### Eager Loading — `Include()`
 
-> **Load related data as part of the initial query.**
+> Load related data as part of the initial query.
 
 ```csharp
 var orders = await db.Orders
@@ -1935,7 +1924,7 @@ var orders = await db.Orders
 
 You are explicitly telling EF Core:
 
-> "I need the Customer along with the Orders."
+> I need the Customer along with the Orders.
 
 **For nested relationships**
 
@@ -1958,7 +1947,7 @@ Address
 
 ### Lazy Loading
 
-> **Related data is loaded automatically when you access the navigation property.**
+> Related data is loaded automatically when you access the navigation property.
 
 For example:
 
@@ -2010,7 +1999,7 @@ This is why lazy loading can cause serious performance problems.
 
 ### Explicit Loading
 
-> **You manually decide when to load related data.**
+> You manually decide when to load related data.
 
 ```csharp
 var order = await db.Orders
@@ -2050,7 +2039,7 @@ You have complete control over when the query happens.
 
 **`Scenario 1`**
 
-> "I always need Customer when retrieving Orders."
+> I always need Customer when retrieving Orders.
 
 Use:
 
@@ -2064,7 +2053,7 @@ or projection.
 
 **`Scenario 2`**
 
-> "I only need Customer in some situations."
+> I only need Customer in some situations.
 
 You could use:
 
@@ -2078,7 +2067,7 @@ You could use:
 
 **`Scenario 3`**
 
-> "I want related data to load automatically whenever I access it."
+> I want related data to load automatically whenever I access it.
 
 Lazy loading can do this.
 
@@ -2205,7 +2194,7 @@ This can reduce the data duplication caused by large joins.
 
 But remember:
 
-> **Split query isn't automatically faster either.**
+> Split query isn't automatically faster either.
 
 It trades a potentially huge joined result for multiple database round trips.
 
@@ -2244,11 +2233,11 @@ That's what determines performance.
 
 > A **transaction** ensures that multiple database operations are treated as **one unit**.
 
-> **Either all operations succeed, or all of them are rolled back.**
+> Either all operations succeed, or all of them are rolled back.
 
 This is especially important when one business operation modifies multiple records/tables.
 
-### Simple Example
+***Simple Example***
 
 Imagine transferring ₹10,000:
 
@@ -2281,9 +2270,11 @@ Both succeed → COMMIT ✅
 Anything fails → ROLLBACK ❌
 ```
 
-That's a transaction.
-
-> If the tables belong to the same database, I'd use an EF Core transaction when the operation spans multiple database operations that must succeed or fail together. I'd call BeginTransactionAsync(), perform the required changes, call SaveChangesAsync() as needed, and call CommitAsync() only after everything succeeds. If an exception occurs, I'd roll back and rethrow. If the changes are all part of one SaveChanges, EF Core normally provides a transaction automatically for relational providers. For operations spanning multiple services or databases, I'd consider a Saga rather than a local database transaction
+- If the tables belong to the same database, I'd use an EF Core transaction when the operation spans multiple database operations that must succeed or fail together. 
+- I'd call BeginTransactionAsync(), perform the required changes, call SaveChangesAsync() as needed, and call CommitAsync() only after everything succeeds. 
+- If an exception occurs, I'd roll back and rethrow. 
+- If the changes are all part of one SaveChanges, EF Core normally provides a transaction automatically for relational providers. 
+- For operations spanning multiple services or databases, I'd consider a Saga rather than a local database transaction
 
 ```csharp
 
@@ -2294,21 +2285,15 @@ try
 {
     // Operation 1
     _db.Orders.Add(order);
-
     await _db.SaveChangesAsync();
-
 
     // Operation 2
     product.Stock -= quantity;
-
     await _db.SaveChangesAsync();
-
 
     // Operation 3
     customer.TotalOrders++;
-
     await _db.SaveChangesAsync();
-
 
     // Everything succeeded
     await transaction.CommitAsync();
@@ -2319,9 +2304,6 @@ catch
     throw;
 }
 ```
-
-
-
 ---
 
 ### ACID Properties
@@ -2599,6 +2581,7 @@ catch
 }
 ```
 ---------
+
 ### TransactionScope
 
 You may also hear about:
@@ -2708,7 +2691,6 @@ You don't need to memorize every detail initially. For interviews, understand th
 
 ------------------
 ------------------
-
 ## Raw SQL in EF Core 
 
 > Sometimes LINQ is not the best option. EF Core allows you to execute **raw SQL** when you need more control over the query.
@@ -3019,17 +3001,15 @@ is preferable because it is:
 
 ---
 
-**When Would You Actually Use Raw SQL?**
+—> When Would You Actually Use Raw SQL?
 
-A good interview answer is:
-
-> "I prefer LINQ for most queries because it provides type safety, maintainability, and database abstraction. I would use raw SQL when I have a specific requirement such as an existing stored procedure, database-specific functionality, or a query that is difficult to express efficiently with LINQ."
+> I prefer LINQ for most queries because it provides type safety, maintainability, and database abstraction. I would use raw SQL when I have a specific requirement such as an existing stored procedure, database-specific functionality, or a query that is difficult to express efficiently with LINQ.
 
 That's a strong answer.
 
 ---
 
-**Don't Use Raw SQL Just Because You Think It's Faster 🚨**
+—> Don't Use Raw SQL Just Because You Think It's Faster 🚨**
 
 A common misconception:
 
@@ -3062,19 +3042,9 @@ Performance should be measured using:
 ------------------------
 ------------------------
 
-## EF Core Performance Optimization
+## Performance Optimization
 
-> "Your EF Core query is slow. How will you improve it?"
-
-Don't answer only:
-
-> "Use `AsNoTracking()`."
-
-There are several things you should check.
-
----
-
-**`First Rule: Don't Load More Data Than Needed`**
+**`Don't Load More Data Than Needed`**
 
 ❌ Bad:
 
@@ -3397,9 +3367,7 @@ For page 2:
 .Skip(20)
 .Take(20)
 ```
-
 ---
-
 **`Skip() / Take() vs Keyset Pagination`**
 
 For basic pagination:
@@ -3447,7 +3415,6 @@ Id > 5000
 This can work very efficiently with an appropriate index.
 
 ---
-
 **`Database Indexes`**
 
 Suppose you're frequently querying:
@@ -3572,11 +3539,11 @@ if (await db.Employees.AnyAsync())
 
 You're asking:
 
-> "Does at least one record exist?"
+> Does at least one record exist?
 
 rather than:
 
-> "How many records are there?"
+> How many records are there?
 
 ---
 
@@ -3783,7 +3750,7 @@ The database matters enormously.
 ---------------------
 ---------------------
 
-## EF Core Concurrency
+## Concurrency handling
 
 > What happens when two users try to update the same record at the same time?
 
@@ -3840,8 +3807,6 @@ This is called:
 
 EF Core commonly uses **optimistic concurrency**.
 
-The idea is:
-
 > Assume conflicts are uncommon, but detect them when they happen.
 
 Instead of locking the record while the user is editing it, we store a **concurrency token/version**.
@@ -3886,7 +3851,7 @@ Actual Version   = 6
 
 EF Core detects:
 
-> "Someone changed this record since you read it."
+> Someone changed this record since you read it.
 
 And the update fails.
 
@@ -4217,8 +4182,8 @@ For most normal web applications:
 5. API commonly returns 409 Conflict.
 ```
 
-> Transaction = "all operations together."
+> Transaction = all operations together.
 
-> Concurrency = "what if someone else changes the same data?"
+> Concurrency = what if someone else changes the same data?
 ---
-
+---

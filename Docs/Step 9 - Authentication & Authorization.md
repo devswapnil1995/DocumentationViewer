@@ -1,8 +1,15 @@
-﻿## Authentication in .NET Core
+﻿- Authentication in .NET Core
+- 15 ways to improve ASP.NET Core API performance
+- Scaling
+
+## Authentication in .NET Core
 
 > Authentication answers: "Who are you?"
 
 > Authorization answers: "What are you allowed to do?"
+
+> Authentication verifies the identity of a user or client, while authorization determines what that authenticated identity is allowed to access.
+
 
 ### Authentication vs Authorization
 
@@ -45,10 +52,6 @@ What can you access?
    ↓
 Endpoint
 ```
-
-***Interview one-liner***
-
-> Authentication verifies the identity of a user or client, while authorization determines what that authenticated identity is allowed to access.
 
     
 **Authentication schemes**
@@ -1015,9 +1018,7 @@ Horizontal scaling starts becoming useful.
 
 You combine:
 
-> **Horizontal scaling + caching + database optimization + async processing + autoscaling**
-
----
+> Horizontal scaling + caching + database optimization + async processing + autoscaling
 
 **Vertical = make the server bigger.**
 **Horizontal = add more servers.**

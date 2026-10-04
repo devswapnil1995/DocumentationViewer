@@ -2,11 +2,13 @@
 - HTTP Verbs
 - IConfiguration & Configuration Providers
 - Key Vault
-- Authentication in .NET Core
 - Startup.cs & Program.cs
 - MetaPackage
-- RESTful API 
-
+- RESTful API
+- API Management
+- CORS
+- Collections in C#
+- Reflection in .NET
 ---
 
 ## HTTP status codes
@@ -39,6 +41,8 @@
 | **503** | **Service Unavailable**   | Server temporarily unavailable                  | Service down/overloaded                   |
 | **504** | **Gateway Timeout**       | Gateway didn't receive response in time         | API Gateway → backend timeout             |
 
+----
+----
 
 ## HTTP Verbs
 
@@ -214,8 +218,6 @@ PATCH instead of PUT
 
 ## IConfiguration & Configuration Providers
 
-> `IConfiguration` is the .NET abstraction used to read configuration values from different sources.
-
 > `IConfiguration` provides a unified way to read hierarchical application configuration from multiple sources, 
 while the Options Pattern provides a strongly typed way to consume related configuration settings.
 
@@ -385,18 +387,12 @@ builder.Configuration.AddCommandLine(args);
 
 ### IOptions<T>
 
-> "IConfiguration is useful for reading configuration values, while the Options Pattern lets us bind a related configuration section to a strongly typed class 
-and inject it using IOptions<T>, making configuration cleaner, safer, and easier to validate and maintain."
-
-Yes. This is where you should understand **`IConfiguration` → Options Pattern → `IOptions<T>`**.
-
-The easiest way to remember it is:
+> IConfiguration is useful for reading configuration values, while the Options Pattern lets us bind a related configuration section to a strongly typed class 
+and inject it using IOptions<T>, making configuration cleaner, safer, and easier to validate and maintain.
 
 > `IConfiguration` gives you configuration as strings. `IOptions<T>` converts a configuration section into a strongly typed C# object.
 
 **The 3 lines you should remember**
-
-If you're preparing for interviews, remember this pattern:
 
 **1. JSON**
 
@@ -430,62 +426,6 @@ public MyService(IOptions<JwtOptions> options)
 }
 ```
 
-That's the **core Options Pattern**.
-
-### Final mental model
-
-Think of `IConfiguration` as a **dictionary**:
-
-```text
-IConfiguration
-
-"Jwt:Issuer" → "MyApi"
-"Jwt:Audience" → "MyClient"
-"Jwt:ExpirationMinutes" → "60"
-```
-
-Options Pattern transforms that into a **C# object**:
-
-```text
-JwtOptions
-
-Issuer             → "MyApi"
-Audience           → "MyClient"
-ExpirationMinutes  → 60
-```
-
-So:
-
-```text
-                appsettings.json
-                       │
-                       ▼
-                IConfiguration
-                       │
-                GetSection("Jwt")
-                       │
-                       ▼
-                 JwtOptions
-                       │
-                       ▼
-                IOptions<JwtOptions>
-                       │
-                       ▼
-                  Your Service
-```
-
-### Important things to remember
-
-```text
-IConfiguration
-      │
-      ├── appsettings.json
-      ├── appsettings.{Environment}.json
-      ├── Environment Variables
-      ├── User Secrets
-      ├── Command-line arguments
-      └── Other providers
-```
 -----------------------------------
 -----------------------------------
 
@@ -644,113 +584,6 @@ var app = builder.Build();
 Now your configuration can include values from Key Vault.
 
 ---
-
-***What is `DefaultAzureCredential`?***
-
-This is a **very important interview topic**.
-
-You don't want this:
-
-```csharp
-var password = "myAzurePassword";
-```
-
-or:
-
-```csharp
-var clientSecret = "some-secret";
-```
-
-inside your application.
-
-Instead:
-
-```csharp
-new DefaultAzureCredential()
-```
-
-allows Azure Identity to find an appropriate authentication mechanism.
-
-Conceptually:
-
-```text
-ASP.NET Core
-     │
-     ▼
-DefaultAzureCredential
-     │
-     ├── Local development
-     │      ↓
-     │   Developer/Azure CLI credentials
-     │
-     └── Azure deployment
-            ↓
-        Managed Identity
-```
-
-The exact credential selected depends on the environment and available credentials.
-
----
-
-***Managed Identity***
-
-This is one of the most important things to mention in an interview. Suppose your API is running in:
-
-```text
-Azure App Service
-```
-
-You don't want to put an Azure username/password or client secret inside your application just to access Key Vault.
-Instead, give the application an **Azure Managed Identity**.
-Conceptually:
-
-```text
-             Azure
-               │
-       ┌───────┴────────┐
-       ▼                ▼
-   App Service       Key Vault
-       │                │
-       │ Managed        │
-       │ Identity       │
-       └───────►────────┘
-              Access
-```
-
-Your application gets an identity from Azure.
-Then you grant that identity permission to read secrets from Key Vault.
-
-**Why Managed Identity is better**
-
-Without Managed Identity:
-
-```text
-Application
-    ↓
-Client ID
-Client Secret
-    ↓
-Key Vault
-```
-
-Now you have another secret to protect.
-
-With Managed Identity:
-
-```text
-Application
-    ↓
-Managed Identity
-    ↓
-Key Vault
-```
-
-No application-stored Azure credential is needed.
-
-So the interview-friendly statement is:
-
-> When an application runs in Azure, Managed Identity is generally preferred for authenticating to Key Vault because it eliminates the need to store Azure credentials in the application.
-
 **Good candidates for key vault**
 
 ```text
@@ -772,8 +605,6 @@ So the interview-friendly statement is:
 ✗ Non-sensitive constants
 ✗ Normal business data
 ```
-
->In production, I would integrate Azure Key Vault using Managed Identity rather than storing a client secret in the application. I would enable a system-assigned managed identity on the App Service, grant that identity the Key Vault Secrets User RBAC role, and then use DefaultAzureCredential from Azure.Identity to authenticate to Key Vault. Locally, DefaultAzureCredential can use my developer credentials, while in Azure it can use the App Service managed identity. Alternatively, for App Service configuration values, I can use Key Vault References so the application doesn't need direct Key Vault configuration code
 
 Not every configuration value is a secret.
 
@@ -818,7 +649,6 @@ dotnet add package Azure.Extensions.AspNetCore.Configuration.Secrets
 
 --------------------------
 --------------------------
-
 
 ## Startup.cs & Program.cs
 
@@ -1021,13 +851,9 @@ So now, you only add extra NuGet packages if you use third-party libraries or op
 
 ## RESTful API 
 
-> REST (Representational State Transfer) is an architectural style for designing web APIs around resources, HTTP methods, and standard HTTP behavior.
-
-> RESTful API = Resources + HTTP methods + stateless communication + standard HTTP semantics.
-
-**REST API?**
-
-> Each request should contain the information necessary for the server to process it; the server should not depend on remembering client session state between requests.
+- REST (Representational State Transfer) is an architectural style for designing web APIs around resources, HTTP methods, and standard HTTP behavior.
+- RESTful API = Resources + HTTP methods + stateless communication + standard HTTP semantics.
+- Each request should contain the information necessary for the server to process it; the server should not depend on remembering client session state between requests.
 
 Then HTTP methods tell the API what you want to do.
 
@@ -1357,19 +1183,19 @@ Policies can do things like:
 ✓ Logging/telemetry integration
 ```
 
-***"Why use Azure APIM?"***
+—> Why use Azure APIM?
 
-> "Azure API Management provides a managed gateway and management layer in front of backend APIs. It allows us to securely expose APIs, apply policies such as rate limiting and authentication, manage subscriptions and API products, support versioning and transformations, and monitor API usage without putting all of these cross-cutting concerns directly into every backend API."
-
-
-***"Is APIM a replacement for ASP.NET Core?"***
-
-> "No. APIM doesn't replace the backend API. It sits in front of the backend and manages API access and traffic. ASP.NET Core still handles the application's business logic, validation, data access, and domain operations."
+> Azure API Management provides a managed gateway and management layer in front of backend APIs. It allows us to securely expose APIs, apply policies such as rate limiting and authentication, manage subscriptions and API products, support versioning and transformations, and monitor API usage without putting all of these cross-cutting concerns directly into every backend API.
 
 
-***"What is an APIM policy?"***
+—> Is APIM a replacement for ASP.NET Core?
 
-> "An APIM policy is a set of rules executed during API request or response processing. Policies can implement concerns such as rate limiting, authentication checks, caching, header manipulation, request/response transformation, and traffic control without changing the backend application."
+> No. APIM doesn't replace the backend API. It sits in front of the backend and manages API access and traffic. ASP.NET Core still handles the application's business logic, validation, data access, and domain operations.
+
+
+—> What is an APIM policy?
+
+> An APIM policy is a set of rules executed during API request or response processing. Policies can implement concerns such as rate limiting, authentication checks, caching, header manipulation, request/response transformation, and traffic control without changing the backend application.
 
 ### Azure APIM — Advantages
 - Central API Gateway — single entry point for multiple APIs
@@ -1400,7 +1226,6 @@ Policies can do things like:
 **CORS = Cross-Origin Resource Sharing**
 
 > CORS is a browser security mechanism that controls whether a web page from one origin is allowed to make requests to a different origin.
-
 
 **What is an Origin?**
 
@@ -1562,7 +1387,7 @@ Indicates whether credentials can be included in the cross-origin request.
 
 ## Collections in C#
 
-A collection is used to **store and manage multiple objects/values**.
+> A collection is used to **store and manage multiple objects/values**.
 The important collections are:
 
 ```text
@@ -1678,7 +1503,7 @@ But finding a node is:
 O(n)
 ```
 
-> "LinkedList is always faster than List."
+> LinkedList is always faster than List.
 
 It isn't.
 
@@ -1923,13 +1748,6 @@ public IReadOnlyList<User> GetUsers()
     return _users;
 }
 ```
-
-This communicates:
-
-> You can read this collection, but you shouldn't modify it through this API.
-
-Be careful: **read-only interface does not necessarily mean the underlying object is immutable**.
-
 ---
 
 **`10. Concurrent Collections`**
@@ -2078,11 +1896,9 @@ Concurrent* collection
 
 ## Reflection in .NET
 
-> **Reflection** is the ability of .NET to **inspect types, classes, methods, properties, constructors, and attributes at runtime**, and in some cases **invoke or create them dynamically**.
+> Reflection is the ability of .NET to **inspect types, classes, methods, properties, constructors, and attributes at runtime**, and in some cases **invoke or create them dynamically.
 
-Simple definition for interview:
-
-> **Reflection allows us to examine and interact with .NET types at runtime instead of knowing everything at compile time.**
+> Reflection allows us to examine and interact with .NET types at runtime instead of knowing everything at compile time.
 
 ---
 
@@ -2474,6 +2290,235 @@ typeof(Employee)
 employee.GetType()
       ↓
 "What type is this object at runtime?"
+```
+----
+----
+
+## Error Handling
+
+* One centralized place for unexpected exceptions
+* Consistent API error responses
+* Correct HTTP status codes
+* Structured logging
+* Trace IDs
+* No sensitive exception details exposed to clients
+* Different behavior for development vs production
+
+
+- Eventually our domain/application layer will need meaningful exceptions.
+
+For now create:
+
+```text
+src/SmartStore.Api/
+└── Exceptions/
+    ├── NotFoundException.cs
+    └── ConflictException.cs
+```
+`NotFoundException.cs`
+
+```csharp
+namespace SmartStore.Api.Exceptions;
+
+public class NotFoundException : Exception
+{
+    public NotFoundException(string message)
+        : base(message)
+    {
+    }
+}
+```
+`ConflictException.cs`
+
+```csharp
+namespace SmartStore.Api.Exceptions;
+
+public class ConflictException : Exception
+{
+    public ConflictException(string message)
+        : base(message)
+    {
+    }
+}
+```
+
+- We'll eventually move these into the appropriate Application/Domain layer as the architecture evolves.
+
+
+```text
+Controller
+    ↓
+Service
+    ↓
+Exception
+    ↓
+Global Exception Handler
+    ↓
+Log exception
+    ↓
+Create ProblemDetails
+    ↓
+HTTP 500
+```
+
+The client should **not** receive:
+
+```json
+{
+  "exception": "SqlException...",
+  "stackTrace": "...",
+  "connectionString": "..."
+}
+```
+
+Instead:
+
+```json
+{
+  "title": "An unexpected error occurred.",
+  "status": 500,
+  "traceId": "..."
+}
+```
+
+***Create Exception Middleware***
+
+Create:
+
+```text
+Middleware/
+└── ExceptionHandlingMiddleware.cs
+```
+
+Add:
+
+```csharp
+using System.Net;
+using Microsoft.AspNetCore.Mvc;
+using SmartStore.Api.Exceptions;
+
+namespace SmartStore.Api.Middleware;
+
+public class ExceptionHandlingMiddleware
+{
+    private readonly RequestDelegate _next;
+    private readonly ILogger<ExceptionHandlingMiddleware> _logger;
+
+    public ExceptionHandlingMiddleware(
+        RequestDelegate next,
+        ILogger<ExceptionHandlingMiddleware> logger)
+    {
+        _next = next;
+        _logger = logger;
+    }
+
+    public async Task InvokeAsync(HttpContext context)
+    {
+        try
+        {
+            await _next(context);
+        }
+        catch (Exception exception)
+        {
+            await HandleExceptionAsync(context, exception);
+        }
+    }
+
+    private async Task HandleExceptionAsync(
+        HttpContext context,
+        Exception exception)
+    {
+        _logger.LogError(
+            exception,
+            "Unhandled exception. TraceId: {TraceId}",
+            context.TraceIdentifier);
+
+        var statusCode = exception switch
+        {
+            NotFoundException => (int)HttpStatusCode.NotFound,
+            ConflictException => (int)HttpStatusCode.Conflict,
+            _ => (int)HttpStatusCode.InternalServerError
+        };
+
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = GetTitle(statusCode),
+            Instance = context.Request.Path
+        };
+
+        problemDetails.Extensions["traceId"] =
+            context.TraceIdentifier;
+
+        context.Response.StatusCode = statusCode;
+        context.Response.ContentType = "application/problem+json";
+
+        await context.Response.WriteAsJsonAsync(problemDetails);
+    }
+
+    private static string GetTitle(int statusCode)
+    {
+        return statusCode switch
+        {
+            StatusCodes.Status404NotFound =>
+                "Resource not found.",
+
+            StatusCodes.Status409Conflict =>
+                "The request could not be completed because of a conflict.",
+
+            _ =>
+                "An unexpected error occurred."
+        };
+    }
+}
+```
+
+In `Program.cs`, put exception handling **very early** in the pipeline.
+
+```csharp
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
+app.UseMiddleware<RequestLoggingMiddleware>();
+
+app.UseHttpsRedirection();
+
+app.MapControllers();
+
+app.Run();
+```
+
+
+The client does **not** receive:
+
+```text
+System.Exception
+StackTrace
+Internal file paths
+Database information
+Connection strings
+Internal implementation details
+```
+
+But our server logs contain the exception:
+
+```text
+Unhandled exception. TraceId: abc123
+```
+
+This is the correct general direction for production APIs.
+
+Why Use `ProblemDetails`?
+
+`ProblemDetails` provides a standardized structure for HTTP API errors.
+
+Instead of every endpoint inventing:
+
+```json
+{
+  "errorMessage": "...",
+  "errorCode": "...",
+  "message": "..."
+}
 ```
 ----
 ----

@@ -1,4 +1,20 @@
-﻿## Monolith vs Modular Monolith vs Microservices
+﻿- Monolith vs Modular Monolith vs Microservices
+- Service Boundaries / Bounded Context
+- Database per Service
+- API Gateway
+- Sync vs Async Communication
+- Message Broker
+- Saga Pattern 
+- Outbox Pattern
+- Eventual Consistency
+- Retry / Timeout
+- Circuit Breaker
+- Idempotency
+- CQRS
+- Distributed Tracing
+- Basic Microservices Questions
+
+## Monolith vs Modular Monolith vs Microservices
 
 **`Monolith`**
 
@@ -81,7 +97,7 @@ This is **very important for interviews**.
 
 A Modular Monolith is:
 
-> **One deployable application, but internally divided into strongly isolated business modules.**
+> One deployable application, but internally divided into strongly isolated business modules.
 
 Example:
 
@@ -164,8 +180,6 @@ Each service:
 * Owns its domain data
 * Communicates through defined contracts
 
-Microsoft describes microservices as independently deployable services that implement specific business capabilities and own their related domain data/logic. 
-
 ---
 
 **The Most Important Difference**
@@ -193,7 +207,6 @@ Strong business boundaries
 +
 Independent data ownership
 ```
-
 ---
 
 **Comparison**
@@ -302,9 +315,6 @@ Retry
 Circuit breaker
 Idempotency
 ```
-
-**Those problems are exactly why we're going to learn the patterns in your roadmap.**
-
 --------------
 
 **When Should You Choose Microservices?**
@@ -358,15 +368,13 @@ Avoid them when:
 * Infrastructure/DevOps maturity is low
 * Distributed complexity isn't justified
 
-Microsoft explicitly notes that in some cases a monolithic deployment is preferable because the costs of microservices outweigh the benefits.
-
 ---
 
 **What About Modular Monolith?**
 
 This is an excellent answer in a system-design interview:
 
-> "If I don't yet need independent deployment or scaling, but the application has multiple business domains, I would consider a modular monolith. It gives me strong module boundaries while keeping deployment and operational complexity low. If the boundaries and scaling/deployment requirements become clear later, individual modules can potentially be extracted into microservices."
+> If I don't yet need independent deployment or scaling, but the application has multiple business domains, I would consider a modular monolith. It gives me strong module boundaries while keeping deployment and operational complexity low. If the boundaries and scaling/deployment requirements become clear later, individual modules can potentially be extracted into microservices.
 
 ---
 
@@ -394,26 +402,23 @@ Inventory
 Shipping
 Customer Management
 ```
-
-Microsoft recommends designing services around business capabilities rather than horizontal technical layers, with loose coupling and high functional cohesion. 
-
 ---
 
 **Interview Questions**
 
-Q1. What is a monolith?
+—> Q1. What is a monolith?
 
 > A monolithic application is deployed as a single application unit, where multiple business capabilities typically run together.
 
-Q2. What is a modular monolith?
+—> Q2. What is a modular monolith?
 
 > A modular monolith is a single deployable application internally divided into strongly isolated business modules.
 
-Q3. What is a microservice?
+—> Q3. What is a microservice?
 
 > A microservice is an independently deployable service that implements a cohesive business capability, owns its domain logic/data, and communicates with other services through defined contracts.
 
-Q4. Why microservices?
+—> Q4. Why microservices?
 
 Mention:
 
@@ -425,7 +430,7 @@ Fault isolation
 Technology flexibility
 ```
 
-Q5. What are the disadvantages?
+—> Q5. What are the disadvantages?
 
 Mention:
 
@@ -439,12 +444,9 @@ Deployment complexity
 Data synchronization
 ```
 
-Q6. Microservice vs Modular Monolith?
+—> Q6. Microservice vs Modular Monolith?
 
-**Best answer:**
-
-> "The major distinction isn't simply the number of modules. A modular monolith has strong internal boundaries but remains one deployment unit, whereas microservices are independently deployable and typically independently own their data."
-
+> The major distinction isn't simply the number of modules. A modular monolith has strong internal boundaries but remains one deployment unit, whereas microservices are independently deployable and typically independently own their data.
 -------
 -------
 
@@ -579,8 +581,6 @@ Notification Service
 
 These represent **business capabilities**.
 
-Microsoft specifically recommends designing microservices around business capabilities rather than horizontal technical layers.
-
 ---
 
 **High Cohesion + Low Coupling**
@@ -625,9 +625,6 @@ Payment DB ❌
 Payment EF Core entities ❌
 Payment internal classes ❌
 ```
-
-Microsoft describes good microservice boundaries as having **loose coupling and high functional cohesion**.
-
 ---
 
 **How Do We Identify Service Boundaries?**
@@ -852,35 +849,35 @@ We'll deal with this further when we study **Sync vs Async communication, Saga, 
 
 **Quick Interview Questions**
 
-Q1. What is Bounded Context?
+—> Q1. What is Bounded Context?
 
 > A boundary within which a specific domain model and business language have a defined meaning.
 
-Q2. Is Bounded Context the same as Microservice?
+—> Q2. Is Bounded Context the same as Microservice?
 
 > No. Bounded Context is a DDD concept; a microservice is a deployable architectural unit that can implement a bounded context.
 
-Q3. How do you decide service boundaries?
+—> Q3. How do you decide service boundaries?
 
 > Business capabilities, domain models, business rules, data ownership, transaction boundaries, team ownership and coupling.
 
-Q4. Should services share the same database?
+—> Q4. Should services share the same database?
 
 > Generally no. Each microservice should own its domain data and expose it through APIs or messaging.
 
-Q5. Should services share domain entities?
+—> Q5. Should services share domain entities?
 
 > No. Each bounded context should have its own domain model appropriate to its business requirements.
 
-Q6. What is high cohesion?
+—> Q6. What is high cohesion?
 
 > Related business responsibilities are grouped together within the same service.
 
-Q7. What is low coupling?
+—> Q7. What is low coupling?
 
 > A service can change internally without requiring changes to other services.
 
-Q8. Should every microservice be very small?
+—> Q8. Should every microservice be very small?
 
 > No. Size isn't the primary goal. Meaningful business boundaries, cohesion, autonomy and low coupling are more important. 
 
@@ -890,7 +887,6 @@ Q8. Should every microservice be very small?
 ## Database per Service
 
 > Each microservice owns its data and is the only service allowed to directly access that data.
----
 
 **1. Why Database per Service?**
 
@@ -928,7 +924,7 @@ It **doesn't necessarily mean**:
 
 It means:
 
-> **The data ownership boundary is per service.**
+> The data ownership boundary is per service
 
 For example, you could have:
 
@@ -1240,11 +1236,11 @@ Outbox
 
 Order service needs PaymentStatus. What would you do?
 
-> "I would not directly access the Payment database. The Order service can obtain the information through the Payment service API, or consume payment events and maintain the required data locally. The choice depends on whether the information needs to be real-time and on the consistency requirements."
+> I would not directly access the Payment database. The Order service can obtain the information through the Payment service API, or consume payment events and maintain the required data locally. The choice depends on whether the information needs to be real-time and on the consistency requirements.
 
 That's much better than:
 
-> "I'll create a SQL JOIN." ❌
+> I'll create a SQL JOIN. ❌
 
 ---
 
@@ -1291,31 +1287,31 @@ The trade-off is **eventual consistency**.
 
 **Interview Questions**
 
-Q1. What is Database per Service?
+—> Q1. What is Database per Service?
 
 > Each microservice owns and controls its domain data, and other services cannot directly access its database.
 
-Q2. Does it require separate physical database servers?
+—> Q2. Does it require separate physical database servers?
 
 > No. The key requirement is independent data ownership. Multiple service databases can run on the same database server.
 
-Q3. Can microservices share the same database schema?
+—> Q3. Can microservices share the same database schema?
 
 > Generally no, because shared schemas create coupling and prevent independent evolution.
 
-Q4. How do services communicate when they need another service's data?
+—> Q4. How do services communicate when they need another service's data?
 
 > Through APIs or asynchronous messaging/events.
 
-Q5. How do you perform joins across microservices?
+—> Q5. How do you perform joins across microservices?
 
 > You don't directly perform database joins. Use API composition, CQRS/read models, materialized views, or event-driven projections depending on the requirement.
 
-Q6. How do you handle transactions across databases?
+—> Q6. How do you handle transactions across databases?
 
 > Avoid relying on a distributed ACID transaction; use patterns such as Saga and eventual consistency for cross-service business workflows.
 
-Q7. What is Polyglot Persistence?
+—> Q7. What is Polyglot Persistence?
 
 > Using different database technologies for different services based on their requirements.
 -------
@@ -1732,9 +1728,7 @@ Order Service:
 
 That's a good separation of responsibility.
 
----
-
-> **API Gateway centralizes access, but it shouldn't become a single-instance bottleneck or failure point.**
+> API Gateway centralizes access, but it shouldn't become a single-instance bottleneck or failure point.
 
 ---
 
@@ -1766,35 +1760,35 @@ Also, aggregation can increase gateway complexity and latency because it waits o
 
 **Interview Questions**
 
-Q1. What is API Gateway?
+—> Q1. What is API Gateway?
 
 > A single entry point that routes client requests to microservices and can centralize cross-cutting concerns such as authentication, rate limiting and SSL termination.
 
-Q2. Why do we need an API Gateway?
+—> Q2. Why do we need an API Gateway?
 
 > To hide internal service topology, simplify clients, centralize API policies and reduce direct exposure of microservices.
 
-Q3. What is Gateway Routing?
+—> Q3. What is Gateway Routing?
 
 > Routing a client request to the appropriate backend service based on path, HTTP method or other routing rules.
 
-Q4. What is Gateway Aggregation?
+—> Q4. What is Gateway Aggregation?
 
 > The gateway calls multiple backend services and combines their responses into one response for the client.
 
-Q5. What is Gateway Offloading?
+—> Q5. What is Gateway Offloading?
 
 > Moving cross-cutting concerns such as authentication, SSL termination and rate limiting from individual services to the gateway.
 
-Q6. Should business logic be implemented in API Gateway?
+—> Q6. Should business logic be implemented in API Gateway?
 
 > No. The gateway should handle infrastructure/API concerns; domain/business logic belongs to the microservices.
 
-Q7. API Gateway vs Load Balancer?
+—> Q7. API Gateway vs Load Balancer?
 
 > A load balancer primarily distributes traffic among instances, while an API gateway provides API-level routing and policies and can perform aggregation and other cross-cutting functions.
 
-Q8. What is BFF?
+—> Q8. What is BFF?
 
 > Backend for Frontend is a gateway/backend specifically tailored to the needs of a particular client such as web or mobile.
 
@@ -1957,7 +1951,7 @@ This distinction is **very important**.
 
 `Request`
 
-> "Payment Service, please process this payment."
+> Payment Service, please process this payment.
 
 ```text
 Order → Payment
@@ -1969,7 +1963,7 @@ The sender expects processing to happen as part of the interaction.
 
 `Event`
 
-> "An order has been created."
+> An order has been created.
 
 ```text
 Order → OrderCreated Event
@@ -1977,7 +1971,7 @@ Order → OrderCreated Event
 
 The sender is saying:
 
-> "This already happened."
+> This already happened.
 
 Other services decide whether they care.
 
@@ -2041,7 +2035,7 @@ These don't necessarily need to block the user's request.
 
 ## Message Broker
 
-> **A message broker is infrastructure that receives messages from producers and delivers them to consumers, allowing services to communicate asynchronously without directly depending on each other.**
+> A message broker is infrastructure that receives messages from producers and delivers them to consumers, allowing services to communicate asynchronously without directly depending on each other.
 
 Think of it as a **middleman**:
 
@@ -2093,8 +2087,6 @@ This gives us:
 * load leveling
 * publish/subscribe
 * independent consumers
-
-Microsoft describes message brokers/service buses as a common infrastructure for asynchronous communication between microservices. 
 
 ---
 
@@ -2166,7 +2158,7 @@ You can have multiple instances:
 
 The workers can **compete for messages**, which helps distribute work. Azure Service Bus supports this competing-consumer model. 
 
-> **Queue = distribute work**
+> Queue = distribute work
 
 ---
 
@@ -2196,7 +2188,7 @@ Example:
 
 Each subscription gets its own copy of the published message. Azure Service Bus uses topics and subscriptions for this model. 
 
-> **Topic = broadcast event**
+> Topic = broadcast event
 
 ---
 
@@ -2218,7 +2210,7 @@ This distinction is extremely useful.
 
 `Command`
 
-> "Please do this."
+> Please do this.
 
 ```text
 ProcessPayment
@@ -2234,7 +2226,7 @@ Usually one intended consumer.
 
 `Event`
 
-> "This already happened."
+> This already happened.
 
 ```text
 OrderCreated
@@ -2258,7 +2250,7 @@ Generic term for the data transmitted through the broker.
 
 So:
 
-> **Command and Event are types of messages.**
+> Command and Event are types of messages
 
 ---
 
@@ -2534,7 +2526,7 @@ Azure Service Bus supports **sessions** for scenarios where message ordering mat
 But don't assume every broker guarantees ordering automatically.
 
 
-> "Message ordering depends on the broker and configuration; if business processing requires ordering, I explicitly design for it rather than assuming it."
+> Message ordering depends on the broker and configuration; if business processing requires ordering, I explicitly design for it rather than assuming it.
 
 ---
 
@@ -2551,7 +2543,7 @@ But don't assume every broker guarantees ordering automatically.
 | Typical use                          | Application messaging           | Enterprise/Azure messaging | Event streaming, analytics, high-volume events |
 
 
-> "Kafka is just a message queue." ❌
+> Kafka is just a message queue. ❌
 
 Kafka is fundamentally an **event streaming platform/log**, whereas RabbitMQ and Azure Service Bus are commonly used as messaging brokers.
 
@@ -2682,7 +2674,7 @@ This is the architecture you should be able to draw on a whiteboard.
 
 ## Saga Pattern 
 
-> **How do we maintain business consistency when one business transaction spans multiple microservices, each with its own database?**
+> How do we maintain business consistency when one business transaction spans multiple microservices, each with its own database?
 
 In a monolith, you might use one database transaction. In microservices, each service has its own local transaction, so a single normal ACID transaction doesn't span all services. Saga coordinates a sequence of local transactions and uses **compensating transactions** when a later step fails.
 
@@ -3077,7 +3069,7 @@ This makes complex workflows easier to visualize and control.
 | Best suited         | Smaller/simple workflows            | Complex business workflows  |
 
 
-> **"Choreography distributes workflow decisions across services using events, while orchestration uses a central coordinator to control the sequence and compensation of the Saga."**
+> Choreography distributes workflow decisions across services using events, while orchestration uses a central coordinator to control the sequence and compensation of the Saga.
 
 ---
 
@@ -3112,7 +3104,7 @@ These are **new business operations**.
 
 So:
 
-> **Saga compensation is not the same thing as database rollback.**
+> Saga compensation is not the same thing as database rollback
 
 This distinction is extremely important.
 
@@ -3471,7 +3463,7 @@ Microsoft describes the Outbox as a transactional table that stores integration 
 
 The important part:
 
-> **Business data + Outbox message are saved atomically.**
+> Business data + Outbox message are saved atomically
 
 ---
 
@@ -3904,14 +3896,13 @@ You may archive/delete them based on retention requirements.
 
 ---
 
-"What happens if the database transaction succeeds but publishing to RabbitMQ/Azure Service Bus fails?"
+—> What happens if the database transaction succeeds but publishing to RabbitMQ/Azure Service Bus fails?
 
-> "I would use the Transactional Outbox pattern. The business entity and integration event are stored in an Outbox table within the same local database transaction. After the transaction commits, a background worker publishes pending outbox events to the message broker. If publishing fails, the event remains pending and can be retried. Because delivery can be at least once, consumers should be idempotent."
+> I would use the Transactional Outbox pattern. The business entity and integration event are stored in an Outbox table within the same local database transaction. After the transaction commits, a background worker publishes pending outbox events to the message broker. If publishing fails, the event remains pending and can be retried. Because delivery can be at least once, consumers should be idempotent.
 
+—> Why not use a distributed transaction between PostgreSQL and the message broker?"
 
-Why not use a distributed transaction between PostgreSQL and the message broker?"
-
-> "Distributed transactions add significant complexity and reduce the autonomy and availability characteristics we're generally trying to achieve with microservices. The Outbox pattern uses a local ACID transaction for the service's database and then reliably publishes the event asynchronously."
+> Distributed transactions add significant complexity and reduce the autonomy and availability characteristics we're generally trying to achieve with microservices. The Outbox pattern uses a local ACID transaction for the service's database and then reliably publishes the event asynchronously.
 
 ### 🔗 How Our Patterns Fit Together
 
@@ -4213,12 +4204,11 @@ Neither is universally "better"; the choice depends on business requirements.
 
 **Common Interview Scenario**
 
-
-"Payment service updates its database, but Order Service still shows Payment = Pending. Is the system broken?"
+—> Payment service updates its database, but Order Service still shows Payment = Pending. Is the system broken?
 
 Not necessarily.
 
-> "Not necessarily. If the architecture uses asynchronous communication and eventual consistency, Order Service may temporarily have the previous state while the PaymentCompleted event is being processed. I'd verify that the event was published, delivered and processed successfully, and that retries and idempotency are working."
+> Not necessarily. If the architecture uses asynchronous communication and eventual consistency, Order Service may temporarily have the previous state while the PaymentCompleted event is being processed. I'd verify that the event was published, delivered and processed successfully, and that retries and idempotency are working."
 
 ----
 ----
@@ -4346,7 +4336,7 @@ POST /payment
 
 Retrying the exact same invalid request won't fix it.
 
-> "I retry failures that are likely to be transient, not permanent business or validation errors."
+> I retry failures that are likely to be transient, not permanent business or validation errors.
 
 **Retry Count**
 
@@ -4398,8 +4388,6 @@ delay = base × 2^attempt
 ```
 
 Real implementations usually also impose maximum delays and other limits.
-
-Microsoft recommends exponential backoff for many cloud scenarios.
 
 ---
 
@@ -5202,7 +5190,7 @@ public async Task<IActionResult> CreatePayment(
 
 `Deduplication`
 
-> "Have I already received/processed this message?"
+> Have I already received/processed this message?
 
 Example:
 
@@ -5215,7 +5203,7 @@ ABC123 exists?
 
 `Idempotency`
 
-> "If I process this operation multiple times, will the business result remain safe?"
+> If I process this operation multiple times, will the business result remain safe?
 
 Example:
 
@@ -5637,9 +5625,9 @@ A trace consists of one or more spans arranged in a parent/child relationship.
 
 **Easy mental model**
 
-> **Trace = entire journey**
+> Trace = entire journey
 
-> **Span = one step in the journey**
+> Span = one step in the journey
 
 ---
 
@@ -7143,7 +7131,7 @@ Payment → 10 instances
 Inventory → 4 instances
 ```
 
-> "I design stateless services, scale horizontally, use caching and asynchronous processing where appropriate, optimize database access, and allow individual services to scale independently based on their workload."
+> I design stateless services, scale horizontally, use caching and asynchronous processing where appropriate, optimize database access, and allow individual services to scale independently based on their workload.
 
 ---
 
@@ -7177,11 +7165,11 @@ Other experiments:
 
 Not:
 
-> "Break production randomly."
+> Break production randomly.
 
 Instead:
 
-> **"Validate resilience assumptions through controlled experiments."**
+> Validate resilience assumptions through controlled experiments.
 
 ---
 

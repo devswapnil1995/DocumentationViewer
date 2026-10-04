@@ -1,6 +1,22 @@
-﻿## Angular Fundamentals
+﻿- Fundamentals
+- Component Lifecycle
+- Component selectors
+- Inputs
+- Outputs
+- Content Projection — `ng-content`
+- Host Elements
+- Queries
+- Programmatic Rendering
+- Advanced Component Configuration
+- Custom Elements (Web Components)
+- Template Binding
+- Control Flow 
+- Pipes
+- `ng-template`
+- `@defer`
+- Directives
 
-**What is Angular?**
+## Fundamentals
 
 > Angular is a TypeScript-based frontend framework developed by Google for building web applications.
 
@@ -55,7 +71,6 @@ The two files I want you to understand first are:
 main.ts
 app.config.ts
 ```
-
 ---
 
 **`main.ts`**
@@ -95,7 +110,6 @@ import { appConfig } from './app/app.config';
 bootstrapApplication(AppComponent, appConfig)
   .catch(err => console.error(err));
 ```
-
 ---
 
 **What is Bootstrap?**
@@ -110,7 +124,7 @@ bootstrapApplication(AppComponent, appConfig);
 
 you're essentially saying:
 
-> "Start Angular using `AppComponent` as the root component and use this application configuration."
+> Start Angular using `AppComponent` as the root component and use this application configuration.
 
 So:
 
@@ -454,7 +468,7 @@ Angular Component Selectors
 ----------
 ----------
 
-## Angular Inputs
+## Inputs
 
 An **input** allows a parent component to pass data to a child component. Angular's modern recommended API is the signal-based `input()` function. 
 
@@ -539,9 +553,6 @@ Therefore the type is effectively:
 ```typescript
 InputSignal<string | undefined>
 ```
-
-
-
 ---
 
 **`4. Required Input`**
@@ -635,11 +646,7 @@ But inside TypeScript, you still use:
 ```typescript
 this.value()
 ```
-
-
-
 ---
-
 **`8. Old @Input() API`**
 
 You will definitely see this in existing Angular projects:
@@ -657,7 +664,6 @@ name = input<string>();
 Both are supported, but Angular recommends the **signal-based `input()` for new projects**. 
 
 ---
-
 ### Input Cheat Sheet
 
 | Requirement    | Syntax                               |
@@ -673,7 +679,7 @@ Both are supported, but Angular recommends the **signal-based `input()` for new 
 -------------
 --------------
 
-## Angular Outputs
+## Outputs
 
 An **output** allows a child component to send a custom event/data to its parent.
 
@@ -756,9 +762,7 @@ Parent:
   (panelClosed)="savePanelState()">
 </app-panel>
 ```
-
 ---
-
 **`3. Passing Data`**
 
 You can emit almost any value:
@@ -785,11 +789,7 @@ Parent receives it through:
 ```html
 (userSelected)="onUserSelected($event)"
 ```
-
-
-
 ---
-
 **`4. Output Alias`**
 
 You can expose a different name in the template:
@@ -817,7 +817,6 @@ this.changed
 Aliases should generally be avoided unless there's a good reason, such as avoiding a native DOM event name collision. 
 
 ---
-
 **`5. Naming Rules`**
 
 Prefer:
@@ -841,7 +840,6 @@ click            // ❌ can conflict with DOM event
 Angular specifically recommends avoiding output names that collide with native DOM events and avoiding the `on` prefix. 
 
 ---
-
 **`6. Important: Outputs Don't Bubble`**
 
 Angular custom outputs **do not bubble through the DOM** like native browser events.
@@ -859,7 +857,6 @@ An output from `Grandchild` doesn't automatically reach `Parent`.
 You need to explicitly handle/re-emit it or use shared state/services for more complex communication. 
 
 ---
-
 **`7. Old `@Output()` API`**
 
 You'll see this frequently in existing projects:
@@ -880,9 +877,6 @@ It is still fully supported, but for **new Angular code**, prefer:
 ```typescript
 userSelected = output<string>();
 ```
-
-
-
 ---
 
 ### Input vs Output
@@ -899,7 +893,7 @@ userSelected = output<string>();
 ---------------
 ---------------
 
-## Angular Content Projection — `ng-content`
+## Content Projection — `ng-content`
 
 **Content projection** lets a component accept HTML/content from its parent and render it inside a specific place in its own template. Think of it like Angular's version of a native HTML `<slot>`. 
 
@@ -1000,9 +994,7 @@ If the parent doesn't provide `card-title`, Angular displays:
 ```text
 Default Title
 ```
-
 ---
-
 ### Ideal Scenario — When Should I Use It?
 
 The **best scenario** is when you are building a **reusable container/layout component where the outer structure is fixed but the inner content needs to vary**.
@@ -1109,7 +1101,7 @@ Angular processes `<ng-content>` at compile time, and projected content is insta
 ------
 ------
 
-## Angular Host Elements
+## Host Elements
 
 The **host element** is the HTML element that matches a component's selector. Angular creates the component on that element, and the component's template is rendered **inside** it. 
 
@@ -1333,7 +1325,7 @@ Component
 ----------
 ----------
 
-## Angular Queries
+## Queries
 
 > Queries let a component find and reference child components, directives, DOM elements, or other values from its template.** Modern Angular query APIs return **signals**.
 
@@ -1605,7 +1597,7 @@ The decorator APIs are still supported.
 ---------
 ---------
 
-## Angular Programmatic Rendering
+## Programmatic Rendering
 
 Normally, we render components directly in the template:
 
@@ -1768,7 +1760,7 @@ Render dynamically
 --------
 --------
 
-## Angular Advanced Component Configuration
+## Advanced Component Configuration
 
 **`1. ChangeDetectionStrategy`**
 
@@ -1874,7 +1866,7 @@ Don't use it just to hide Angular template errors.
 -------
 -------
 
-## Angular Custom Elements (Web Components)
+## Custom Elements (Web Components)
 
 **Angular Elements** allow you to convert an Angular component into a **standard Web Component (Custom Element)** that can be used in:
 
@@ -2093,7 +2085,7 @@ This can create conflicts and duplicate component instantiation. Use a different
 
 ---
 
-### Angular Component vs Angular Element
+### Component vs Angular Element
 
 | Angular Component               | Angular Element                   |
 | ------------------------------- | --------------------------------- |
@@ -2105,9 +2097,9 @@ This can create conflicts and duplicate component instantiation. Use a different
 -----
 -----
 
-## Angular Template Binding
+## Template Binding
 
-**Binding creates a dynamic connection between the component's data and the template.** When the data changes, Angular updates the UI. 
+Binding creates a dynamic connection between the component's data and the template.** When the data changes, Angular updates the UI. 
 
 There are **4 things you should master**:
 
@@ -2317,14 +2309,12 @@ You can also do:
 
 Angular supports individual style properties and multi-style bindings. 
 
----
-
 > Two-way binding synchronizes a value between the component and the UI. Angular uses [()] syntax; [(ngModel)] is commonly used with forms, while model() enables two-way binding between components.
 
 --------
 --------
 
-## Angular Control Flow 
+## Control Flow 
 
 Angular provides built-in template control flow using:
 
@@ -2335,8 +2325,6 @@ Angular provides built-in template control flow using:
 ```
 
 These are the **modern Angular syntax** and are preferred over the older `*ngIf`, `*ngFor`, and `*ngSwitch` style. 
-
----
 
 **`1. @if`**
 
@@ -2416,8 +2404,6 @@ track user.id
  ↓
 Efficient DOM updates
 ```
-
----
 
 **`@for` built-in variables**
 
@@ -2507,9 +2493,9 @@ You can also have multiple cases for the same block:
 --------------
 ---------------
 
-## Angular Pipes
+## Pipes
 
-> A **pipe transforms data for display in the template** without changing the original data.
+> A pipe transforms data for display in the template without changing the original data.
 
 Syntax:
 
@@ -2658,7 +2644,7 @@ creates a new array reference, so Angular detects it.
 
 Angular checks it much more frequently.
 
-⚠️ **Avoid impure pipes unless genuinely necessary** because they can have a significant performance cost. 
+⚠️ Avoid impure pipes unless genuinely necessary because they can have a significant performance cost. 
 
 ---
 
@@ -2689,7 +2675,7 @@ in the component, you can use:
 --------
 --------
 
-## Angular `ng-template`
+## `ng-template`
 
 `<ng-template>` defines a **template fragment** that Angular does **not render immediately**. You can render it later dynamically or programmatically. 
 
@@ -2714,9 +2700,7 @@ Template definition
       ↓
 Render later
 ```
-
 ---
-
 **`2. TemplateRef`**
 
 Give the template a reference:
@@ -2734,9 +2718,7 @@ You can get it with:
 ```typescript
 loading = viewChild<TemplateRef<unknown>>('loading');
 ```
-
 ---
-
 **`3. NgTemplateOutlet`**
 
 Use `NgTemplateOutlet` when you want to render a template fragment **from the template**.
@@ -2760,7 +2742,6 @@ Loading...
 Usually use it with `<ng-container>` so you don't introduce an unnecessary DOM element. 
 
 ---
-
 **`4. Passing Data to Template`**
 
 You can pass context:
@@ -2872,7 +2853,7 @@ Don't confuse these:
 -------
 -------
 
-## Angular `@defer`
+## `@defer`
 
 > `@defer` is Angular's **deferred/lazy loading** feature. It delays loading code that isn't needed for the initial page, reducing the initial JavaScript bundle and improving initial load performance. 
 
@@ -2897,7 +2878,6 @@ Browser becomes idle
     ↓
 Load HeavyComponent
 ```
-
 ---
 
 **2. `@placeholder`**
@@ -2925,7 +2905,6 @@ HeavyComponent
 Placeholder dependencies are loaded eagerly, so keep them lightweight. 
 
 ---
-
 **3. `@loading` and `@error`**
 
 ```html
@@ -3125,7 +3104,7 @@ Lazy-load part of a page
 ---------
 ---------
 
-## Angular Directives
+## Directives
 
 A **directive adds behavior to an existing element or component**. It can change appearance, behavior, or how elements fit into the DOM. 
 
@@ -3284,429 +3263,3 @@ Angular specifically recommends a component when you need to render your own mar
 
 -------------
 ---------------
-
-## Angular Routing
-
-> Routing decides which component should be displayed for a given URL, without doing a full page reload.
-
-Think:
-
-```text
-URL
- ↓
-Router
- ↓
-Matching Route
- ↓
-Component
- ↓
-<router-outlet>
-```
-
----
-
-**1. Define Routes**
-
-```typescript
-import { Routes } from '@angular/router';
-
-export const routes: Routes = [
-  {
-    path: 'users',
-    component: UsersComponent
-  },
-  {
-    path: 'products',
-    component: ProductsComponent
-  }
-];
-```
-
-Now:
-
-```text
-/users     → UsersComponent
-/products  → ProductsComponent
-```
-
----
-
-**2. `router-outlet`**
-
-This is the **placeholder where Angular renders the active route component**.
-
-```html
-<nav>
-  <a routerLink="/users">Users</a>
-  <a routerLink="/products">Products</a>
-</nav>
-
-<router-outlet />
-```
-
-If URL is:
-
-```text
-/products
-```
-
-Angular renders:
-
-```text
-<router-outlet>
-      ↓
-ProductsComponent
-```
-
-Routes, outlets, and links are the three core building blocks of Angular routing. 
-
----
-
-**3. `routerLink`**
-
-Used for navigation from the template.
-
-```html
-<a routerLink="/users">Users</a>
-```
-
-Instead of:
-
-```html
-<a href="/users">Users</a>
-```
-
-`routerLink` lets Angular Router handle the navigation without a full page reload.
-
-You can also bind it:
-
-```html
-<a [routerLink]="['/users', userId]">
-  View User
-</a>
-```
-
----
-
-**`4. Route Parameters`**
-
-Useful when the URL contains an identifier.
-
-```typescript
-{
-  path: 'users/:id',
-  component: UserComponent
-}
-```
-
-URL:
-
-```text
-/users/101
-```
-
-Read it using `ActivatedRoute`:
-
-```typescript
-private route = inject(ActivatedRoute);
-
-userId = this.route.snapshot.paramMap.get('id');
-```
-
-Mental model:
-
-```text
-/users/:id
-     ↓
-/users/101
-     ↓
-id = 101
-```
-
----
-
-**`5. Query Parameters`**
-
-Useful for filters, sorting, pagination, etc.
-
-URL:
-
-```text
-/products?category=laptop&page=2
-```
-
-Navigate:
-
-```typescript
-this.router.navigate(
-  ['/products'],
-  {
-    queryParams: {
-      category: 'laptop',
-      page: 2
-    }
-  }
-);
-```
-
-Read:
-
-```typescript
-this.route.queryParams.subscribe(params => {
-  console.log(params['category']);
-});
-```
-
----
-
-**`6. Programmatic Navigation`**
-
-Instead of clicking a link:
-
-```typescript
-private router = inject(Router);
-
-openUser() {
-  this.router.navigate(['/users', 101]);
-}
-```
-
-Useful after:
-
-```text
-Login successful
-      ↓
-Navigate to dashboard
-```
-
-or:
-
-```text
-Form submitted
-      ↓
-Navigate to confirmation page
-```
-
----
-
-**`7. Nested Routes`
-
-You can have routes inside routes.
-
-```text
-/dashboard
-    ├── /overview
-    ├── /orders
-    └── /settings
-```
-
-Example:
-
-```typescript
-{
-  path: 'dashboard',
-  component: DashboardComponent,
-  children: [
-    {
-      path: 'orders',
-      component: OrdersComponent
-    },
-    {
-      path: 'settings',
-      component: SettingsComponent
-    }
-  ]
-}
-```
-
-The parent component needs its own:
-
-```html
-<router-outlet />
-```
-
-for the child route.
-
----
-
-**`8. Wildcard Route`**
-
-Handle unknown URLs:
-
-```typescript
-{
-  path: '**',
-  component: NotFoundComponent
-}
-```
-
-Example:
-
-```text
-/random-url
-     ↓
-NotFoundComponent
-```
-
-Usually keep it **last** because route matching order matters.
-
----
-
-**`9. Lazy Loading`**
-
-Instead of loading every component when the application starts:
-
-```typescript
-{
-  path: 'admin',
-  loadComponent: () =>
-    import('./admin/admin.component')
-      .then(m => m.AdminComponent)
-}
-```
-
-Angular loads the component when the route is needed.
-
-For larger features:
-
-```typescript
-{
-  path: 'admin',
-  loadChildren: () =>
-    import('./admin/admin.routes')
-      .then(m => m.ADMIN_ROUTES)
-}
-```
-
-This helps reduce the initial application bundle.
-
-----------------
-----------------
-
-## Angular Route Loading Strategies
-
-Angular has **2 main route loading strategies**:
-
-```text
-Route Loading
-├── Eager
-└── Lazy
-```
-
-The choice affects your **initial bundle size and application startup performance**. 
-
----
-
-**`1. Eager Loading`**
-
-If you directly reference a component in the route:
-
-```typescript
-import { HomeComponent } from './home.component';
-
-export const routes: Routes = [
-  {
-    path: '',
-    component: HomeComponent
-  }
-];
-```
-
-Angular includes that component in the initial JavaScript bundle. 
-
-```text
-Application starts
-      ↓
-Download JS
-      ↓
-HomeComponent already available
-```
-
-**Use when**
-
-Usually for your **main landing page** or small, frequently used pages.
-
----
-
-**`2. Lazy Loading`**
-
-Load the component **only when the user navigates to that route**.
-
-`loadComponent`
-
-```typescript
-export const routes: Routes = [
-  {
-    path: 'reports',
-    loadComponent: () =>
-      import('./reports/reports.component')
-  }
-];
-```
-
-Angular creates a separate JS chunk and downloads it when `/reports` becomes active. 
-
-```text
-Initial application
-      ↓
-Reports code NOT downloaded
-      ↓
-User opens /reports
-      ↓
-Download reports chunk
-      ↓
-Render ReportsComponent
-```
-
----
-
-3. `loadChildren`
-
-Used to lazy-load a **route tree/child routes**.
-
-```typescript
-export const routes: Routes = [
-  {
-    path: 'admin',
-    loadChildren: () =>
-      import('./admin/admin.routes')
-  }
-];
-```
-
-Good for large features:
-
-```text
-/admin
-   ├── users
-   ├── products
-   ├── reports
-   └── settings
-```
-
-The entire admin route configuration can be loaded only when needed. 
-
----
-
-**`loadComponent` vs `loadChildren`**
-
-|          | `loadComponent` | `loadChildren`       |
-| -------- | --------------- | -------------------- |
-| Loads    | One component   | Route tree           |
-| Good for | Individual page | Large feature/module |
-| Example  | `/login`        | `/admin/*`           |
-
-Mental model:
-
-```text
-One lazy page
-     ↓
-loadComponent()
-
-Entire feature with routes
-     ↓
-loadChildren()
-```
--------------
--------------
-

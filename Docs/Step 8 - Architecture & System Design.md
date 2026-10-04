@@ -1,4 +1,14 @@
-﻿## Layered Architecture
+﻿- Layered Architecture
+- Clean Architecture / Onion Architecture
+- Microservices
+- CQRS Pattern
+- Repository & Unit of Work Pattern
+- Domain-Driven Design (DDD)
+- Event-Driven Architecture & Messaging
+- Message Broker
+- API Gateway & BFF
+
+## Layered Architecture
 
 > Divide the application into separate layers, where each layer has a specific responsibility.
 
@@ -25,7 +35,7 @@ Typical structure:
             Database
 ```
 
-### Presentation Layer
+**`Presentation Layer`**
 
 This is the layer that interacts with the outside world.
 
@@ -84,7 +94,7 @@ public async Task<IActionResult> Create(Employee employee)
 
 Controllers become huge and difficult to maintain.
 
-### Business Layer
+**`Business Layer`**
 
 This contains the **application/business rules**.
 
@@ -126,7 +136,7 @@ var employee =
 
 The controller doesn't need to know how the business rule works.
 
-### Data Layer
+**`Data Layer`**
 
 This layer handles persistence.
 
@@ -157,11 +167,11 @@ public class EmployeeRepository : IEmployeeRepository
 
 The responsibility is:
 
-> **How do I store/retrieve data?**
+> How do I store/retrieve data?
 
 Not:
 
-> **What should the business do?**
+> What should the business do?
 
 
 ### Complete Request Flow
@@ -204,7 +214,7 @@ HTTP Response
 Client
 ```
 
-### Why Do We Use Layers?
+**Why Do We Use Layers?**
 
 **`1. Separation of concerns`**
 
@@ -306,17 +316,17 @@ without meaningful separation.
 
 You end up with:
 
-> **Layers for the sake of layers.**
+> Layers for the sake of layers.
 ----------------
 ----------------
 
 ## Clean Architecture / Onion Architecture
 
-> **Clean Architecture keeps business logic independent from frameworks, databases, UI, and external services.**
+> Clean Architecture keeps business logic independent from frameworks, databases, UI, and external services.
 
 The most important rule is:
 
-> **Dependencies point inward, toward the business/domain.**
+> Dependencies point inward, toward the business/domain.
 
 ### Why Do We Need Clean Architecture?
 
@@ -402,7 +412,7 @@ The **Domain is at the center**.
 Dependencies should point toward it.
 
 
-### The Four Main Parts
+**The Four Main Parts**
 
 A common Clean Architecture implementation has:
 
@@ -481,7 +491,7 @@ That's intentional.
 
 The Application layer contains:
 
-> **Use cases / application workflows.**
+> Use cases / application workflows.
 
 For example:
 
@@ -717,7 +727,7 @@ Database
 
 The focus is:
 
-> **Dependency direction and protecting the business core.**
+> Dependency direction and protecting the business core.
 
 ---
 
@@ -737,11 +747,13 @@ The focus is:
 ------------------
 ------------------
 
-## Microservices Basics
+## Microservices
 
 > Microservices architecture divides a large application into small, independently deployable services, where each service owns a specific business capability.
 
-> Microservices decompose an application around business capabilities into independently deployable services. Services communicate through synchronous protocols like REST/gRPC or asynchronous messaging, and each service ideally owns its data. The benefit is independent deployment and scaling, while the major trade-off is increased distributed-system complexity.
+- Microservices decompose an application around business capabilities into independently deployable services. 
+- Services communicate through synchronous protocols like REST/gRPC or asynchronous messaging, and each service ideally owns its data. 
+- The benefit is independent deployment and scaling, while the major trade-off is increased distributed-system complexity.
 
 For example, instead of one large e-commerce application:
 
@@ -799,15 +811,7 @@ Each service can potentially be:
 
 **What Makes Something a Microservice?**
 
-Don't define it simply as:
-
-> "A small API."
-
-That's incomplete.
-
-A better definition:
-
-> **A microservice is an independently deployable service focused on a specific business capability, with clear boundaries and usually independent ownership of its data.**
+> A microservice is an independently deployable service focused on a specific business capability, with clear boundaries and usually independent ownership of its data.
 
 For example:
 
@@ -1043,6 +1047,7 @@ Email Analytics Shipping Inventory
 
 Much more decoupled.
 
+----
 ### API Gateway
 
 This is another major interview topic.
@@ -1399,13 +1404,13 @@ Payment may happen twice ❌
 
 That's why:
 
-> **Idempotency**
+> Idempotency
 
 is extremely important in distributed systems.
 
-### What Is Idempotency?
+—> What Is Idempotency?
 
-An operation is idempotent if performing it multiple times has the same intended effect as performing it once.
+> An operation is idempotent if performing it multiple times has the same intended effect as performing it once.
 
 For example:
 
@@ -1560,7 +1565,7 @@ Absolutely not.
 
 This is one of the most important interview answers.
 
-> **"Microservices aren't automatically better than a monolith."**
+> Microservices aren't automatically better than a monolith.
 
 For a small application:
 
@@ -1583,7 +1588,7 @@ Different availability/scaling requirements
 Organizational ownership
 ```
 
-> "Design an e-commerce system using microservices."
+> Design an e-commerce system using microservices.
 
 A good high-level answer:
 
@@ -1668,13 +1673,14 @@ CQRS is a very common **architecture/system-design interview topic**.
 
 The easiest way to remember it:
 
-> **CQRS = Command Query Responsibility Segregation**
+> CQRS = Command Query Responsibility Segregation
 
 It means:
 
-> **Separate operations that change data from operations that only read data.**
-
-> **CQRS separates commands that modify state from queries that retrieve state. It allows the read and write sides to evolve and scale independently, and the read side can use optimized models when needed. CQRS doesn't inherently require separate databases, microservices, MediatR, or event sourcing. Its main trade-off is increased complexity, so I wouldn't use it for a simple CRUD application.**
+* Separate operations that change data from operations that only read data.
+* CQRS separates commands that modify state from queries that retrieve state. 
+* It allows the read and write sides to evolve and scale independently, and the read side can use optimized models when needed. 
+* CQRS doesn't inherently require separate databases, microservices, MediatR, or event sourcing. Its main trade-off is increased complexity, so I wouldn't use it for a simple CRUD application.
 
 **`First Understand Normal CRUD`**
 
@@ -1981,10 +1987,6 @@ This is a major point.
 
 ## Repository & Unit of Work Pattern
 
-This is an important .NET interview topic, especially because **EF Core already implements some Repository and Unit of Work concepts**.
-
-The first thing to understand:
-
 > Repository = abstraction around data access
 
 > Unit of Work = coordinate multiple changes and commit them as one unit
@@ -2129,7 +2131,7 @@ public class Repository<T> : IRepository<T>
 
 This is called a:
 
-> **Generic Repository**
+> Generic Repository
 
 ### Why Generic Repository Can Be Problematic
 
@@ -2167,11 +2169,6 @@ FindPaged()
 FindWithProjection()
 ...
 ```
-
-Congratulations:
-
-> **You have started rebuilding EF Core.** 😄
-
 ---
 
 ### Unit of Work
@@ -2240,7 +2237,7 @@ Commit
 
 That's why:
 
-> **You usually don't need to create a separate UnitOfWork wrapper around DbContext just for the sake of the pattern.**
+> You usually don't need to create a separate UnitOfWork wrapper around DbContext just for the sake of the pattern.
 
 **Example Without Custom Unit of Work***
 
@@ -2306,7 +2303,7 @@ You've created a wrapper around something EF Core already provides.
 
 So ask:
 
-> **What additional value does this abstraction provide?**
+> What additional value does this abstraction provide?
 
 ### Repository + Unit of Work Together
 
@@ -2377,11 +2374,9 @@ with no meaningful benefit.
 ---------------
 ---------------
 
-## Domain-Driven Design (DDD) Basics
+## Domain-Driven Design (DDD)
 
-DDD is less about a specific framework and more about:
-
-> **Designing software around the business domain and its rules.**
+> Designing software around the business domain and its rules.
 
 For interviews, focus on these concepts:
 
@@ -2461,7 +2456,7 @@ It's still the same employee.
 
 Therefore:
 
-> **Identity matters more than attributes.**
+> Identity matters more than attributes.
 
 ---
 
@@ -2497,9 +2492,8 @@ identifies it.
 
 ### Value Object
 
-A **Value Object** doesn't have its own meaningful identity.
-
-Its identity is based on its **value**.
+- A **Value Object** doesn't have its own meaningful identity.
+- Its identity is based on its **value**.
 
 Classic examples:
 
@@ -2572,7 +2566,7 @@ Value Object
 
 A Domain Event represents:
 
-> **Something important that happened in the domain.**
+> Something important that happened in the domain.
 
 Examples:
 
@@ -2701,10 +2695,6 @@ Domain Events:
 OrderConfirmed
 OrderCancelled
 ```
-
----
-
-
 --------------
 ------------
 ## Event-Driven Architecture & Messaging
@@ -2725,13 +2715,11 @@ Message Brokers
 
 The simplest definition:
 
-> **Event-Driven Architecture (EDA) is an architecture where components communicate by producing and consuming events representing things that have happened.**
+> Event-Driven Architecture (EDA) is an architecture where components communicate by producing and consuming events representing things that have happened.
 
 ### What Is an Event?
 
-An event represents:
-
-> **Something that already happened.**
+> Something that already happened.
 
 Examples:
 
@@ -2749,21 +2737,15 @@ Notice the naming:
 OrderCreated
 ```
 
-means:
-
-> "The order has been created."
+> The order has been created.
 
 It is not asking someone to do something.
 
 ### Event vs Command
 
-This is a very common interview question.
+**`Command`**
 
-*`Command`*
-
-A command says:
-
-> **"Please do this."**
+> Please do this
 
 Examples:
 
@@ -2776,11 +2758,9 @@ SendEmail
 
 It represents an instruction.
 
-*`Event`*
+**`Event`**
 
-An event says:
-
-> **"This already happened."**
+> This already happened.
 
 Examples:
 
@@ -2845,7 +2825,7 @@ That's:
 
 Two important terms.
 
-#### Publisher / Producer
+**`Publisher / Producer`**
 
 Creates/publishes the event.
 
@@ -2855,7 +2835,7 @@ Order Service
 OrderCreated
 ```
 
-#### Consumer / Subscriber
+**`Consumer / Subscriber`**
 
 Consumes the event.
 
@@ -3087,7 +3067,7 @@ Exactly-once
 
 *`At-Most-Once`*
 
-> **Message is delivered zero or one time.**
+> Message is delivered zero or one time.
 
 Potentially:
 
@@ -3115,7 +3095,7 @@ Messages can be lost
 
 *`At-Least-Once`*
 
-> **The system attempts to ensure the message is processed at least once, so duplicates are possible.**
+> The system attempts to ensure the message is processed at least once, so duplicates are possible.
 
 Example:
 
@@ -3141,17 +3121,17 @@ Message processed twice
 
 This is why consumers should often be:
 
-> **Idempotent**
+> Idempotent
 
-*`Exactly-Once`*
+`Exactly-Once`
 
-> "The message will be processed exactly once."
+> The message will be processed exactly once.
 
 But distributed systems make this difficult.
 
 You should be careful saying:
 
-> "Kafka/RabbitMQ guarantees exactly once end-to-end."
+> Kafka/RabbitMQ guarantees exactly once end-to-end.
 
 That's generally too simplistic.
 
@@ -3173,7 +3153,7 @@ A failure can occur between any of them.
 
 A better interview answer:
 
-> **"Exactly-once processing semantics are difficult to guarantee end-to-end in distributed systems. Systems may provide exactly-once guarantees within specific boundaries, but application-level idempotency is still important."**
+> Exactly-once processing semantics are difficult to guarantee end-to-end in distributed systems. Systems may provide exactly-once guarantees within specific boundaries, but application-level idempotency is still important.
 
 -----------
 
@@ -3197,7 +3177,7 @@ Attempt 3 → success
 
 A common strategy is:
 
-> **Exponential backoff**
+> Exponential backoff
 
 Example:
 
@@ -3223,7 +3203,7 @@ This reduces pressure on an already struggling dependency.
 
 ### Event-Driven vs Synchronous Architecture
 
-*`Synchronous`*
+**`Synchronous`**
 
 ```text
 A
@@ -3237,7 +3217,7 @@ Response
 
 A waits for B.
 
-*`Asynchronous`*
+**`Asynchronous`**
 
 ```text
 A
@@ -3255,7 +3235,7 @@ A doesn't need to wait for B to finish.
 
 ### When Should You Use Messaging?
 
-*`Background processing`*
+**`Background processing`**
 
 ```text
 API
@@ -3265,7 +3245,7 @@ Queue
 Worker
 ```
 
-*`Notifications`*
+**`Notifications`**
 
 ```text
 OrderCreated
@@ -3275,7 +3255,7 @@ SMS
 Push
 ```
 
-*`Integration between services`*
+**`Integration between services`**
 
 ```text
 Service A
@@ -3285,7 +3265,7 @@ Event
 Service B
 ```
 
-*`High-volume workloads`*
+**`High-volume workloads`**
 
 ```text
 10000 requests
@@ -3295,7 +3275,7 @@ Queue
 Workers process at controlled rate
 ```
 
-*`Decoupling`*
+**`Decoupling`**
 
 When producers and consumers should evolve independently.
 
@@ -3303,8 +3283,7 @@ When producers and consumers should evolve independently.
 
 ### RabbitMQ vs Kafka
 
-
-#### RabbitMQ
+`RabbitMQ`
 
 Strong fit for:
 
@@ -3316,7 +3295,7 @@ Commands/tasks
 Traditional broker patterns
 ```
 
-#### Kafka
+`Kafka`
 
 Strong fit for:
 
@@ -3537,10 +3516,7 @@ which we'll cover separately.
 
 ## API Gateway & BFF
 
-
-> **API Gateway = a single entry point between clients and backend services.**
-
----
+> API Gateway = a single entry point between clients and backend services.
 
 ### Without API Gateway
 
@@ -3607,7 +3583,7 @@ The gateway knows where backend services are.
 
 Think of the Gateway as:
 
-> **The front door to your backend.**
+> The front door to your backend.
 
 Common responsibilities:
 
@@ -3679,10 +3655,9 @@ Client complexity
 
 This is a common interview question.
 
-#### API Gateway
+`API Gateway`
 
-
-> **Generic entry point for multiple clients/services.**
+> Generic entry point for multiple clients/services
 
 Example:
 
@@ -3701,11 +3676,9 @@ Rate limiting
 Cross-cutting concerns
 ```
 
-#### BFF
+`BFF`
 
-Usually:
-
-> **Client-specific backend layer.**
+> Client-specific backend layer
 
 Example:
 

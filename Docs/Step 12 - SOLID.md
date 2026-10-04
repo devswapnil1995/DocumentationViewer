@@ -1,4 +1,9 @@
-﻿> SOLID = 5 principles that help us write maintainable, flexible, testable, and loosely coupled code.
+﻿- SOLID
+
+
+## SOLID
+
+> SOLID = 5 principles that help us write maintainable, flexible, testable, and loosely coupled code.
 
 > Keep classes focused (S), extend instead of modifying (O), ensure implementations can safely replace abstractions (L), keep interfaces small (I), and depend on abstractions rather than concrete implementations (D).
 

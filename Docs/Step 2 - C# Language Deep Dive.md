@@ -2,7 +2,7 @@
 - Nullable Reference Types
 - Records (`record` vs `class` vs `struct`)
 - Pattern Matching (switch expressions, `is`, `when`)
-- Generics and Constraints
+- Generics Constraints
 - Delegates, Events, Func/Action/Predicate
 - Extension Methods
 - `Span<T>`, `Memory<T>` (performance-focused topics)
@@ -21,6 +21,8 @@ The easiest interview mental model is:
 **`out` = write only / must be assigned**
 
 **`in` = read only** 
+
+> `ref` is for an existing value that the method needs to read and modify. `out` is for a value that the method is responsible for producing, commonly used in Try-pattern APIs such as `TryParse`. `in` is for read-only reference access, mainly when working with larger value types where avoiding a copy is beneficial. In normal cases, I prefer regular parameters and return values because they're simpler and clearer.
 
 **ref:**
 
@@ -63,8 +65,6 @@ The easiest interview mental model is:
            ref                   out                  in
 ```
 
-> `ref` is for an existing value that the method needs to read and modify. `out` is for a value that the method is responsible for producing, commonly used in Try-pattern APIs such as `TryParse`. `in` is for read-only reference access, mainly when working with larger value types where avoiding a copy is beneficial. In normal cases, I prefer regular parameters and return values because they're simpler and clearer.
-
 [Take me to github for Ref-Out-In Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/RefOutInExample.cs)
 
 ----------------------------------
@@ -84,6 +84,9 @@ The easiest interview mental model is:
 
 ## record vs class vs struct
 
+> A class is a reference type generally used when object identity matters. A record is also a reference type but provides value-based equality and is convenient for immutable data models and DTOs. A struct is a value type and is suitable for small value-like objects. A record struct combines value-type semantics with record features such as concise declarations, value equality, and with expressions.
+
+
 ```text
                      C# Types
                         │
@@ -98,34 +101,24 @@ The easiest interview mental model is:
           record struct
 ```
 
-**`class`**
+```
+class
+→ Reference type
+→ Identity/object oriented
 
-- Classes are the foundational building blocks of Object-Oriented Programming (OOP) in C#. They track identity and maintain an evolving state over time.
-- **Memory**: Allocated on the managed heap. Variables store a pointer to the memory location.
-- **Equality**: Two variables are only equal if they point to the exact same object in memory, even if their internal data matches perfectly.
-- **Best Used For**: Complex business logic, entities with state that changes frequently (e.g., a `BankAccount` with `Deposit()` methods), and architectures relying heavily on inheritance.
+record
+→ Reference type
+→ Data + value equality
 
-**`struct`**
+struct
+→ Value type
+→ Small values
 
-- Structs are lightweight data containers designed to minimize memory overhead for short-lived data.
-- **Memory**: Allocated on the stack or inline inside containing types.
-- **Performance Trap**: Traditional structs use reflection to determine value equality, making operations like `Equals()` notably slow.
-- **Best Used For**: Small, lightweight, primitive-like data structures with minimal to no behavior (e.g., a 2D `Point(x, y)`, `Color(r, g, b)`, or vectors).
+record struct
+→ Value type
+→ Small values + record features
+```
 
-**`record` or `record class`**
-
-- Introduced in C# 9, records are specialized classes designed to act as transparent, immutable data containers.
-- Reference Type
-- **Value Semantics**: They are reference types but behave like value types when compared. If two separate record instances hold identical properties, they are considered equal.
-- **Nondestructive Mutation**: Because they are immutable by default, you modify them using the `with` keyword, which safely clones the record with specified modifications.
-- **Best Used For**: Data Transfer Objects (DTOs), API request/response payloads, and configuration settings where data remains constant.
-
-**`record struct`**
-
-- Introduced in C# 10, these combine the stack allocation benefits of a struct with the compiler-generated enhancements of a record.
-- Value Type
-- **Optimization**: Unlike traditional structs, `record struct` generates strongly typed equality operators at compile-time, completely bypassing slow reflection.
-- **Best Used For**: Scenarios where you need maximum performance, zero heap allocations, and fast value-based equality checking.
 
 | Feature | `class` | `record class` | `struct` | `record struct` |
 | --- | --- | --- | --- | --- |
@@ -256,8 +249,11 @@ Console.WriteLine($"{name}, {age}, {email}");
 ------------
 ------------
 
-## Switch Expression
+## Pattern matching (switch expressions, `is`, `when`)
 
+> Pattern matching in C# allows us to test an object's type, value, or properties and optionally extract values. `is` is commonly used to match a pattern in an expression, while `when` adds an additional condition to a switch pattern.
+
+**`switch expressions`**
 - Switch expression in c# introduced after .NET 10
 - They are a more concise, readable and expressive way to handle multiple conditional branches compared to the traditional switch statement.
 - Switch expressions can return values directly, making them suitable for assignments, return statements or inline logic.
@@ -272,6 +268,48 @@ It differs from the traditional switch statement in the following ways:
 - When you need a concise value-based mapping from an input.
 - When using pattern matching for cleaner and more readable code.
 - When you want to avoid fall-through bugs common in switch statements.
+
+```
+Suppose you have:
+
+object value = 100;
+
+Old approach:
+
+if (value is int)
+{
+    int number = (int)value;
+
+    if (number > 50)
+    {
+        Console.WriteLine("Greater than 50");
+    }
+}
+
+Pattern matching:
+
+if (value is int number && number > 50)
+{
+    Console.WriteLine("Greater than 50");
+}
+
+Or using switch + when:
+
+switch (value)
+{
+    case int number when number > 50:
+        Console.WriteLine("Greater than 50");
+        break;
+
+    case int number:
+        Console.WriteLine("50 or less");
+        break;
+
+    default:
+        Console.WriteLine("Not an integer");
+        break;
+}
+```
 
 [Take me to github for Switch Expression Example](https://github.com/devswapnil1995/TopicDemoApp/blob/main/Modules/SwitchExpressionExample.cs)
 
@@ -898,7 +936,7 @@ public static class ClassName {
 }
 ```
 
-### Key Points
+***Key Points***
 
 - Must be defined in a static class.
 - Must be declared as a static method.
@@ -918,13 +956,13 @@ The method evaluates whether the student has passed or failed, without modifying
 In this example, we extend an interface ILogger. 
 By defining the LogError extension method, every class implementing ILogger automatically gains this additional functionality without needing to redefine it.
 
-### Benefits
+***Benefits***
 - Add functionality without modifying original code.
 - Can extend sealed classes (e.g., string, DateTime).
 - Keep code clean and readable.
 - Useful in scenarios like LINQ queries and utility functions.
 
-### Limitations
+***Limitations***
 - Cannot override existing methods.
 - Can lead to confusion if overused, especially with similar method names.
 - Extension methods are static methods defined inside a static class, with the first parameter marked using the this keyword.
@@ -957,6 +995,11 @@ Memory<int> memory = new Memory<int>(new int[] { 1, 2, 3 });
 - Span<T> and Memory<T> are both zero/low-allocation ways to work with contiguous memory in .NET
 - They are especially useful when performance matters—parsing, serialization, networking, file processing, etc.
 
+
+> `Span<T>` = synchronous/high-performance view
+
+> `Memory<T>` = heap-friendly view that can survive asynchronous operations
+
 ###### contiguous
 - Data is stored next to each other in memory, without gaps.
 - Suppose an int takes 4 bytes.
@@ -979,7 +1022,7 @@ The elements are next to each other: That's contiguous memory.
 └──────┴──────┴──────┴──────┘
  1000   1004   1008   1012
  ```
-### The problem with normal arrays
+***The problem with normal arrays***
 
 Suppose you have:
 
@@ -1010,9 +1053,9 @@ Now `part1` and `part2` are just **views over the original array**.
 No new byte array is created.
 
 
-### What exactly is `Span<T>`?
+***What exactly is `Span<T>`?***
 
-> `Span<T>` is a window/view over a continuous region of memory.
+`Span<T>` is a window/view over a continuous region of memory.
 
 For example:
 
@@ -1052,51 +1095,24 @@ numbers
 ```
 
 
-### Then what is `Memory<T>`?
+**what is `Memory<T>`?**
 
-This is where `Memory<T>` becomes useful.
-
-Think:
-
-> `Span<T>` = synchronous/high-performance view
-
-> `Memory<T>` = heap-friendly view that can survive asynchronous operations
-
-Example:
+Imagine a network operation.
 
 ```csharp
-Memory<byte> memory = new byte[1000];
+Memory<byte> buffer = new byte[4096];
+await stream.ReadAsync(buffer);
 ```
 
-You can store it in a class:
+After the async operation:
 
 ```csharp
-class BufferManager
-{
-    private Memory<byte> buffer;
-
-    public BufferManager()
-    {
-        buffer = new byte[1000];
-    }
-}
+Span<byte> data = buffer.Span;
+Process(data);
 ```
 
-And you can use it with async code:
 
-```csharp
-async Task ProcessAsync(Memory<byte> memory)
-{
-    await SomeAsyncOperation();
-    Span<byte> span = memory.Span;
-    // Process span
-}
-```
-
-This is one of the biggest differences to remember.
-
-
-### `Span<T>` vs `Memory<T>`
+***`Span<T>` vs `Memory<T>`***
 
 |                         | `Span<T>`            | `Memory<T>`          |
 | ----------------------- | -------------------- | -------------------- |
@@ -1128,7 +1144,7 @@ Memory<byte> memory = new byte[1000];
 Span<byte> span = memory.Span;
 ```
 
-### `ReadOnlySpan<T>`
+**`ReadOnlySpan<T>`**
 
 Use it when you want to read memory but **not modify it**.
 
@@ -1156,7 +1172,7 @@ You are telling the caller:
 
 > "Give me access to this memory, but I promise not to modify it."
 
-#### A very important performance example
+***A very important performance example***
 
 Consider:
 
@@ -1207,22 +1223,6 @@ This is why spans are popular in:
 * database drivers
 * high-performance libraries
 
-### Where `Memory<T>` shines
-
-Imagine a network operation.
-
-```csharp
-Memory<byte> buffer = new byte[4096];
-await stream.ReadAsync(buffer);
-```
-
-After the async operation:
-
-```csharp
-Span<byte> data = buffer.Span;
-Process(data);
-```
-
 This gives you a nice pattern:
 
 ```text
@@ -1264,10 +1264,7 @@ var result = input.AsSpan(10, 20);
 
 The second avoids creating a new string. But if your application doesn't have allocation/copying as a bottleneck, using spans everywhere can make the code unnecessarily complicated.
 
-#### The easiest rule to remember
-
-Think of these four types like this:
-
+**The easiest rule to remember**
 ```text
 T[]
  │
@@ -1308,8 +1305,9 @@ Async processing
 - Unlike standard set accessors, an init accessor restricts assignments to object initializers or constructors. 
 - This enforces immutability without using read-only fields.
 - These are features for controlling how objects are initialized, especially useful when you want objects to be immutable or require certain values when created.
+- You can set this property only while creating the object.
 
-### `init`-only properties
+***`init`-only properties***
 
 Normally, a property with `set` can be changed anytime:
 
@@ -1338,36 +1336,13 @@ public class Employee
 {
     public string Name { get; init; }
 }
-```
 
-Now:
-
-```csharp
 var employee = new Employee
 {
     Name = "Swapnil"
 };
-```
 
-is allowed.
-
-But:
-
-```csharp
 employee.Name = "Rahul"; // ❌ Compilation error
-```
-
-**Think of `init` as:**
-
-> You can set this property only while creating the object.
-
-```text
-new Employee
-{
-    Name = "Swapnil"   ← ✅
-}
-
-employee.Name = ...   ← ❌
 ```
 
 **`required` does NOT mean `init`**
@@ -1397,7 +1372,7 @@ employee.Name = "Rahul"; // ✅
 
 Because it has `set`.
 
-### Compare all combinations
+**Compare all combinations**
 
 | Declaration                           | Must provide? | Can change later? |
 | ------------------------------------- | ------------: | ----------------: |
@@ -1407,6 +1382,8 @@ Because it has `set`.
 | `required string Name { get; init; }` |             ✅ |                 ❌ |
 
 This table is worth remembering for interviews.
+
+> get and set are about encapsulation and control — they let you manage how data is accessed and modified, instead of exposing fields directly.
 
 ---------------------------
 ---------------------------

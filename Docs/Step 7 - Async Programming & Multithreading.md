@@ -4,12 +4,17 @@
 - Deadlocks in async code
 - CancellationToken
 - Parallel.For, Parallel.ForEach
-- lock, Monitor, Mutex, Semaphore, SemaphoreSlim
-- ConcurrentDictionary and other thread-safe collections
-- Channels (System.Threading.Channels)
+- Thread Synchronization - lock, Monitor, Mutex, Semaphore, SemaphoreSlim
 
+-----
 
 ## async/await internals (Task, ValueTask)
+
+- `async/await` provides a non-blocking programming model, especially for I/O-bound operations. 
+- It doesn't inherently create a new thread; the compiler uses a state machine to suspend and later resume the method around incomplete awaits.
+- It free up threads to handle other work while waiting for I/O operations to complete, improving scalability and responsiveness in applications.
+- Never use async void - it used for event handlers only. Always prefer async Task or async Task<T> for asynchronous methods. 
+- Exceptions in async void methods cannot be awaited and will crash the application if unhandled.
 
 **Why do we need `async` / `await`?**
 
@@ -64,9 +69,7 @@ public async Task<int> GetData()
 
 It does **not** mean:
 
-> "Run this method on another thread."
-
-🚨 This is a very important interview point.
+> Run this method on another thread.
 
 **Wrong understanding**
 
@@ -173,7 +176,7 @@ Task<int>
 
 means:
 
-> "An asynchronous operation that will eventually produce an `int`."
+> An asynchronous operation that will eventually produce an `int`.
 
 Example:
 
@@ -279,8 +282,6 @@ These are **not the same thing**.
 
 **`Async`**
 
-Usually about:
-
 > Not blocking while waiting for an asynchronous operation.
 
 Example:
@@ -290,8 +291,6 @@ var employee = await GetEmployeeAsync();
 ```
 
 **Parallelism**
-
-About:
 
 > Doing multiple pieces of work at the same time.
 
@@ -474,7 +473,7 @@ Database
 
 This is often called:
 
-> **Async all the way.**
+> Async all the way.
 -----------
 
 **What is `ValueTask`?**
@@ -592,12 +591,6 @@ The exact benefit depends on the workload.
 
 7. Async and parallelism are different concepts
 ```
-
-> `async/await` provides a non-blocking programming model, especially for I/O-bound operations. It doesn't inherently create a new thread; the compiler uses a state machine to suspend and later resume the method around incomplete awaits.
-
-> It free up threads to handle other work while waiting for I/O operations to complete, improving scalability and responsiveness in applications.
-
-> Never use async void - it used for event handlers only. Always prefer async Task or async Task<T> for asynchronous methods. Exceptions in async void methods cannot be awaited and will crash the application if unhandled.
 
 --------------------
 --------------------
@@ -823,12 +816,11 @@ For normal application development:
 
 The simplest explanation:
 
-> `ConfigureAwait(false)` tells the awaiter: "After this await completes, I don't need to resume on the captured synchronization context.
+> `ConfigureAwait(false)` tells the awaiter: After this await completes, I don't need to resume on the captured synchronization context.
 
 But there's an important modern .NET/ASP.NET Core nuance:
 
 > In ASP.NET Core, there is normally no custom `SynchronizationContext`, so `ConfigureAwait(false)` is usually not necessary for application code.
-
 
 **What is a SynchronizationContext?**
 
@@ -1209,9 +1201,7 @@ public async Task<PaymentResult> ProcessAsync()
 }
 ```
 
-This communicates:
-
-> "The continuation doesn't depend on the caller's context."
+> The continuation doesn't depend on the caller's context.
 
 **What Does "Continuation" Mean?**
 
@@ -1265,7 +1255,7 @@ It mainly avoids synchronization-context capture.
 
 Any performance benefit is generally from reducing unnecessary context-related overhead, not from making the database/network operation itself faster.
 
-**Does `ConfigureAwait(false)` Mean "Run on ThreadPool"?**
+—> Does `ConfigureAwait(false)` Mean Run on ThreadPool
 
 Not exactly.
 
@@ -1715,7 +1705,7 @@ The **controller** of cancellation.
 
 The **signal** that tells an operation:
 
-> "Cancellation has been requested."
+> Cancellation has been requested.
 
 
 **Basic Example**
@@ -1767,7 +1757,7 @@ doesn't automatically kill your method.
 
 It simply says:
 
-> "Please cancel."
+> Please cancel.
 
 The operation must cooperate.
 
@@ -2441,7 +2431,7 @@ Actual:
 
 That's a:
 
-> **Race condition**
+> Race condition
 
 Why Does This Happen?
 
@@ -2619,7 +2609,7 @@ else
 }
 ```
 
-> "`lock` is a convenient C# syntax around Monitor. Monitor provides additional capabilities such as TryEnter and explicit control over entering and exiting the critical section."
+> `lock` is a convenient C# syntax around Monitor. Monitor provides additional capabilities such as TryEnter and explicit control over entering and exiting the critical section.
 
 **`lock` vs `Monitor`**
 
@@ -2683,7 +2673,7 @@ Whereas `lock` is generally used for synchronization within a process.
 
 So if you simply need:
 
-> "Only one thread in my application can access this."
+> Only one thread in my application can access this.
 
 Use:
 
@@ -2693,7 +2683,7 @@ lock
 
 If you need:
 
-> "Only one process/application instance can access this resource."
+> Only one process/application instance can access this resource.
 
 A named `Mutex` may be appropriate.
 
@@ -2704,7 +2694,7 @@ A named `Mutex` may be appropriate.
 
 Suppose you want:
 
-> **Maximum 3 operations at the same time.**
+> Maximum 3 operations at the same time.
 
 ```csharp
 private readonly SemaphoreSlim _semaphore = new(3, 3);
@@ -3092,9 +3082,9 @@ Best practice:
 
 **`lock` vs `SemaphoreSlim` — Interview Question**
 
-> "I need to protect an async method. Should I use lock?"
+> I need to protect an async method. Should I use lock?
 
-> "A normal `lock` can't be held across an `await`. For asynchronous mutual exclusion, I'd typically use `SemaphoreSlim` and `WaitAsync()`."
+> A normal `lock` can't be held across an `await`. For asynchronous mutual exclusion, I'd typically use `SemaphoreSlim` and `WaitAsync()`.
 
 Example:
 
@@ -3113,34 +3103,33 @@ finally
 
 **Interview Questions**
 
-Q1. What is a race condition?
+—> What is a race condition?
 
 > "A race condition occurs when multiple threads access shared mutable state concurrently and the result depends on the timing or ordering of their execution."
 
-Q2. What is `lock`?
+—> What is `lock`?
 
 > `lock` provides mutual exclusion, ensuring that only one thread at a time can execute a protected critical section for a particular lock object.
 
-Q3. `lock` vs `Monitor`?
+—> `lock` vs `Monitor`?
 
 > `lock` is syntactic sugar around Monitor's enter/exit behavior. Monitor provides additional functionality such as TryEnter.
 
-Q4. `lock` vs `Mutex`?
+—> `lock` vs `Mutex`?
 
 > `lock` is generally used for synchronization within a process, while Mutex can also provide cross-process synchronization. Mutex has more overhead.
 
-Q5. When would you use `SemaphoreSlim`?
+—> When would you use `SemaphoreSlim`?
 
 > I'd use SemaphoreSlim when I need asynchronous synchronization or need to limit concurrency, such as allowing only 10 concurrent API calls. `WaitAsync()` allows callers to wait without synchronously blocking a thread.
 
-Q6. When would you use `Interlocked`?
+—> When would you use `Interlocked`?
 
 > For simple atomic operations such as incrementing, decrementing, exchanging, or compare-and-swap on shared values. It's preferable to a lock when the operation is simple enough.
 
-Q7. What are Concurrent Collections?
+—> What are Concurrent Collections?
 
 > They are thread-safe collection implementations such as ConcurrentDictionary and ConcurrentQueue that support concurrent access without requiring the caller to manually synchronize every collection operation.
-
 
 
 ```text
